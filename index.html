@@ -1,0 +1,930 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Soul Catcher</title>
+  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      margin: 0; min-height: 100vh; display: flex; flex-direction: column;
+      align-items: center; justify-content: center; gap: 8px;
+      background: #000;
+      background-image: radial-gradient(ellipse at 50% 0%, #2a1040 0%, transparent 55%),
+        radial-gradient(ellipse at 80% 100%, #401020 0%, transparent 45%);
+      font-family: system-ui, sans-serif; color: #fff; user-select: none;
+    }
+    body.pre-game .page-ui { visibility: hidden; }
+    .page-ui { width: min(480px, 96vw); }
+    .hud {
+      display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center;
+      gap: 8px 12px; padding: 8px 12px; background: #000; border: 4px solid #fff;
+      box-shadow: inset 0 0 0 2px #000, 0 0 20px #ff004466;
+      font-family: 'Press Start 2P', monospace; font-size: 0.42rem; line-height: 1.6;
+    }
+    .hud strong { color: #ff0044; }
+    #hearts { display: flex; gap: 3px; font-size: 0.85rem; }
+    #hearts .heart { color: #ff0044; filter: drop-shadow(0 0 4px #ff0044); }
+    #hearts .heart.broken { color: #333; filter: none; opacity: 0.4; }
+    #game-wrap {
+      position: relative; width: min(480px, 96vw);
+      border: 4px solid #fff;
+      box-shadow: 0 0 0 2px #000, 0 0 30px #7b2ff566, 0 0 60px #ff004433;
+      overflow: hidden;
+    }
+    #game-wrap::after {
+      content: ''; position: absolute; inset: 0; pointer-events: none; z-index: 6;
+      background: repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0,0,0,0.08) 2px, rgba(0,0,0,0.08) 4px);
+    }
+    canvas { display: block; width: 100%; height: auto; cursor: none; background: #050508; }
+    .undertale-font {
+      font-family: 'Press Start 2P', monospace; color: #fff;
+      text-shadow: 2px 2px 0 #000, -1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000;
+    }
+    .battle-box {
+      background: #000; border: 4px solid #fff;
+      box-shadow: inset 0 0 0 2px #000, 0 0 16px #ffffff22;
+      padding: 14px 16px; text-align: center; width: 100%; max-width: 420px;
+    }
+    .screen {
+      position: absolute; inset: 0; z-index: 8;
+      display: flex; align-items: center; justify-content: center;
+      padding: 16px; background: rgba(0,0,0,0.9);
+    }
+    .screen.hidden { display: none; }
+    .box h2, .battle-box h2 { margin: 0 0 10px; font-family: 'Press Start 2P', monospace; font-size: 0.52rem; line-height: 1.8; }
+    .box p, .battle-box p { margin: 0 0 10px; font-family: 'Press Start 2P', monospace; font-size: 0.38rem; line-height: 1.9; color: #ccc; }
+    .box input, .battle-box input {
+      width: 100%; margin: 8px 0 10px; padding: 10px; background: #111; border: 3px solid #fff;
+      color: #fff; font-family: 'Press Start 2P', monospace; font-size: 0.42rem; text-align: center;
+    }
+    .avatars { display: flex; justify-content: center; gap: 8px; margin: 10px 0; flex-wrap: wrap; }
+    .avatar-btn {
+      width: 64px; height: 72px; border: 3px solid #555; background: #111; cursor: pointer; padding: 4px;
+      display: flex; flex-direction: column; align-items: center; gap: 2px;
+    }
+    .avatar-btn.selected { border-color: #ff0044; box-shadow: 0 0 14px #ff004488; }
+    .avatar-btn canvas { width: 48px; height: 48px; image-rendering: pixelated; }
+    .avatar-btn span { font-family: 'Press Start 2P', monospace; font-size: 0.28rem; color: #888; }
+    .avatar-btn.selected span { color: #fc6; }
+    .btn {
+      font-family: 'Press Start 2P', monospace; font-size: 0.42rem;
+      border: 3px solid #fff; background: #ff0044; color: #fff;
+      padding: 10px 14px; cursor: pointer; margin-top: 8px; box-shadow: 4px 4px 0 #000;
+    }
+    .btn:active { transform: translate(2px,2px); box-shadow: 2px 2px 0 #000; }
+    #dialogue-box {
+      position: absolute; bottom: 14px; left: 10px; right: 10px; z-index: 9;
+      background: #000; border: 4px solid #fff; padding: 10px 12px;
+      font-family: 'Press Start 2P', monospace; font-size: 0.36rem; line-height: 1.9;
+      box-shadow: 0 0 16px #7b2ff544; display: none;
+    }
+    #dialogue-box.visible { display: block; }
+    #dialogue-box .prompt { color: #fc6; margin-top: 6px; font-size: 0.3rem; animation: blink 1s step-end infinite; }
+    #title-card {
+      position: absolute; inset: 0; z-index: 10; display: none;
+      flex-direction: column; align-items: center; justify-content: center;
+      background: rgba(0,0,0,0.75); cursor: pointer;
+    }
+    #title-card.visible { display: flex; }
+    #title-card .title-box { animation: box-pulse 2s ease-in-out infinite; }
+    @keyframes box-pulse { 50% { box-shadow: inset 0 0 0 2px #000, 0 0 24px #ff004488; } }
+    #title-card h1 {
+      font-family: 'Press Start 2P', monospace; font-size: clamp(0.65rem, 2.8vw, 0.85rem);
+      line-height: 1.8; margin: 0 0 8px; animation: title-pop 0.8s ease both;
+    }
+    #title-card .sub { font-family: 'Press Start 2P', monospace; font-size: 0.34rem; color: #fc6; margin: 4px 0; }
+    .title-bar {
+      height: 4px; margin-top: 10px;
+      background: linear-gradient(90deg, #ff0044, #7b2ff5, #ffcc00, #ff0044);
+      background-size: 200% 100%; animation: bar-slide 2s linear infinite;
+    }
+    @keyframes bar-slide { to { background-position: 200% 0; } }
+    @keyframes title-pop { from { opacity:0; transform: scale(0.9); } to { opacity:1; transform: scale(1); } }
+    @keyframes blink { 50% { opacity: 0; } }
+    #overlay { position: absolute; inset: 0; z-index: 2; display: flex; align-items: center; justify-content: center; padding: 16px; background: rgba(0,0,0,0.85); }
+    #overlay.hidden { display: none; }
+    #status { min-height: 1.2em; font-family: 'Press Start 2P', monospace; font-size: 0.38rem; color: #fc6; text-align: center; }
+    .hint { font-family: 'Press Start 2P', monospace; font-size: 0.32rem; color: #555; text-align: center; line-height: 1.8; }
+  </style>
+</head>
+<body class="pre-game">
+  <div class="page-ui">
+    <div class="hud">
+      <span id="hearts"></span>
+      <span>ISLE <strong id="level">1</strong>/12</span>
+      <span>SC <strong id="score">0</strong></span>
+      <span>GO <strong id="goal">3</strong></span>
+      <span id="player-tag"></span>
+    </div>
+  </div>
+
+  <div id="game-wrap">
+    <canvas id="game" width="480" height="640"></canvas>
+
+    <div id="create-screen" class="screen">
+      <div class="battle-box">
+        <h2 class="undertale-font">Who seeks the souls?</h2>
+        <input id="name-input" type="text" maxlength="12" placeholder="Name" value="Traveler">
+        <p>Choose your avatar</p>
+        <div class="avatars" id="avatar-list"></div>
+        <button class="btn" id="create-btn">Begin Journey</button>
+      </div>
+    </div>
+
+    <div id="dialogue-box" class="undertale-font"><span id="dialogue-text"></span><div class="prompt">▼ click to continue</div></div>
+
+    <div id="title-card">
+      <div class="battle-box title-box">
+        <div style="font-size:1.4rem;margin-bottom:6px">♥</div>
+        <h1 class="undertale-font">SOUL<br>CATCHER</h1>
+        <p class="sub">made by kevin raphael</p>
+        <p class="sub">enjoy</p>
+        <div class="title-bar"></div>
+      </div>
+    </div>
+
+    <div id="overlay" class="hidden">
+      <div class="battle-box">
+        <h2 class="undertale-font" id="overlay-title">Soul Catcher</h2>
+        <p class="undertale-font" id="overlay-text"></p>
+        <button class="btn" id="start-btn">Set Sail</button>
+      </div>
+    </div>
+
+    <div id="ending-screen" class="screen hidden">
+      <div class="battle-box">
+        <h2 class="undertale-font">Victory!</h2>
+        <p class="undertale-font" id="ending-text"></p>
+        <button class="btn" id="ending-btn">Play Again</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="page-ui"><div id="status"></div><p class="hint">MOUSE / WASD · Soul Catcher</p></div>
+
+  <script>
+    const canvas = document.getElementById('game');
+    const ctx = canvas.getContext('2d');
+    const W = 480, H = 640;
+    const MAX_HEARTS = 6, MIN_SPEED = 4.5, MIN_VY = 2.8, SUBSTEPS = 8;
+
+    const AVATARS = [
+      { id: 0, name: 'Knight', skin: '#f5c99a', hair: '#553311', main: '#4488dd', dark: '#224488', accent: '#ccaa44' },
+      { id: 1, name: 'Mage', skin: '#e8b888', hair: '#221133', main: '#8833cc', dark: '#441166', accent: '#ffcc00' },
+      { id: 2, name: 'Ranger', skin: '#c89870', hair: '#332211', main: '#338844', dark: '#1a4422', accent: '#886633' },
+      { id: 3, name: 'Spirit', skin: '#aaddff', hair: '#6688aa', main: '#88ccff', dark: '#4488aa', accent: '#ffffff' },
+    ];
+
+    const ISLANDS = [
+      { name: 'Dawn Isle', target: 3, ballSpeed: 4, maxSpeed: 9, paddleW: 120, sand: '#e8c878', grass: '#5a9a44', water: '#1a5080', blocks: [] },
+      { name: 'Mist Rock', target: 3, ballSpeed: 4.1, maxSpeed: 9.2, paddleW: 115, sand: '#c8a868', grass: '#4a8844', water: '#184870', blocks: [{ x: 175, y: 200, w: 130, h: 18 }] },
+      { name: 'Twin Shoals', target: 4, ballSpeed: 4.2, maxSpeed: 9.4, paddleW: 112, sand: '#d8b878', grass: '#509040', water: '#1a5588', blocks: [{ x: 40, y: 170, w: 150, h: 18 }, { x: 290, y: 170, w: 150, h: 18 }] },
+      { name: 'Drift Keys', target: 4, ballSpeed: 4.3, maxSpeed: 9.6, paddleW: 110, sand: '#b89858', grass: '#488038', water: '#143860', blocks: [{ x: 30, y: 130, w: 130, h: 18 }, { x: 320, y: 230, w: 130, h: 18 }, { x: 30, y: 330, w: 130, h: 18 }] },
+      { name: 'Storm Atoll', target: 5, ballSpeed: 4.5, maxSpeed: 9.8, paddleW: 108, sand: '#a88848', grass: '#407030', water: '#123050', blocks: [{ x: 155, y: 120, w: 170, h: 18 }, { x: 40, y: 250, w: 120, h: 18 }, { x: 320, y: 250, w: 120, h: 18 }] },
+      { name: 'Coral Bay', target: 5, ballSpeed: 4.6, maxSpeed: 10, paddleW: 105, sand: '#f0d090', grass: '#58a050', water: '#206898', blocks: [{ x: 20, y: 190, w: 160, h: 18 }, { x: 300, y: 190, w: 160, h: 18 }, { x: 140, y: 310, w: 200, h: 18 }] },
+      { name: 'Fog Haven', target: 6, ballSpeed: 4.8, maxSpeed: 10.2, paddleW: 102, sand: '#c0a060', grass: '#3a7830', water: '#0e2848', blocks: [{ x: 10, y: 110, w: 140, h: 16 }, { x: 330, y: 190, w: 140, h: 16 }, { x: 10, y: 270, w: 140, h: 16 }, { x: 330, y: 350, w: 140, h: 16 }] },
+      { name: 'Moon Reef', target: 6, ballSpeed: 5, maxSpeed: 10.4, paddleW: 100, sand: '#d0c0a0', grass: '#508848', water: '#284878', blocks: [{ x: 140, y: 140, w: 200, h: 18 }, { x: 40, y: 240, w: 110, h: 18 }, { x: 330, y: 240, w: 110, h: 18 }, { x: 140, y: 340, w: 200, h: 18 }] },
+      { name: 'Void Cay', target: 7, ballSpeed: 5.2, maxSpeed: 10.6, paddleW: 96, sand: '#887858', grass: '#305828', water: '#081830', blocks: [{ x: 0, y: 160, w: 150, h: 18 }, { x: 330, y: 160, w: 150, h: 18 }, { x: 0, y: 280, w: 150, h: 18 }, { x: 330, y: 280, w: 150, h: 18 }] },
+      { name: 'Star Isle', target: 7, ballSpeed: 5.4, maxSpeed: 10.8, paddleW: 92, sand: '#e0c888', grass: '#609850', water: '#3060a0', blocks: [{ x: 80, y: 130, w: 90, h: 16 }, { x: 310, y: 130, w: 90, h: 16 }, { x: 80, y: 240, w: 90, h: 16 }, { x: 310, y: 240, w: 90, h: 16 }, { x: 195, y: 330, w: 90, h: 16 }] },
+      { name: 'Abyss Key', target: 8, ballSpeed: 5.6, maxSpeed: 11, paddleW: 88, sand: '#706040', grass: '#284820', water: '#040818', blocks: [{ x: 20, y: 110, w: 170, h: 16 }, { x: 290, y: 110, w: 170, h: 16 }, { x: 155, y: 200, w: 170, h: 16 }, { x: 20, y: 290, w: 170, h: 16 }, { x: 290, y: 290, w: 170, h: 16 }] },
+      { name: 'Soul Nexus', target: 8, ballSpeed: 5.8, maxSpeed: 11.5, paddleW: 84, sand: '#908070', grass: '#406838', water: '#102040', blocks: [{ x: 15, y: 100, w: 100, h: 16 }, { x: 190, y: 100, w: 100, h: 16 }, { x: 365, y: 100, w: 100, h: 16 }, { x: 100, y: 200, w: 100, h: 16 }, { x: 280, y: 200, w: 100, h: 16 }, { x: 15, y: 300, w: 100, h: 16 }, { x: 190, y: 300, w: 100, h: 16 }, { x: 365, y: 300, w: 100, h: 16 }] },
+    ];
+
+    const spiritPositions = [
+      { x: 60, y: 120 }, { x: 200, y: 80 }, { x: 380, y: 110 }, { x: 120, y: 220 },
+      { x: 300, y: 200 }, { x: 420, y: 280 }, { x: 50, y: 340 }, { x: 180, y: 400 },
+      { x: 320, y: 380 }, { x: 400, y: 480 }, { x: 100, y: 520 }, { x: 260, y: 560 },
+    ];
+
+    const stars = Array.from({ length: 70 }, (_, i) => ({
+      x: Math.random() * W, y: Math.random() * H, s: Math.random() * 2 + 0.5,
+      sp: Math.random() * 0.35 + 0.08, c: i % 5 === 0 ? '#ff0044' : '#fff',
+    }));
+
+    let scene = 'create', introPhase = 0, endingPhase = 0;
+    let player = { name: 'Traveler', avatar: 0 };
+    let levelIndex = 0, score = 0, hearts = MAX_HEARTS, gameActive = false;
+    let blocks = [], maxSpeed = 9, stuckFrames = 0, endingSouls = [], capturedSouls = 0;
+
+    const ball = { x: W/2, y: H*0.2, r: 12, vx: 3, vy: 4, phase: 0 };
+    const paddle = { x: W/2, y: H-56, w: 110, h: 44, speed: 8 };
+    const keys = { left: false, right: false };
+    const ballTrail = [];
+    const clock = { t: 0 };
+
+    const els = {
+      create: document.getElementById('create-screen'),
+      nameInput: document.getElementById('name-input'),
+      avatarList: document.getElementById('avatar-list'),
+      createBtn: document.getElementById('create-btn'),
+      dialogue: document.getElementById('dialogue-box'),
+      dialogueText: document.getElementById('dialogue-text'),
+      titleCard: document.getElementById('title-card'),
+      overlay: document.getElementById('overlay'),
+      overlayText: document.getElementById('overlay-text'),
+      startBtn: document.getElementById('start-btn'),
+      ending: document.getElementById('ending-screen'),
+      endingText: document.getElementById('ending-text'),
+      endingBtn: document.getElementById('ending-btn'),
+      hearts: document.getElementById('hearts'),
+      level: document.getElementById('level'),
+      score: document.getElementById('score'),
+      goal: document.getElementById('goal'),
+      playerTag: document.getElementById('player-tag'),
+      status: document.getElementById('status'),
+    };
+
+    const music = {
+      ctx: null, master: null, crush: null, scheduler: null, step: 0,
+      levelIndex: 0, creditsMode: false, titleMode: false, usingFile: false, audio: null, nextNoteTime: 0,
+      notes: {
+        D2:73.42, F2:87.31, G2:98, A2:110, Bb2:116.54,
+        D3:146.83, F3:174.61, G3:196, A3:220, Bb3:233.08, Ab3:207.65,
+        D4:293.66, F4:349.23, G4:392, A4:440, Bb4:466.16, C5:523.25, D5:587.33,
+      },
+      lead: ['D4',null,'D4','F4','A4','A4','G4','F4','D4','F4','A4','C5','A4','G4','F4','D4'],
+      answer: ['A4',null,'A4','F4','D4','F4','G4','A4','Bb4','A4','G4','F4','D4','F4','G4','A4'],
+      bass: ['D2','D2',null,'F2','G2','G2',null,'A2','D2','D2',null,'F2','G2','Bb2','A2','D2'],
+      arp: ['F4','A4','D5','A4','G4','Bb4','D5','Bb4','F4','A4','D5','A4','G4','Bb4','D5','Bb4'],
+      async init() {
+        if (this.ctx) return;
+        this.ctx = new (window.AudioContext||window.webkitAudioContext)();
+        this.crush = this.ctx.createWaveShaper();
+        const c = new Float32Array(256);
+        for (let i=0;i<256;i++){ const x=(i/128)-1; c[i]=Math.tanh(x*3.2)*0.75; }
+        this.crush.curve = c;
+        const f = this.ctx.createBiquadFilter(); f.type='lowpass'; f.frequency.value=5200;
+        this.master = this.ctx.createGain(); this.master.gain.value=0.28;
+        this.crush.connect(f); f.connect(this.master); this.master.connect(this.ctx.destination);
+        try {
+          const r = await fetch('music/megalovania.mp3');
+          if (!r.ok) throw 0;
+          this.audio = new Audio(URL.createObjectURL(await r.blob())); this.audio.loop=true; this.usingFile=true;
+        } catch { this.usingFile=false; }
+      },
+      async resume(){ if(!this.ctx) await this.init(); if(this.ctx.state==='suspended') await this.ctx.resume(); },
+      sq(freq,t,d,v,det=0){ if(!freq)return; const g=this.ctx.createGain();
+        g.gain.setValueAtTime(0.0001,t); g.gain.exponentialRampToValueAtTime(v,t+0.006);
+        g.gain.exponentialRampToValueAtTime(v*0.55,t+d*0.35);
+        g.gain.exponentialRampToValueAtTime(0.0001,t+d); g.connect(this.crush);
+        [0,det,-det*0.5].forEach(dt=>{ const o=this.ctx.createOscillator(); o.type='square'; o.frequency.setValueAtTime(freq,t);
+          if(dt)o.detune.setValueAtTime(dt,t); o.connect(g); o.start(t); o.stop(t+d+0.02); }); },
+      tri(freq,t,d,v){ if(!freq)return; const g=this.ctx.createGain();
+        g.gain.setValueAtTime(0.0001,t); g.gain.exponentialRampToValueAtTime(v,t+0.004);
+        g.gain.exponentialRampToValueAtTime(0.0001,t+d); g.connect(this.crush);
+        const o=this.ctx.createOscillator(); o.type='triangle'; o.frequency.setValueAtTime(freq,t);
+        o.connect(g); o.start(t); o.stop(t+d+0.02); },
+      kick(t,v){ const o=this.ctx.createOscillator(),g=this.ctx.createGain(); o.type='sine';
+        o.frequency.setValueAtTime(180,t); o.frequency.exponentialRampToValueAtTime(42,t+0.11);
+        g.gain.setValueAtTime(v,t); g.gain.exponentialRampToValueAtTime(0.0001,t+0.13);
+        o.connect(g); g.connect(this.crush); o.start(t); o.stop(t+0.14); },
+      snare(t,v){ const b=this.ctx.createBuffer(1,this.ctx.sampleRate*0.08|0,this.ctx.sampleRate);
+        const d=b.getChannelData(0); for(let i=0;i<d.length;i++)d[i]=Math.random()*2-1;
+        const n=this.ctx.createBufferSource(); n.buffer=b; const g=this.ctx.createGain();
+        g.gain.setValueAtTime(v,t); g.gain.exponentialRampToValueAtTime(0.0001,t+0.08);
+        n.connect(g); g.connect(this.crush); n.start(t); n.stop(t+0.09); },
+      hat(t,v){ const b=this.ctx.createBuffer(1,(this.ctx.sampleRate*0.025)|0,this.ctx.sampleRate);
+        const d=b.getChannelData(0); for(let i=0;i<d.length;i++)d[i]=Math.random()*2-1;
+        const n=this.ctx.createBufferSource(); n.buffer=b; const g=this.ctx.createGain(),hp=this.ctx.createBiquadFilter();
+        hp.type='highpass'; hp.frequency.value=7000;
+        g.gain.setValueAtTime(v,t); g.gain.exponentialRampToValueAtTime(0.0001,t+0.025);
+        n.connect(hp); hp.connect(g); g.connect(this.crush); n.start(t); n.stop(t+0.03); },
+      tick(){
+        const dr=this.creditsMode||this.titleMode;
+        const int=this.creditsMode?11:this.titleMode?10:this.levelIndex;
+        const bpm=dr?128:132+int*3;
+        const s=(60/bpm)/4;
+        const t=this.nextNoteTime;
+        const i=this.step%16;
+        const p=Math.floor(this.step/16)%2;
+        const note=(p?this.answer:this.lead)[i];
+        const bassNote=this.bass[i];
+        const arpNote=this.arp[i];
+        const lv=dr?0.11:0.065+int*0.004;
+        const bl=dr?0.1:0.055+int*0.004;
+        const al=dr?0.045:0.022+int*0.002;
+        if(note){
+          this.sq(this.notes[note],t,s*0.88,lv,10);
+          this.sq(this.notes[note]/2,t,s*0.88,lv*0.38,10);
+        }
+        if(bassNote) this.sq(this.notes[bassNote],t,s*1.55,bl,-5);
+        if((int>=1||dr)&&arpNote&&(i%2===0||dr)) this.tri(this.notes[arpNote],t+ s*0.12,s*0.42,al);
+        if(i%4===0||(dr&&i%2===0)) this.kick(t,dr?0.14:0.08+int*0.004);
+        if(i===4||i===12) this.snare(t,dr?0.1:0.05+int*0.003);
+        if(i%2===1) this.hat(t,dr?0.035:0.018+int*0.0015);
+        if((int>=5||dr)&&(i===0||i===8)){
+          ['F4','A4','D5'].forEach((n,idx)=>this.tri(this.notes[n],t+idx*0.012,s*0.55,dr?0.05:0.028));
+        }
+        this.step++; this.nextNoteTime+=s;
+      },
+      go(){ if(this.scheduler)return; this.nextNoteTime=this.ctx.currentTime+0.05;
+        this.scheduler=setInterval(()=>{ if(this.usingFile)return;
+          if(!gameActive&&!this.creditsMode&&!this.titleMode&&scene!=='intro'&&scene!=='ending')return;
+          while(this.nextNoteTime<this.ctx.currentTime+0.22)this.tick(); },20); },
+      stopProc(){ if(this.scheduler){clearInterval(this.scheduler);this.scheduler=null;} },
+      async playFile(r,v){ if(!this.usingFile||!this.audio)return false; this.audio.playbackRate=r; this.audio.volume=v;
+        try{await this.audio.play();return true;}catch{return false;} },
+      async startDramatic(){ await this.resume(); this.titleMode=true; this.creditsMode=false; this.step=0;
+        this.nextNoteTime=this.ctx.currentTime+0.05; this.master.gain.value=0.32;
+        if(!(await this.playFile(1.0,0.52)))this.go(); },
+      async startFinale(){ await this.resume(); this.creditsMode=true; this.titleMode=false; this.step=0;
+        this.nextNoteTime=this.ctx.currentTime+0.05; this.master.gain.value=0.34;
+        if(!(await this.playFile(1.15,0.58)))this.go(); },
+      stopAll(){ this.creditsMode=false; this.titleMode=false; this.stopProc();
+        if(this.audio){this.audio.pause();this.audio.currentTime=0;} },
+      async startGameMusic(){ await this.resume(); this.titleMode=false; this.creditsMode=false; this.step=0;
+        this.nextNoteTime=this.ctx.currentTime+0.05;
+        if(this.usingFile&&this.audio){ await this.playFile(0.9+this.levelIndex*0.03,0.35+this.levelIndex*0.02); }
+        else this.go(); },
+      sfx(type){ if(!this.ctx)return; const t=this.ctx.currentTime;
+        if(type==='hit'){this.sq(this.notes.A4,t,0.04,0.08,6);this.sq(this.notes.D5,t+0.03,0.05,0.05);}
+        if(type==='heart'){this.sq(this.notes.A3,t,0.15,0.09);this.sq(this.notes.D3,t+0.06,0.2,0.08);}
+        if(type==='catch'){this.sq(this.notes.D4,t,0.08,0.09);this.sq(this.notes.C5,t+0.06,0.12,0.1);this.sq(this.notes.A4,t+0.12,0.1,0.08);}
+        if(type==='level'){this.sq(this.notes.D4,t,0.06,0.09);this.sq(this.notes.F4,t+0.07,0.08,0.08);this.sq(this.notes.A4,t+0.14,0.14,0.1);} },
+    };
+
+    function px(c, x, y, w, h, color) { c.fillStyle = color; c.fillRect(Math.round(x), Math.round(y), w, h); }
+
+    function drawAvatar(c, id, cx, cy, scale, facing = 1) {
+      const a = AVATARS[id]; const s = scale; const f = facing;
+      const r = (x, y, w, h, col) => px(c, cx + x * s * f - (w * s) / 2, cy + y * s, w * s, h * s, col);
+
+      if (id === 0) {
+        r(-5, -18, 10, 4, a.accent);
+        r(-6, -14, 12, 8, '#888');
+        r(-5, -13, 10, 2, '#aaa');
+        r(-4, -12, 8, 3, '#333');
+        r(-5, -4, 10, 10, a.main);
+        r(-4, -3, 8, 2, a.dark);
+        r(-7, -2, 2, 8, a.dark);
+        r(5, -2, 2, 8, a.dark);
+        r(8, -6, 2, 12, '#ccc');
+        r(-6, 6, 4, 4, '#333');
+        r(2, 6, 4, 4, '#333');
+      } else if (id === 1) {
+        r(-6, -20, 12, 6, a.main);
+        r(-4, -22, 8, 4, a.dark);
+        r(-2, -19, 4, 2, a.accent);
+        r(-5, -14, 10, 8, a.skin);
+        r(-4, -12, 2, 2, '#222');
+        r(2, -12, 2, 2, '#222');
+        r(-1, -9, 2, 1, a.skin);
+        r(-7, -6, 14, 12, a.main);
+        r(-6, -4, 12, 2, a.dark);
+        r(-2, -4, 4, 4, a.accent);
+        r(9, -14, 2, 18, '#886644');
+        r(10, -16, 4, 4, a.accent);
+        r(-5, 6, 4, 4, a.dark);
+        r(1, 6, 4, 4, a.dark);
+      } else if (id === 2) {
+        r(-7, -16, 14, 8, a.dark);
+        r(-5, -14, 10, 6, a.main);
+        r(-4, -12, 8, 4, a.skin);
+        r(-3, -11, 2, 2, '#111');
+        r(1, -11, 2, 2, '#111');
+        r(-6, -6, 12, 10, a.main);
+        r(-5, -4, 10, 2, a.accent);
+        r(-9, -8, 3, 10, a.accent);
+        r(-8, -4, 8, 2, '#664422');
+        r(-7, 6, 4, 4, '#443322');
+        r(3, 6, 4, 4, '#443322');
+        r(7, -10, 2, 2, a.accent);
+      } else {
+        r(-8, -14, 16, 16, a.main + '88');
+        r(-6, -12, 12, 12, a.main);
+        r(-5, -10, 10, 8, a.skin);
+        r(-3, -9, 2, 3, '#fff');
+        r(1, -9, 2, 3, '#fff');
+        r(-6, 2, 12, 8, a.main);
+        r(-4, 10, 8, 6, a.main + '66');
+        r(-8, -8, 16, 16, a.accent + '22');
+      }
+    }
+
+    function buildAvatarPicker() {
+      els.avatarList.innerHTML = '';
+      AVATARS.forEach((a) => {
+        const btn = document.createElement('button');
+        btn.type = 'button';
+        btn.className = 'avatar-btn' + (a.id === player.avatar ? ' selected' : '');
+        const mini = document.createElement('canvas'); mini.width = 48; mini.height = 48;
+        drawAvatar(mini.getContext('2d'), a.id, 24, 26, 1.1);
+        const label = document.createElement('span'); label.textContent = a.name;
+        btn.appendChild(mini); btn.appendChild(label);
+        btn.onclick = () => {
+          player.avatar = a.id;
+          document.querySelectorAll('.avatar-btn').forEach((b) => b.classList.remove('selected'));
+          btn.classList.add('selected');
+        };
+        els.avatarList.appendChild(btn);
+      });
+    }
+
+    function renderHearts() {
+      els.hearts.innerHTML = '';
+      for (let i = 0; i < MAX_HEARTS; i++) {
+        const s = document.createElement('span');
+        s.className = 'heart' + (i >= hearts ? ' broken' : '');
+        s.textContent = i >= hearts ? '♡' : '♥';
+        els.hearts.appendChild(s);
+      }
+    }
+
+    function updateHud() {
+      els.score.textContent = score;
+      els.goal.textContent = ISLANDS[levelIndex].target;
+      els.level.textContent = levelIndex + 1;
+      els.playerTag.innerHTML = `<strong>${player.name.slice(0, 8)}</strong>`;
+      renderHearts();
+    }
+
+    function drawStars(intensity = 1, dim = false) {
+      for (const s of stars) {
+        s.y += s.sp * intensity;
+        if (s.y > H) { s.y = 0; s.x = Math.random() * W; }
+        ctx.globalAlpha = (dim ? 0.12 : 0.22) + Math.sin(clock.t * 0.004 + s.x) * 0.08;
+        ctx.fillStyle = dim ? (s.c === '#ff0044' ? '#661122' : '#aaa') : s.c;
+        ctx.fillRect(s.x, s.y, s.s, s.s);
+      }
+      ctx.globalAlpha = 1;
+    }
+
+    function drawBattleFrame() {
+      ctx.strokeStyle = '#fff'; ctx.lineWidth = 3;
+      ctx.strokeRect(8, 8, W - 16, H - 16);
+      ctx.strokeStyle = '#ff004444'; ctx.lineWidth = 1;
+      ctx.strokeRect(12, 12, W - 24, H - 24);
+    }
+
+    function drawSoul(x, y, r, phase, alpha) {
+      ctx.save();
+      ctx.globalAlpha = alpha ?? 0.9;
+      const wob = Math.sin(phase) * 2.5;
+      ctx.shadowColor = '#aaf'; ctx.shadowBlur = 18;
+      const g = ctx.createRadialGradient(x, y - wob, 1, x, y - wob, r * 2);
+      g.addColorStop(0, '#fff'); g.addColorStop(0.35, '#bdf'); g.addColorStop(1, 'rgba(80,160,255,0)');
+      ctx.beginPath(); ctx.arc(x, y + wob, r, 0, Math.PI * 2);
+      ctx.fillStyle = g; ctx.fill();
+      ctx.shadowBlur = 0; ctx.strokeStyle = '#fff'; ctx.lineWidth = 2; ctx.stroke();
+      ctx.fillStyle = '#134'; ctx.fillRect(x - 4, y + wob - 2, 3, 4);
+      ctx.fillRect(x + 1, y + wob - 2, 3, 4);
+      ctx.globalAlpha = 1; ctx.restore();
+    }
+
+    function drawMiniIsle(x, y, isle, index, t) {
+      const bob = Math.sin(t * 0.002 + index * 0.9) * 2;
+      const iy = y + bob;
+      ctx.fillStyle = isle.water + '44';
+      ctx.beginPath();
+      ctx.ellipse(x, iy + 20, 34, 11, 0, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.fillStyle = isle.sand;
+      ctx.beginPath();
+      ctx.ellipse(x, iy + 15, 26, 9, 0, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.fillStyle = isle.grass;
+      ctx.beginPath();
+      ctx.ellipse(x, iy + 8, 22, 13, 0, Math.PI, 0);
+      ctx.fill();
+      ctx.fillRect(x - 22, iy + 8, 44, 9);
+      ctx.fillStyle = '#1a2818';
+      ctx.fillRect(x - 2, iy - 1, 4, 9);
+      ctx.fillStyle = isle.grass;
+      ctx.fillRect(x - 7, iy - 4, 14, 5);
+      ctx.fillRect(x - 5, iy - 7, 10, 3);
+    }
+
+    function spiritWander(p, i, t) {
+      const drift = 12 + (i % 4) * 4;
+      const angle = i * (Math.PI * 2 / 12) + t * 0.0004;
+      return {
+        x: p.x + Math.cos(angle) * drift * 0.4 + Math.sin(t * 0.0014 + i * 0.8) * 7,
+        y: p.y + Math.sin(angle) * drift * 0.3 + Math.cos(t * 0.0011 + i * 0.6) * 6,
+      };
+    }
+
+    function drawIntroWorld(t) {
+      const g = ctx.createLinearGradient(0, 0, 0, H);
+      g.addColorStop(0, '#0a1028');
+      g.addColorStop(0.35, '#0c1838');
+      g.addColorStop(0.7, '#102848');
+      g.addColorStop(1, '#081820');
+      ctx.fillStyle = g;
+      ctx.fillRect(0, 0, W, H);
+
+      const moonG = ctx.createRadialGradient(W - 70, 70, 4, W - 70, 70, 48);
+      moonG.addColorStop(0, '#eef4ff');
+      moonG.addColorStop(0.4, '#8899bb44');
+      moonG.addColorStop(1, 'transparent');
+      ctx.fillStyle = moonG;
+      ctx.fillRect(0, 0, W, 160);
+      ctx.fillStyle = '#dde8ff';
+      ctx.beginPath();
+      ctx.arc(W - 70, 70, 14, 0, Math.PI * 2);
+      ctx.fill();
+
+      drawStars(1.3);
+
+      ctx.fillStyle = '#0a1830';
+      for (let x = 0; x < W; x += 3) {
+        const wave = Math.sin(x * 0.018 + t * 0.002) * 4 + Math.sin(x * 0.035 - t * 0.0015) * 2;
+        ctx.fillRect(x, H * 0.68 + wave, 3, H);
+      }
+      ctx.fillStyle = '#0c2040aa';
+      for (let x = 0; x < W; x += 5) {
+        const wave = Math.sin(x * 0.022 - t * 0.0025) * 3;
+        ctx.fillRect(x, H * 0.74 + wave, 5, H);
+      }
+
+      const wanderPts = spiritPositions.map((p, i) => spiritWander(p, i, t));
+      ctx.strokeStyle = '#c77dff28';
+      ctx.lineWidth = 1;
+      ctx.setLineDash([4, 10]);
+      ctx.beginPath();
+      wanderPts.forEach((pt, i) => {
+        if (i === 0) ctx.moveTo(pt.x, pt.y);
+        else ctx.lineTo(pt.x, pt.y);
+      });
+      ctx.stroke();
+      ctx.setLineDash([]);
+
+      spiritPositions.forEach((p, i) => {
+        const { x: sx, y: sy } = wanderPts[i];
+        const isle = ISLANDS[i];
+        const bob = Math.sin(t * 0.004 + i * 0.7) * 4;
+        const soulY = sy - 24 + bob;
+        const driftAngle = i * (Math.PI * 2 / 12) + t * 0.0004;
+
+        drawMiniIsle(sx, sy, isle, i, t);
+
+        for (let j = 3; j >= 1; j--) {
+          const tx = sx - Math.cos(driftAngle) * j * 5;
+          const ty = soulY - Math.sin(driftAngle) * j * 4;
+          drawSoul(tx, ty, 9 - j * 0.8, t * 0.005 + i, 0.08 * j);
+        }
+
+        ctx.save();
+        ctx.globalAlpha = 0.15 + Math.sin(t * 0.005 + i) * 0.08;
+        ctx.fillStyle = '#88aaff';
+        ctx.beginPath();
+        ctx.arc(sx, soulY, 16, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.restore();
+
+        drawSoul(sx, soulY, 10, t * 0.005 + i, 0.88);
+
+        ctx.fillStyle = '#fc6';
+        ctx.font = '5px "Press Start 2P"';
+        ctx.textAlign = 'center';
+        ctx.fillText(String(i + 1), sx, sy + 38);
+        if (sy < H - 110) {
+          ctx.fillStyle = '#778da9';
+          ctx.font = '4px "Press Start 2P"';
+          ctx.fillText(isle.name.split(' ')[0].toUpperCase(), sx, sy + 48);
+        }
+      });
+
+      drawAvatar(ctx, player.avatar, 56, H - 58, 1.1, 1);
+      ctx.fillStyle = '#ffffff55';
+      ctx.font = '5px "Press Start 2P"';
+      ctx.textAlign = 'left';
+      ctx.fillText(player.name.toUpperCase(), 86, H - 50);
+
+      drawBattleFrame();
+      ctx.fillStyle = '#fc6';
+      ctx.font = '8px "Press Start 2P"';
+      ctx.textAlign = 'center';
+      ctx.fillText('12 LOST SOULS', W / 2, 34);
+      ctx.fillStyle = '#778da9';
+      ctx.font = '5px "Press Start 2P"';
+      ctx.fillText('WANDERING THE SEA', W / 2, 50);
+      ctx.fillStyle = '#ffffff33';
+      ctx.font = '5px "Press Start 2P"';
+      ctx.fillText('CLICK TO CONTINUE', W / 2, H - 8);
+    }
+
+    function drawEndingCutscene(t) {
+      ctx.fillStyle = '#050510'; ctx.fillRect(0, 0, W, H);
+      drawStars(2);
+      drawAvatar(ctx, player.avatar, W / 2, H / 2 + 10, 2.2);
+      endingSouls.forEach((s) => {
+        s.x += (W / 2 - s.x) * 0.045;
+        s.y += (H / 2 - 36 - s.y) * 0.045;
+        drawSoul(s.x, s.y, 7 + s.arrived * 2, t * 0.006, s.arrived ? 1 : 0.85);
+        if (Math.hypot(s.x - W / 2, s.y - (H / 2 - 36)) < 18) s.arrived = 1;
+      });
+      capturedSouls = endingSouls.filter((s) => s.arrived).length;
+      drawBattleFrame();
+      if (endingPhase >= 1) {
+        ctx.fillStyle = '#fff'; ctx.font = '9px "Press Start 2P"'; ctx.textAlign = 'center';
+        ctx.fillText('SOULS CAPTURED', W / 2, 72);
+        ctx.fillStyle = '#ff0044'; ctx.font = '8px "Press Start 2P"';
+        ctx.fillText(`${capturedSouls} / 12`, W / 2, 98);
+      }
+      if (endingPhase >= 2) {
+        ctx.fillStyle = '#fc6'; ctx.font = '10px "Press Start 2P"';
+        ctx.fillText('VICTORY', W / 2, 560);
+        ctx.fillStyle = '#fff'; ctx.font = '6px "Press Start 2P"';
+        ctx.fillText(`${player.name.toUpperCase()}`, W / 2, 586);
+      }
+    }
+
+    function drawArenaBg(isle) {
+      const g = ctx.createLinearGradient(0, 0, 0, H);
+      g.addColorStop(0, '#0e0818');
+      g.addColorStop(0.5, '#080510');
+      g.addColorStop(1, '#120810');
+      ctx.fillStyle = g;
+      ctx.fillRect(0, 0, W, H);
+      drawStars(0.8, true);
+      ctx.fillStyle = '#ffffff06';
+      ctx.fillRect(0, H - 72, W, 72);
+      ctx.strokeStyle = '#415a7722';
+      ctx.lineWidth = 2;
+      ctx.setLineDash([8, 12]);
+      ctx.beginPath();
+      ctx.moveTo(W / 2, 16);
+      ctx.lineTo(W / 2, H - 16);
+      ctx.stroke();
+      ctx.setLineDash([]);
+      drawBattleFrame();
+      ctx.fillStyle = '#778da9';
+      ctx.font = '7px "Press Start 2P"';
+      ctx.textAlign = 'center';
+      ctx.fillText(`ISLE ${levelIndex + 1}: ${isle.name.toUpperCase()}`, W / 2, 32);
+    }
+
+    function drawBlocks() {
+      for (const b of blocks) {
+        ctx.shadowColor = '#7b2ff5'; ctx.shadowBlur = 10;
+        ctx.fillStyle = '#3a1060';
+        ctx.fillRect(b.x, b.y, b.w, b.h);
+        ctx.shadowBlur = 0;
+        ctx.strokeStyle = '#c77dff'; ctx.lineWidth = 2;
+        ctx.strokeRect(b.x, b.y, b.w, b.h);
+        ctx.fillStyle = '#ff004444';
+        ctx.fillRect(b.x + 4, b.y + 3, b.w - 8, 3);
+      }
+    }
+
+    function drawBallSoul() {
+      ball.phase += 0.09;
+      ballTrail.forEach((p, i) => drawSoul(p.x, p.y, ball.r * ((i + 1) / ballTrail.length) * 0.55, ball.phase, 0.25));
+      drawSoul(ball.x, ball.y, ball.r, ball.phase, 0.95);
+    }
+
+    function drawPaddleAvatar() {
+      const x = paddle.x, y = paddle.y;
+      ctx.fillStyle = '#00000044';
+      ctx.fillRect(x - paddle.w / 2, y + 14, paddle.w, 6);
+      drawAvatar(ctx, player.avatar, x, y - 4, 1.35);
+    }
+
+    function resetBall() {
+      ball.x = W / 2; ball.y = H * 0.22; stuckFrames = 0;
+      const s = ISLANDS[levelIndex].ballSpeed;
+      ball.vx = (Math.random() > 0.5 ? 1 : -1) * s * 0.8;
+      ball.vy = -s;
+      ballTrail.length = 0;
+    }
+
+    async function applyLevel(i, msg = '') {
+      levelIndex = i;
+      const isle = ISLANDS[i];
+      blocks = isle.blocks.map((b) => ({ ...b }));
+      paddle.w = isle.paddleW; maxSpeed = isle.maxSpeed;
+      resetBall(); updateHud(); els.status.textContent = msg;
+      music.levelIndex = i;
+    }
+
+    function clampSpeed() {
+      const sp = Math.hypot(ball.vx, ball.vy);
+      if (sp > maxSpeed) { ball.vx = ball.vx / sp * maxSpeed; ball.vy = ball.vy / sp * maxSpeed; }
+    }
+
+    function enforceMinSpeed() {
+      const sp = Math.hypot(ball.vx, ball.vy);
+      if (sp < MIN_SPEED) {
+        if (sp < 0.01) {
+          ball.vx = (Math.random() > 0.5 ? 1 : -1) * ISLANDS[levelIndex].ballSpeed;
+          ball.vy = -ISLANDS[levelIndex].ballSpeed;
+        } else {
+          ball.vx = ball.vx / sp * MIN_SPEED;
+          ball.vy = ball.vy / sp * MIN_SPEED;
+        }
+      }
+      if (Math.abs(ball.vy) < MIN_VY) ball.vy = ball.vy >= 0 ? MIN_VY : -MIN_VY;
+    }
+
+    function bounceWalls() {
+      if (ball.x - ball.r <= 8) { ball.x = 8 + ball.r; ball.vx = Math.abs(ball.vx); }
+      else if (ball.x + ball.r >= W - 8) { ball.x = W - 8 - ball.r; ball.vx = -Math.abs(ball.vx); }
+      if (ball.y - ball.r <= 8) { ball.y = 8 + ball.r; ball.vy = Math.abs(ball.vy); enforceMinSpeed(); }
+    }
+
+    function resolveBlock(b, prevX, prevY) {
+      const cx = Math.max(b.x, Math.min(ball.x, b.x + b.w));
+      const cy = Math.max(b.y, Math.min(ball.y, b.y + b.h));
+      const dx = ball.x - cx, dy = ball.y - cy;
+      if (dx * dx + dy * dy >= ball.r * ball.r) return false;
+
+      const oL = ball.x + ball.r - b.x, oR = b.x + b.w - (ball.x - ball.r);
+      const oT = ball.y + ball.r - b.y, oB = b.y + b.h - (ball.y - ball.r);
+      const pad = 2.5;
+      const m = Math.min(oL, oR, oT, oB);
+
+      if (m === oL || m === oR) {
+        ball.x = m === oL ? b.x - ball.r - pad : b.x + b.w + ball.r + pad;
+        ball.vx = (m === oL ? -1 : 1) * Math.max(Math.abs(ball.vx), MIN_SPEED * 0.7);
+        if (Math.abs(ball.vy) < MIN_VY) ball.vy = (ball.y < prevY ? -1 : 1) * MIN_VY;
+      } else {
+        ball.y = m === oT ? b.y - ball.r - pad : b.y + b.h + ball.r + pad;
+        ball.vy = (m === oT ? -1 : 1) * Math.max(Math.abs(ball.vy), MIN_VY);
+        if (Math.abs(ball.vx) < 1.5) ball.vx = (ball.x < prevX ? -1 : 1) * 2.5;
+      }
+
+      const bcx = b.x + b.w / 2, bcy = b.y + b.h / 2;
+      ball.vx += (ball.x - bcx) * 0.015;
+      ball.vy += (ball.y - bcy) * 0.015;
+      enforceMinSpeed(); clampSpeed();
+      return true;
+    }
+
+    function bounceBlocks(prevX, prevY) {
+      for (let pass = 0; pass < 4; pass++) {
+        let hit = false;
+        for (const b of blocks) if (resolveBlock(b, prevX, prevY)) hit = true;
+        if (!hit) break;
+      }
+    }
+
+    function unstuck(prevX, prevY) {
+      const moved = Math.hypot(ball.x - prevX, ball.y - prevY);
+      if (moved < 0.35) stuckFrames++; else stuckFrames = 0;
+      if (stuckFrames > 12) {
+        const s = ISLANDS[levelIndex].ballSpeed;
+        ball.vx = (Math.random() > 0.5 ? 1 : -1) * s;
+        ball.vy = -s * 1.3;
+        ball.y = Math.min(ball.y, paddle.y - 100);
+        stuckFrames = 0;
+        enforceMinSpeed();
+      }
+    }
+
+    function hitPaddle() {
+      const top = paddle.y - 10, left = paddle.x - paddle.w / 2, right = paddle.x + paddle.w / 2;
+      const prevB = ball.y - ball.vy + ball.r, nowB = ball.y + ball.r;
+      if (ball.vy > 0 && prevB <= top && nowB >= top && ball.x >= left - ball.r && ball.x <= right + ball.r) {
+        ball.y = top - ball.r;
+        ball.vy = -Math.max(Math.abs(ball.vy) * 1.03, MIN_VY);
+        ball.vx += ((ball.x - paddle.x) / (paddle.w / 2)) * 2.8;
+        clampSpeed(); score++; updateHud(); music.sfx('hit');
+        if (score >= ISLANDS[levelIndex].target) advanceLevel();
+        return true;
+      }
+      return false;
+    }
+
+    function loseHeart() {
+      hearts--; score = 0; updateHud(); resetBall(); music.sfx('heart');
+      if (hearts <= 0) { gameOver(); return; }
+      els.status.textContent = `* ${hearts} hearts left.`;
+    }
+
+    async function advanceLevel() {
+      music.sfx('level');
+      if (levelIndex >= ISLANDS.length - 1) { startEnding(); return; }
+      score = 0;
+      await applyLevel(levelIndex + 1, `* Sailing to ${ISLANDS[levelIndex + 1].name}...`);
+    }
+
+    function startEnding() {
+      gameActive = false; scene = 'ending'; endingPhase = 0;
+      endingSouls = spiritPositions.map((p) => ({ x: p.x, y: p.y, arrived: 0 }));
+      els.ending.classList.add('hidden');
+      document.body.classList.add('pre-game');
+      music.startFinale();
+      setTimeout(() => { endingPhase = 1; }, 700);
+      setTimeout(() => { endingPhase = 2; music.sfx('catch'); }, 4500);
+      setTimeout(() => {
+        els.endingText.innerHTML = `${player.name} captured all 12 souls.<br>The world is whole.<br><br>by Kevin Raphael`;
+        els.ending.classList.remove('hidden');
+      }, 7500);
+    }
+
+    function gameOver() {
+      gameActive = false; music.stopAll();
+      els.overlayText.innerHTML = `* ${player.name}'s quest ends.<br>* The souls remain lost.`;
+      els.startBtn.textContent = 'Retry';
+      els.overlay.classList.remove('hidden');
+      document.body.classList.add('pre-game');
+    }
+
+    async function startGame() {
+      els.ending.classList.add('hidden');
+      els.overlay.classList.add('hidden');
+      document.body.classList.remove('pre-game');
+      hearts = MAX_HEARTS; score = 0; gameActive = true; scene = 'play';
+      music.stopProc(); await music.init();
+      await applyLevel(0, `* ${player.name} reaches ${ISLANDS[0].name}.`);
+      await music.startGameMusic();
+    }
+
+    function advanceIntro() {
+      if (introPhase === 0) { introPhase = 1; els.dialogueText.textContent = `${player.name} must seek the 12 mysterious souls spread throughout the land...`; els.dialogue.classList.add('visible'); return; }
+      if (introPhase === 1) { introPhase = 2; els.dialogue.classList.remove('visible'); els.titleCard.classList.add('visible'); return; }
+      if (introPhase === 2) { introPhase = 3; els.titleCard.classList.remove('visible'); scene = 'menu';
+        els.overlayText.innerHTML = `* ${player.name} sets out.<br>* Catch each soul per isle.`;
+        els.overlay.classList.remove('hidden'); return; }
+    }
+
+    function beginIntro() {
+      scene = 'intro'; introPhase = 0;
+      els.create.classList.add('hidden');
+      document.body.classList.add('pre-game');
+      music.startDramatic();
+    }
+
+    function resetToCreate() {
+      scene = 'create'; gameActive = false; music.stopAll();
+      els.create.classList.remove('hidden');
+      els.dialogue.classList.remove('visible');
+      els.titleCard.classList.remove('visible');
+      els.overlay.classList.add('hidden');
+      els.ending.classList.add('hidden');
+      document.body.classList.add('pre-game');
+      levelIndex = 0; score = 0; hearts = MAX_HEARTS;
+    }
+
+    function update() {
+      if (scene !== 'play' || !gameActive) return;
+      if (keys.left) paddle.x -= paddle.speed;
+      if (keys.right) paddle.x += paddle.speed;
+      paddle.x = Math.max(paddle.w / 2, Math.min(W - paddle.w / 2, paddle.x));
+
+      const px = ball.x, py = ball.y;
+      for (let s = 0; s < SUBSTEPS; s++) {
+        ball.x += ball.vx / SUBSTEPS;
+        ball.y += ball.vy / SUBSTEPS;
+        bounceWalls();
+        bounceBlocks(px, py);
+      }
+      hitPaddle();
+      enforceMinSpeed();
+      unstuck(px, py);
+      if (ball.y - ball.r > H) loseHeart();
+      ballTrail.push({ x: ball.x, y: ball.y });
+      if (ballTrail.length > 10) ballTrail.shift();
+    }
+
+    function draw() {
+      clock.t = Date.now();
+      if (scene === 'create') {
+        ctx.fillStyle = '#0a0614'; ctx.fillRect(0, 0, W, H);
+        drawStars(0.5); drawBattleFrame(); return;
+      }
+      if (scene === 'intro') { drawIntroWorld(clock.t); return; }
+      if (scene === 'ending') { drawEndingCutscene(clock.t); return; }
+      if (scene === 'play' && gameActive) {
+        drawArenaBg(ISLANDS[levelIndex]);
+        drawBlocks();
+        drawPaddleAvatar();
+        drawBallSoul();
+      } else {
+        ctx.fillStyle = '#0a0614'; ctx.fillRect(0, 0, W, H);
+        drawStars(0.4); drawBattleFrame();
+      }
+    }
+
+    function loop() { update(); draw(); requestAnimationFrame(loop); }
+
+    els.createBtn.onclick = () => {
+      player.name = (els.nameInput.value.trim() || 'Traveler').slice(0, 12);
+      beginIntro();
+    };
+    canvas.addEventListener('click', () => { if (scene === 'intro') advanceIntro(); });
+    els.titleCard.onclick = (e) => { e.stopPropagation(); if (scene === 'intro' && introPhase === 2) advanceIntro(); };
+    els.dialogue.onclick = () => { if (scene === 'intro' && introPhase === 1) advanceIntro(); };
+    els.startBtn.onclick = () => startGame();
+    els.endingBtn.onclick = () => resetToCreate();
+    canvas.addEventListener('mousemove', (e) => {
+      if (!gameActive) return;
+      const r = canvas.getBoundingClientRect();
+      paddle.x = (e.clientX - r.left) * (W / r.width);
+      paddle.x = Math.max(paddle.w / 2, Math.min(W - paddle.w / 2, paddle.x));
+    });
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'ArrowLeft' || e.key === 'a') keys.left = true;
+      if (e.key === 'ArrowRight' || e.key === 'd') keys.right = true;
+    });
+    document.addEventListener('keyup', (e) => {
+      if (e.key === 'ArrowLeft' || e.key === 'a') keys.left = false;
+      if (e.key === 'ArrowRight' || e.key === 'd') keys.right = false;
+    });
+
+    buildAvatarPicker(); renderHearts(); loop();
+  </script>
+</body>
+</html>
