@@ -1,12 +1,13 @@
-Optional Megalovania music
-==========================
+Background music
+================
 
-If you own Undertale, you can add:
+By default the scrapbook plays a built-in catchy K-pop style beat (~99 BPM,
+bright synth hook, punchy kick & clap).
 
-  music/megalovania.mp3
+Optional: add ILLIT's official instrumental as:
 
-The game will play that file and speed it up slightly as levels increase.
-If the file is missing, the game uses built-in Megalovania-style chiptune
-(D minor riff, bass, drums added at higher levels).
+  music/not-cute-anymore-instrumental.mp3
 
-Do not redistribute copyrighted game music.
+If that file exists, it plays instead of the built-in beat.
+
+Do not commit or redistribute copyrighted music unless you have the rights.

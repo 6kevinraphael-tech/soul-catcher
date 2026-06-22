@@ -1,6 +1,8 @@
-# Soul Catcher
+# Your Digital Scrapbook
 
-A browser keep-up game — bounce the ghost soul on your avatar across 12 isles.
+A browser arts & crafts scrapbook — decorate pages with crayons, stickers, washi tape, clip-art, photo uploads, and more while chill lofi beats play in the background.
+
+**Live site:** https://6kevinraphael-tech.github.io/soul-catcher/
 
 **Play locally**
 
@@ -12,6 +14,4 @@ Open http://localhost:8765/
 
 **Deploy**
 
-This is a static site (`index.html` only). Host on GitHub Pages, Netlify, or Vercel by pointing at this folder.
-
-Created by Kevin Raphael.
+Static site (`index.html` only). Host on GitHub Pages, Netlify, or Vercel by pointing at this folder.
