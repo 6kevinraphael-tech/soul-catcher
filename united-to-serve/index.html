@@ -371,36 +371,54 @@
     td.day-cell {
       text-align: center;
       padding: 8px 4px;
-      width: 56px;
+      min-width: 68px;
     }
     tbody tr:hover td { background: rgba(239,246,255,0.45); }
     tbody tr:hover td.request-col { background: #f8fbff; }
-    .star-btn {
-      width: 44px;
-      height: 44px;
-      border: 1px solid var(--border);
-      border-radius: 10px;
-      background: #fafbfc;
+    .pray-btn {
+      width: 100%;
+      min-width: 58px;
+      min-height: 40px;
+      padding: 6px 4px;
+      border: 2px solid #cbd5e1;
+      border-radius: 8px;
+      background: #fff;
       cursor: pointer;
-      font-size: 1.1rem;
-      line-height: 1;
-      position: relative;
-      transition: background 0.12s, border-color 0.12s;
-    }
-    .star-btn:hover { background: var(--gold-soft); border-color: #fcd34d; }
-    .star-btn.on {
-      background: var(--gold-soft);
-      border-color: #fbbf24;
-    }
-    .star-btn .count {
-      position: absolute;
-      bottom: 2px;
-      right: 3px;
-      font-size: 0.58rem;
+      font-family: inherit;
+      font-size: 0.62rem;
       font-weight: 700;
+      line-height: 1.15;
+      letter-spacing: 0.03em;
+      text-transform: uppercase;
+      color: #64748b;
+      transition: background 0.12s, border-color 0.12s, color 0.12s;
+    }
+    .pray-btn:hover {
+      border-color: var(--accent);
+      color: var(--accent);
+      background: var(--accent-soft);
+    }
+    .pray-btn.done {
+      border-color: #16a34a;
+      background: #22c55e;
+      color: #fff;
+    }
+    .pray-btn.done:hover {
+      background: #16a34a;
+      border-color: #15803d;
+      color: #fff;
+    }
+    .pray-btn .people {
+      display: block;
+      margin-top: 3px;
+      font-size: 0.55rem;
+      font-weight: 600;
+      text-transform: none;
+      letter-spacing: 0;
       color: var(--accent);
       line-height: 1;
     }
+    .pray-btn.done .people { color: rgba(255,255,255,0.92); }
     .footer-note {
       margin-top: 14px;
       text-align: center;
@@ -449,8 +467,8 @@
     <span style="top:12%;right:6%">✨</span>
     <span style="bottom:18%;left:3%">🙏</span>
     <span style="bottom:8%;right:5%">✨</span>
-    <span style="top:45%;left:2%;font-size:1rem">☆</span>
-    <span style="top:55%;right:3%;font-size:1rem">☆</span>
+    <span style="top:45%;left:2%;font-size:1rem">✓</span>
+    <span style="top:55%;right:3%;font-size:1rem">✓</span>
   </div>
 
   <div class="app">
@@ -465,7 +483,7 @@
           <button type="button" class="btn btn-ghost" id="copy-link-btn">Copy link</button>
         </div>
       </div>
-      <p class="hint">Tap ☆ on a day when you prayed. Counts are anonymous. Stars reset Saturday midnight Pacific.</p>
+      <p class="hint">Tap <strong>Pray</strong> on a day when you prayed — it turns green <strong>✓ Prayed</strong>. Counts are anonymous. Resets Saturday midnight Pacific.</p>
     </header>
 
     <div class="layout">
@@ -483,7 +501,7 @@
               Share a need — your group lifts it up through the week.
               <ul class="fill-steps">
                 <li><span class="n">1</span> Add a request on the left</li>
-                <li><span class="n">2</span> Tap ☆ when you pray each day</li>
+                <li><span class="n">2</span> Tap <strong>Pray</strong> → turns <strong>✓ Prayed</strong></li>
                 <li><span class="n">3</span> See how many prayed (anonymous)</li>
               </ul>
             </div>
@@ -508,7 +526,7 @@
           <div class="panel-fill">
             <div class="fill-card">
               <strong>Week at a glance</strong>
-              Gold ★ = you prayed · Number = others who prayed · Resets Saturday midnight PT
+              Green <strong>✓ Prayed</strong> = you prayed that day · Number below = total people who prayed · Resets Saturday midnight PT
               <div class="week-key">
                 <span>Sat</span><span>Sun</span><span>Mon</span><span>Tue</span><span>Wed</span><span>Thu</span><span>Fri</span>
               </div>
@@ -521,7 +539,7 @@
     <div class="info-row">
       <div class="info-tile"><div class="icon">🔗</div><strong>Same link</strong>Everyone opens the same page — requests stay in sync.</div>
       <div class="info-tile"><div class="icon">🤍</div><strong>Anonymous</strong>Only prayer counts are shared, never names.</div>
-      <div class="info-tile"><div class="icon">🔄</div><strong>Fresh start</strong>Stars reset every Saturday at midnight Pacific.</div>
+      <div class="info-tile"><div class="icon">🔄</div><strong>Fresh start</strong>Prayer marks reset every Saturday at midnight Pacific.</div>
     </div>
 
     <p class="footer-note">Week runs Sat–Fri · Resets Saturday midnight PT · by Kevin Raphael</p>
@@ -626,7 +644,7 @@
       const current = getWeekStartKey();
       if (state.weekKey && state.weekKey !== current) {
         state.marks = {};
-        showToast('New week — stars reset');
+        showToast('New week — prayer marks reset');
       }
       state.weekKey = current;
     }
@@ -758,7 +776,7 @@
       render();
     }
 
-    function toggleStar(requestId, day) {
+    function togglePray(requestId, day) {
       maybeResetWeek();
       const key = markKey(requestId, day);
       if (!state.marks[key] || typeof state.marks[key] !== 'object') state.marks[key] = {};
@@ -800,10 +818,19 @@
       });
     }
 
+    function prayBtnLabel(mine, count) {
+      const main = mine ? '✓ Prayed' : 'Pray';
+      let people = '';
+      if (count > 0) {
+        people = count === 1 ? '1 person' : count + ' people';
+      }
+      return { main, people };
+    }
+
     function renderGrid() {
       if (!state.requests.length) {
         els.gridBody.innerHTML = `<tr><td class="request-col empty" colspan="8">
-          <div class="empty-icon">☆</div>
+          <div class="empty-icon">📋</div>
           Your week chart appears here<br><span style="font-size:0.8rem">Add a request to begin tracking prayers</span>
         </td></tr>`;
         return;
@@ -811,9 +838,10 @@
       els.gridBody.innerHTML = state.requests.map(r => {
         const cells = DAYS.map(day => {
           const { count, mine } = getCellPrayers(r.id, day);
+          const { main, people } = prayBtnLabel(mine, count);
           return `<td class="day-cell">
-            <button type="button" class="star-btn${mine ? ' on' : ''}" data-id="${r.id}" data-day="${day}" aria-label="Prayed">
-              ${mine ? '★' : '☆'}${count > 1 ? `<span class="count">${count}</span>` : ''}
+            <button type="button" class="pray-btn${mine ? ' done' : ''}" data-id="${r.id}" data-day="${day}" aria-label="${mine ? 'You prayed this day' : 'Mark as prayed'}">
+              ${main}${people ? `<span class="people">${people}</span>` : ''}
             </button>
           </td>`;
         }).join('');
@@ -822,8 +850,8 @@
           ${cells}
         </tr>`;
       }).join('');
-      els.gridBody.querySelectorAll('.star-btn').forEach(btn => {
-        btn.addEventListener('click', () => toggleStar(btn.dataset.id, btn.dataset.day));
+      els.gridBody.querySelectorAll('.pray-btn').forEach(btn => {
+        btn.addEventListener('click', () => togglePray(btn.dataset.id, btn.dataset.day));
       });
     }
 
