@@ -612,27 +612,6 @@
       padding: 0 4px;
     }
     .banner-dismiss:hover { opacity: 1; }
-    .view-toolbar {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 6px;
-      margin-bottom: 14px;
-    }
-    .view-toolbar .btn-toggle {
-      font-size: 0.75rem;
-      padding: 6px 10px;
-      border-radius: 999px;
-      background: rgba(255,255,255,0.92);
-      border: 1px solid var(--border);
-      color: var(--muted);
-      cursor: pointer;
-      font-weight: 600;
-    }
-    .view-toolbar .btn-toggle.active {
-      background: var(--accent-soft);
-      border-color: #93c5fd;
-      color: var(--accent);
-    }
     .share-row {
       display: flex;
       flex-wrap: wrap;
@@ -752,21 +731,6 @@
       border: 1px solid var(--border);
     }
     .sync-dot.offline-mode { color: #b45309; border-color: #fde68a; background: #fffbeb; }
-    body.view-compact .pray-btn { min-height: 34px; padding: 4px 2px; font-size: 0.58rem; }
-    body.view-compact td.request-col { padding: 8px 12px; font-size: 0.82rem; }
-    body.view-compact td.day-cell { padding: 4px 2px; min-width: 58px; }
-    body.view-comfortable .pray-btn { min-height: 48px; font-size: 0.68rem; }
-    body.a11y-large .pray-btn { min-height: 52px; font-size: 0.72rem; }
-    body.a11y-large .btn { padding: 10px 16px; }
-    body.a11y-contrast {
-      --bg: #fff;
-      --text: #000;
-      --muted: #333;
-      --border: #000;
-      --accent: #0000cc;
-    }
-    body.a11y-contrast .pray-btn { border-width: 3px; }
-    body.a11y-contrast .pray-btn.done { background: #006400; border-color: #004d00; }
     .pray-btn:focus-visible {
       outline: 3px solid var(--accent);
       outline-offset: 2px;
@@ -817,13 +781,6 @@
       <span class="pulse" id="today-pulse">— prayers logged today</span>
       <span class="week-meta" id="week-meta"></span>
       <span class="reset-countdown" id="reset-countdown"></span>
-    </div>
-
-    <div class="view-toolbar" aria-label="Display options">
-      <button type="button" class="btn-toggle" data-view="comfortable" id="view-comfortable">Comfortable</button>
-      <button type="button" class="btn-toggle" data-view="compact" id="view-compact">Compact</button>
-      <button type="button" class="btn-toggle" id="toggle-large">Larger buttons</button>
-      <button type="button" class="btn-toggle" id="toggle-contrast">High contrast</button>
     </div>
 
     <section class="verse-panel" id="verse-panel" aria-label="Scripture of the week">
@@ -940,7 +897,6 @@
       Sunday: 'sun',
     };
     const VERSE_EPOCH = '2025-06-16';
-    const PREFS_KEY = 'uts-ui-prefs';
     const PWA_DISMISS_KEY = 'uts-pwa-dismissed';
 
     const WEEKLY_VERSES = [
@@ -1022,10 +978,6 @@
       offlineBanner: document.getElementById('offline-banner'),
       pwaBanner: document.getElementById('pwa-banner'),
       pwaDismiss: document.getElementById('pwa-dismiss'),
-      viewComfortable: document.getElementById('view-comfortable'),
-      viewCompact: document.getElementById('view-compact'),
-      toggleLarge: document.getElementById('toggle-large'),
-      toggleContrast: document.getElementById('toggle-contrast'),
     };
 
     function markKey(requestId, day) {
@@ -1159,35 +1111,6 @@
       if (/iPhone|iPad|iPod|Android/i.test(navigator.userAgent)) {
         els.pwaBanner.classList.remove('hidden');
       }
-    }
-
-    function loadPrefs() {
-      try { return JSON.parse(localStorage.getItem(PREFS_KEY)) || {}; } catch (_) { return {}; }
-    }
-
-    function savePrefs(prefs) {
-      localStorage.setItem(PREFS_KEY, JSON.stringify(prefs));
-    }
-
-    function applyPrefs() {
-      const prefs = loadPrefs();
-      const view = prefs.view || 'comfortable';
-      document.body.classList.toggle('view-compact', view === 'compact');
-      document.body.classList.toggle('view-comfortable', view !== 'compact');
-      document.body.classList.toggle('a11y-large', !!prefs.large);
-      document.body.classList.toggle('a11y-contrast', !!prefs.contrast);
-      els.viewComfortable.classList.toggle('active', view !== 'compact');
-      els.viewCompact.classList.toggle('active', view === 'compact');
-      els.toggleLarge.classList.toggle('active', !!prefs.large);
-      els.toggleContrast.classList.toggle('active', !!prefs.contrast);
-    }
-
-    function setPref(key, value) {
-      const prefs = loadPrefs();
-      prefs[key] = value;
-      savePrefs(prefs);
-      applyPrefs();
-      updateScrollHint();
     }
 
     function renderVerse() {
@@ -1578,23 +1501,11 @@
       els.pwaBanner.classList.add('hidden');
     });
 
-    els.viewComfortable.addEventListener('click', () => setPref('view', 'comfortable'));
-    els.viewCompact.addEventListener('click', () => setPref('view', 'compact'));
-    els.toggleLarge.addEventListener('click', () => {
-      const prefs = loadPrefs();
-      setPref('large', !prefs.large);
-    });
-    els.toggleContrast.addEventListener('click', () => {
-      const prefs = loadPrefs();
-      setPref('contrast', !prefs.contrast);
-    });
-
     window.addEventListener('online', updateOfflineBanner);
     window.addEventListener('offline', updateOfflineBanner);
     window.addEventListener('resize', updateScrollHint);
     if (els.gridWrap) els.gridWrap.addEventListener('scroll', updateScrollHint);
 
-    applyPrefs();
     showPwaHint();
     updateOfflineBanner();
     els.shareUrl.value = buildShareUrl();
