@@ -8,326 +8,279 @@
   <style>
     *, *::before, *::after { box-sizing: border-box; }
     :root {
-      --bg: #f4f7fb;
+      --bg: #f6f8fb;
       --surface: #ffffff;
-      --border: #d8e2ef;
-      --text: #1a2b42;
-      --muted: #5a6d85;
-      --accent: #2b6cb0;
-      --accent-soft: #ebf4ff;
-      --gold: #c9a227;
-      --gold-soft: #fff8e6;
-      --danger: #c53030;
-      --danger-soft: #fff5f5;
-      --star: #e8b923;
-      --shadow: 0 8px 30px rgba(26, 43, 66, 0.08);
-      --radius: 14px;
+      --border: #e2e8f0;
+      --text: #1e293b;
+      --muted: #64748b;
+      --accent: #2563eb;
+      --accent-soft: #eff6ff;
+      --gold-soft: #fffbeb;
+      --danger: #dc2626;
+      --radius: 12px;
     }
     body {
       margin: 0;
       min-height: 100vh;
       font-family: 'DM Sans', system-ui, sans-serif;
       color: var(--text);
-      background:
-        radial-gradient(ellipse 60% 50% at 0% 0%, rgba(43,108,176,0.08), transparent 70%),
-        radial-gradient(ellipse 50% 40% at 100% 100%, rgba(201,162,39,0.1), transparent 70%),
-        var(--bg);
+      background: var(--bg);
     }
     .app {
-      max-width: 1200px;
+      max-width: 1100px;
       margin: 0 auto;
-      padding: 20px 16px 40px;
+      padding: 24px 16px 32px;
     }
     header {
-      text-align: center;
-      margin-bottom: 24px;
+      margin-bottom: 20px;
+    }
+    .header-top {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 12px;
     }
     header h1 {
       font-family: 'Libre Baskerville', Georgia, serif;
-      font-size: clamp(1.6rem, 4vw, 2.2rem);
-      margin: 0 0 6px;
-      color: var(--text);
-    }
-    header p {
+      font-size: clamp(1.5rem, 4vw, 2rem);
       margin: 0;
+      line-height: 1.2;
+    }
+    .byline {
+      margin: 4px 0 0;
+      font-size: 0.8rem;
       color: var(--muted);
-      font-size: 0.95rem;
+      font-weight: 500;
     }
-    .status-bar {
+    .header-actions {
       display: flex;
-      flex-wrap: wrap;
-      gap: 10px;
-      justify-content: center;
+      gap: 8px;
       align-items: center;
-      margin-top: 14px;
     }
-    .pill {
+    .sync-dot {
       display: inline-flex;
       align-items: center;
       gap: 6px;
-      padding: 6px 12px;
-      border-radius: 999px;
       font-size: 0.78rem;
       font-weight: 600;
+      color: var(--muted);
+      padding: 6px 10px;
       background: var(--surface);
       border: 1px solid var(--border);
-      color: var(--muted);
+      border-radius: 999px;
     }
-    .pill.live { background: #ecfdf5; border-color: #a7f3d0; color: #047857; }
-    .pill.local { background: var(--gold-soft); border-color: #f6e05e; color: #975a16; }
-    .pill.error { background: var(--danger-soft); border-color: #feb2b2; color: var(--danger); }
+    .sync-dot.live { color: #047857; border-color: #bbf7d0; background: #f0fdf4; }
+    .sync-dot.local { color: #b45309; border-color: #fde68a; background: #fffbeb; }
+    .sync-dot.error { color: var(--danger); border-color: #fecaca; background: #fef2f2; }
+    .sync-dot::before {
+      content: '';
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: currentColor;
+    }
+    .btn {
+      border: none;
+      border-radius: 8px;
+      padding: 8px 14px;
+      font: inherit;
+      font-weight: 600;
+      font-size: 0.85rem;
+      cursor: pointer;
+      transition: background 0.12s;
+    }
+    .btn-primary { background: var(--accent); color: #fff; }
+    .btn-primary:hover { background: #1d4ed8; }
+    .btn-ghost {
+      background: var(--surface);
+      color: var(--accent);
+      border: 1px solid var(--border);
+    }
+    .btn-ghost:hover { background: var(--accent-soft); }
+    .btn-icon {
+      width: 32px;
+      height: 32px;
+      padding: 0;
+      border-radius: 8px;
+      background: transparent;
+      border: none;
+      color: var(--muted);
+      font-size: 1.1rem;
+      cursor: pointer;
+      flex-shrink: 0;
+    }
+    .btn-icon:hover { background: #fef2f2; color: var(--danger); }
+    .hint {
+      margin: 10px 0 0;
+      font-size: 0.82rem;
+      color: var(--muted);
+      line-height: 1.45;
+    }
     .layout {
       display: grid;
-      grid-template-columns: minmax(260px, 320px) 1fr;
-      gap: 18px;
+      grid-template-columns: 280px 1fr;
+      gap: 16px;
       align-items: start;
     }
-    @media (max-width: 860px) {
+    @media (max-width: 800px) {
       .layout { grid-template-columns: 1fr; }
     }
     .panel {
       background: var(--surface);
       border: 1px solid var(--border);
       border-radius: var(--radius);
-      box-shadow: var(--shadow);
       overflow: hidden;
     }
-    .panel-head {
-      padding: 16px 18px 12px;
-      border-bottom: 1px solid var(--border);
-      background: linear-gradient(180deg, #fafcff, var(--surface));
-    }
-    .panel-head h2 {
-      margin: 0;
-      font-size: 1.05rem;
-    }
-    .panel-head p {
-      margin: 4px 0 0;
-      font-size: 0.82rem;
+    .panel-label {
+      padding: 12px 14px 0;
+      font-size: 0.72rem;
+      font-weight: 700;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
       color: var(--muted);
     }
     .add-form {
       display: flex;
       gap: 8px;
-      padding: 14px 16px;
-      border-bottom: 1px solid var(--border);
+      padding: 10px 14px 14px;
     }
     .add-form input {
       flex: 1;
       border: 1px solid var(--border);
-      border-radius: 10px;
-      padding: 11px 12px;
+      border-radius: 8px;
+      padding: 10px 11px;
       font: inherit;
-      font-size: 0.92rem;
+      font-size: 0.9rem;
+      min-width: 0;
     }
     .add-form input:focus {
-      outline: 2px solid rgba(43,108,176,0.25);
+      outline: 2px solid rgba(37,99,235,0.2);
       border-color: var(--accent);
-    }
-    .btn {
-      border: none;
-      border-radius: 10px;
-      padding: 10px 14px;
-      font: inherit;
-      font-weight: 600;
-      font-size: 0.88rem;
-      cursor: pointer;
-      transition: transform 0.12s, background 0.12s;
-    }
-    .btn:active { transform: scale(0.98); }
-    .btn-primary { background: var(--accent); color: #fff; }
-    .btn-primary:hover { background: #255fa0; }
-    .btn-ghost {
-      background: var(--accent-soft);
-      color: var(--accent);
-    }
-    .btn-ghost:hover { background: #dbeafe; }
-    .btn-danger {
-      background: var(--danger-soft);
-      color: var(--danger);
-      padding: 6px 10px;
-      font-size: 0.78rem;
     }
     .request-list {
       list-style: none;
       margin: 0;
-      padding: 8px;
-      max-height: 420px;
+      padding: 0 8px 8px;
+      max-height: 360px;
       overflow-y: auto;
     }
     .request-item {
       display: flex;
       align-items: center;
-      justify-content: space-between;
-      gap: 10px;
-      padding: 12px 12px;
-      border-radius: 10px;
-      margin-bottom: 4px;
+      gap: 8px;
+      padding: 10px 8px;
+      border-radius: 8px;
+      border-bottom: 1px solid #f1f5f9;
     }
-    .request-item:hover { background: #f8fafc; }
+    .request-item:last-child { border-bottom: none; }
+    .request-body { flex: 1; min-width: 0; }
     .request-text {
-      flex: 1;
-      font-size: 0.92rem;
+      font-size: 0.9rem;
       line-height: 1.35;
       word-break: break-word;
     }
+    .request-count {
+      font-size: 0.72rem;
+      color: var(--muted);
+      margin-top: 2px;
+    }
+    .request-count.has { color: var(--accent); font-weight: 600; }
     .empty {
       text-align: center;
-      padding: 28px 16px;
+      padding: 24px 14px;
       color: var(--muted);
-      font-size: 0.9rem;
+      font-size: 0.88rem;
     }
     .grid-wrap {
       overflow-x: auto;
-      padding: 12px;
+      padding: 0 0 8px;
     }
     table {
       width: 100%;
-      border-collapse: separate;
-      border-spacing: 0;
-      min-width: 640px;
-    }
-    th, td {
-      border: 1px solid var(--border);
-      text-align: center;
-      vertical-align: middle;
+      border-collapse: collapse;
+      min-width: 520px;
     }
     th {
-      background: var(--accent-soft);
-      color: var(--accent);
-      font-size: 0.82rem;
+      font-size: 0.75rem;
       font-weight: 700;
-      padding: 12px 8px;
+      color: var(--muted);
+      padding: 10px 6px;
+      border-bottom: 1px solid var(--border);
+      background: #fafbfc;
     }
     th.request-col {
       text-align: left;
-      padding-left: 16px;
-      min-width: 180px;
+      padding-left: 14px;
+      min-width: 140px;
       position: sticky;
       left: 0;
-      z-index: 2;
-      background: var(--accent-soft);
+      background: #fafbfc;
+      z-index: 1;
+    }
+    td {
+      border-bottom: 1px solid #f1f5f9;
+      vertical-align: middle;
     }
     td.request-col {
       text-align: left;
-      padding: 14px 16px;
-      font-size: 0.92rem;
-      line-height: 1.35;
+      padding: 12px 14px;
+      font-size: 0.88rem;
       font-weight: 500;
+      line-height: 1.35;
       position: sticky;
       left: 0;
-      z-index: 1;
       background: var(--surface);
+      z-index: 1;
       word-break: break-word;
     }
-    tr:nth-child(even) td.request-col { background: #fbfdff; }
-    td.day-cell { padding: 8px; width: 72px; }
-    .star-btn {
+    td.day-cell {
+      text-align: center;
+      padding: 6px 4px;
       width: 52px;
-      min-height: 52px;
-      border: none;
-      border-radius: 12px;
-      background: #f8fafc;
-      cursor: pointer;
-      font-size: 1.35rem;
-      line-height: 1;
-      transition: background 0.12s, transform 0.12s;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      gap: 2px;
-      padding: 4px;
     }
-    .star-btn:hover { background: var(--gold-soft); transform: scale(1.06); }
+    .star-btn {
+      width: 40px;
+      height: 40px;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      background: #fafbfc;
+      cursor: pointer;
+      font-size: 1.1rem;
+      line-height: 1;
+      position: relative;
+      transition: background 0.12s, border-color 0.12s;
+    }
+    .star-btn:hover { background: var(--gold-soft); border-color: #fcd34d; }
     .star-btn.on {
       background: var(--gold-soft);
-      box-shadow: inset 0 0 0 2px rgba(201,162,39,0.35);
+      border-color: #fbbf24;
     }
-    .pray-count {
-      font-size: 0.68rem;
+    .star-btn .count {
+      position: absolute;
+      bottom: 2px;
+      right: 3px;
+      font-size: 0.58rem;
       font-weight: 700;
       color: var(--accent);
       line-height: 1;
     }
-    .pray-count.zero { color: #cbd5e0; }
-    .request-meta {
-      display: flex;
-      flex-direction: column;
-      gap: 4px;
-      flex: 1;
-      min-width: 0;
-    }
-    .prayer-total {
-      display: inline-flex;
-      align-items: center;
-      gap: 4px;
-      font-size: 0.76rem;
-      font-weight: 600;
-      color: var(--accent);
-      background: var(--accent-soft);
-      padding: 3px 8px;
-      border-radius: 999px;
-      width: fit-content;
-    }
-    .prayer-total.none { color: var(--muted); background: #f1f5f9; }
-    .credit {
+    .footer-note {
+      margin-top: 16px;
       text-align: center;
-      margin-top: 28px;
-      font-size: 0.82rem;
+      font-size: 0.75rem;
       color: var(--muted);
-    }
-    .legend {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 14px;
-      padding: 12px 16px 16px;
-      font-size: 0.82rem;
-      color: var(--muted);
-      border-top: 1px solid var(--border);
-    }
-    .share-box {
-      margin-top: 18px;
-      padding: 16px;
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: var(--radius);
-      box-shadow: var(--shadow);
-    }
-    .share-box label {
-      display: block;
-      font-size: 0.82rem;
-      font-weight: 600;
-      color: var(--muted);
-      margin-bottom: 6px;
-    }
-    .share-row {
-      display: flex;
-      gap: 8px;
-      flex-wrap: wrap;
-    }
-    .share-row input {
-      flex: 1;
-      min-width: 200px;
-      border: 1px solid var(--border);
-      border-radius: 10px;
-      padding: 10px 12px;
-      font: inherit;
-      font-size: 0.85rem;
-      background: #f8fafc;
     }
     .setup-note {
-      margin-top: 16px;
-      padding: 14px 16px;
+      margin-top: 12px;
+      padding: 12px 14px;
       border-radius: var(--radius);
-      background: var(--gold-soft);
-      border: 1px solid #f6e05e;
-      font-size: 0.86rem;
-      color: #744210;
-      line-height: 1.45;
+      background: #fffbeb;
+      border: 1px solid #fde68a;
+      font-size: 0.82rem;
+      color: #92400e;
     }
     .setup-note.hidden { display: none; }
-    .setup-note a { color: var(--accent); }
     .toast {
       position: fixed;
       bottom: 20px;
@@ -342,7 +295,6 @@
       opacity: 0;
       transition: transform 0.25s, opacity 0.25s;
       z-index: 100;
-      pointer-events: none;
     }
     .toast.show {
       transform: translateX(-50%) translateY(0);
@@ -353,69 +305,54 @@
 <body>
   <div class="app">
     <header>
-      <h1>United to Serve</h1>
-      <p>Prayer Chain — anonymous, synced, resets every Saturday midnight PT</p>
-      <div class="status-bar">
-        <span class="pill" id="sync-pill">Connecting…</span>
-        <span class="pill" id="group-pill">Group: …</span>
-        <span class="pill" id="reset-pill">Resets Sat midnight PT</span>
+      <div class="header-top">
+        <div>
+          <h1>United to Serve</h1>
+          <p class="byline">Prayer Chain · by Kevin Raphael</p>
+        </div>
+        <div class="header-actions">
+          <span class="sync-dot" id="sync-pill">Connecting…</span>
+          <button type="button" class="btn btn-ghost" id="copy-link-btn">Copy link</button>
+        </div>
       </div>
+      <p class="hint">Tap ☆ on a day when you prayed. Counts are anonymous. Stars reset Saturday midnight Pacific.</p>
     </header>
 
     <div class="layout">
       <section class="panel">
-        <div class="panel-head">
-          <h2>Prayer requests</h2>
-          <p>Add names or needs. Everyone in your group sees the same list.</p>
-        </div>
+        <div class="panel-label">Requests</div>
         <form class="add-form" id="add-form">
-          <input type="text" id="request-input" placeholder="e.g. Healing for Maria" maxlength="200" required>
+          <input type="text" id="request-input" placeholder="Add a prayer need…" maxlength="200" required>
           <button type="submit" class="btn btn-primary">Add</button>
         </form>
         <ul class="request-list" id="request-list"></ul>
       </section>
 
       <section class="panel">
-        <div class="panel-head">
-          <h2>This week</h2>
-          <p>Tap ☆ when you prayed. Your star is private — only counts are shared.</p>
-        </div>
+        <div class="panel-label">This week</div>
         <div class="grid-wrap">
-          <table id="grid">
+          <table>
             <thead>
               <tr>
-                <th class="request-col">Prayer request</th>
-                <th>Prayed</th>
-                <th>Sat</th><th>Sun</th><th>Mon</th><th>Tue</th><th>Wed</th><th>Thu</th><th>Fri</th>
+                <th class="request-col">Request</th>
+                <th>S</th><th>S</th><th>M</th><th>T</th><th>W</th><th>T</th><th>F</th>
               </tr>
             </thead>
             <tbody id="grid-body"></tbody>
           </table>
         </div>
-        <div class="legend">
-          <span>★ = you prayed &nbsp;·&nbsp; number = people who prayed (anonymous) &nbsp;·&nbsp; resets <strong>Saturday midnight Pacific</strong></span>
-        </div>
       </section>
     </div>
 
-    <div class="share-box">
-      <label>Share this link with your prayer group (same link = same list on every phone &amp; computer)</label>
-      <div class="share-row">
-        <input type="text" id="share-url" readonly>
-        <button type="button" class="btn btn-ghost" id="copy-link-btn">Copy link</button>
-      </div>
-    </div>
+    <p class="footer-note">Week runs Sat–Fri · Resets Saturday midnight PT · by Kevin Raphael</p>
 
     <div class="setup-note hidden" id="setup-note">
-      <strong>Sync not set up yet.</strong> This device is saving locally only.
-      To sync with phones and other computers, follow
-      <a href="README.md" target="_blank">README.md</a> to connect Firebase (free, ~5 minutes).
+      Sync not connected — changes stay on this device only.
     </div>
-
-    <p class="credit">Made by Kevin Raphael</p>
   </div>
 
   <div class="toast" id="toast"></div>
+  <input type="text" id="share-url" hidden readonly>
 
   <script src="firebase-config.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
@@ -424,7 +361,6 @@
   (() => {
     const PT = 'America/Los_Angeles';
     const DAYS = ['sat', 'sun', 'mon', 'tue', 'wed', 'thu', 'fri'];
-    const DAY_LABELS = ['Sat', 'Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri'];
 
     const params = new URLSearchParams(location.search);
     const groupId = (params.get('group') || 'united-to-serve').trim().replace(/[^\w-]/g, '-').slice(0, 64) || 'united-to-serve';
@@ -438,14 +374,12 @@
     }
 
     let state = { requests: [], marks: {}, weekKey: '' };
-    let db = null;
     let docRef = null;
     let saveTimer = null;
     let resetTimer = null;
 
     const els = {
       syncPill: document.getElementById('sync-pill'),
-      groupPill: document.getElementById('group-pill'),
       requestList: document.getElementById('request-list'),
       gridBody: document.getElementById('grid-body'),
       addForm: document.getElementById('add-form'),
@@ -512,7 +446,7 @@
       const current = getWeekStartKey();
       if (state.weekKey && state.weekKey !== current) {
         state.marks = {};
-        showToast('New week — prayer stars reset');
+        showToast('New week — stars reset');
       }
       state.weekKey = current;
     }
@@ -520,17 +454,14 @@
     function getCellPrayers(requestId, day) {
       const cell = state.marks[markKey(requestId, day)];
       if (!cell || typeof cell !== 'object') return { count: 0, mine: false };
-      const ids = Object.keys(cell);
-      return { count: ids.length, mine: !!cell[userId] };
+      return { count: Object.keys(cell).length, mine: !!cell[userId] };
     }
 
     function countUniquePrayersForRequest(requestId) {
       const users = new Set();
       DAYS.forEach(day => {
         const cell = state.marks[markKey(requestId, day)];
-        if (cell && typeof cell === 'object') {
-          Object.keys(cell).forEach(id => users.add(id));
-        }
+        if (cell && typeof cell === 'object') Object.keys(cell).forEach(id => users.add(id));
       });
       return users.size;
     }
@@ -543,8 +474,7 @@
 
     function firebaseReady() {
       const c = window.FIREBASE_CONFIG;
-      if (!c || !c.apiKey || c.apiKey === 'YOUR_API_KEY') return false;
-      return true;
+      return !!(c && c.apiKey && c.apiKey !== 'YOUR_API_KEY');
     }
 
     function loadLocal() {
@@ -573,13 +503,13 @@
           }, { merge: true });
         } catch (e) {
           console.error(e);
-          setSyncStatus('error', 'Sync error — saved on this device');
+          setSyncStatus('error', 'Sync error');
         }
       }, 350);
     }
 
     function setSyncStatus(mode, text) {
-      els.syncPill.className = 'pill ' + (mode === 'live' ? 'live' : mode === 'error' ? 'error' : 'local');
+      els.syncPill.className = 'sync-dot ' + mode;
       els.syncPill.textContent = text;
       els.setupNote.classList.toggle('hidden', mode === 'live');
     }
@@ -597,17 +527,16 @@
     function initFirebase() {
       if (!firebaseReady()) {
         applyState(loadLocal());
-        setSyncStatus('local', 'This device only — set up sync');
+        setSyncStatus('local', 'Offline');
         return;
       }
       try {
         firebase.initializeApp(window.FIREBASE_CONFIG);
-        db = firebase.firestore();
-        docRef = db.collection('prayerChains').doc(groupId);
+        docRef = firebase.firestore().collection('prayerChains').doc(groupId);
         docRef.onSnapshot(snap => {
           if (snap.exists) {
             applyState(snap.data());
-            setSyncStatus('live', 'Live — synced with group');
+            setSyncStatus('live', 'Synced');
           } else {
             state = loadLocal();
             maybeResetWeek();
@@ -617,18 +546,16 @@
               weekKey: state.weekKey,
               updatedAt: firebase.firestore.FieldValue.serverTimestamp(),
             });
-            setSyncStatus('live', 'Live — synced with group');
+            setSyncStatus('live', 'Synced');
             render();
           }
-        }, err => {
-          console.error(err);
+        }, () => {
           applyState(loadLocal());
-          setSyncStatus('error', 'Offline — using this device');
+          setSyncStatus('error', 'Offline');
         });
       } catch (e) {
-        console.error(e);
         applyState(loadLocal());
-        setSyncStatus('local', 'This device only');
+        setSyncStatus('local', 'Offline');
       }
     }
 
@@ -638,27 +565,23 @@
       state.requests.push({ id: uid(), text: trimmed, createdAt: Date.now() });
       scheduleSave();
       render();
-      showToast('Prayer request added');
+      showToast('Added');
     }
 
     function deleteRequest(id) {
-      if (!confirm('Remove this prayer request?')) return;
+      if (!confirm('Remove this request?')) return;
       state.requests = state.requests.filter(r => r.id !== id);
-      const prefix = id + '_';
       Object.keys(state.marks).forEach(k => {
-        if (k.startsWith(prefix)) delete state.marks[k];
+        if (k.startsWith(id + '_')) delete state.marks[k];
       });
       scheduleSave();
       render();
-      showToast('Request removed');
     }
 
     function toggleStar(requestId, day) {
       maybeResetWeek();
       const key = markKey(requestId, day);
-      if (!state.marks[key] || typeof state.marks[key] !== 'object') {
-        state.marks[key] = {};
-      }
+      if (!state.marks[key] || typeof state.marks[key] !== 'object') state.marks[key] = {};
       if (state.marks[key][userId]) {
         delete state.marks[key][userId];
         if (!Object.keys(state.marks[key]).length) delete state.marks[key];
@@ -669,26 +592,24 @@
       render();
     }
 
-    function prayerTotalLabel(count) {
-      if (count === 0) return 'No prayers yet';
-      if (count === 1) return '1 person prayed';
-      return count + ' people prayed';
+    function countLabel(n) {
+      if (!n) return '';
+      return n === 1 ? '1 person prayed' : n + ' people prayed';
     }
 
     function renderRequestList() {
       if (!state.requests.length) {
-        els.requestList.innerHTML = '<li class="empty">No requests yet. Add one above.</li>';
+        els.requestList.innerHTML = '<li class="empty">No requests yet</li>';
         return;
       }
       els.requestList.innerHTML = state.requests.map(r => {
-        const total = countUniquePrayersForRequest(r.id);
-        return `
-        <li class="request-item">
-          <div class="request-meta">
-            <span class="request-text">${escapeHtml(r.text)}</span>
-            <span class="prayer-total${total ? '' : ' none'}">${prayerTotalLabel(total)}</span>
+        const n = countUniquePrayersForRequest(r.id);
+        return `<li class="request-item">
+          <div class="request-body">
+            <div class="request-text">${escapeHtml(r.text)}</div>
+            <div class="request-count${n ? ' has' : ''}">${countLabel(n) || 'No prayers yet'}</div>
           </div>
-          <button type="button" class="btn btn-danger" data-delete="${r.id}">Remove</button>
+          <button type="button" class="btn-icon" data-delete="${r.id}" title="Remove">×</button>
         </li>`;
       }).join('');
       els.requestList.querySelectorAll('[data-delete]').forEach(btn => {
@@ -698,29 +619,20 @@
 
     function renderGrid() {
       if (!state.requests.length) {
-        els.gridBody.innerHTML = `<tr><td class="request-col empty" colspan="9">Add a prayer request to see the week chart.</td></tr>`;
+        els.gridBody.innerHTML = '<tr><td class="request-col empty" colspan="8">Add a request to start</td></tr>';
         return;
       }
       els.gridBody.innerHTML = state.requests.map(r => {
-        const total = countUniquePrayersForRequest(r.id);
-        const totalCell = `<td class="day-cell">
-          <span class="prayer-total${total ? '' : ' none'}" style="font-size:0.72rem">${total || '—'}</span>
-        </td>`;
         const cells = DAYS.map(day => {
           const { count, mine } = getCellPrayers(r.id, day);
           return `<td class="day-cell">
-            <button type="button" class="star-btn${mine ? ' on' : ''}" data-id="${r.id}" data-day="${day}" aria-label="Prayed on ${day}">
-              <span>${mine ? '★' : '☆'}</span>
-              <span class="pray-count${count ? '' : ' zero'}">${count || '·'}</span>
+            <button type="button" class="star-btn${mine ? ' on' : ''}" data-id="${r.id}" data-day="${day}" aria-label="Prayed">
+              ${mine ? '★' : '☆'}${count > 1 ? `<span class="count">${count}</span>` : ''}
             </button>
           </td>`;
         }).join('');
         return `<tr>
-          <td class="request-col">
-            ${escapeHtml(r.text)}
-            <div class="prayer-total${total ? '' : ' none'}" style="margin-top:6px;font-size:0.75rem">${prayerTotalLabel(total)}</div>
-          </td>
-          ${totalCell}
+          <td class="request-col">${escapeHtml(r.text)}</td>
           ${cells}
         </tr>`;
       }).join('');
@@ -744,18 +656,6 @@
       return url.toString();
     }
 
-    function scheduleWeekCheck() {
-      clearInterval(resetTimer);
-      resetTimer = setInterval(() => {
-        const before = state.weekKey;
-        maybeResetWeek();
-        if (before !== state.weekKey) {
-          scheduleSave();
-          render();
-        }
-      }, 60000);
-    }
-
     els.addForm.addEventListener('submit', e => {
       e.preventDefault();
       addRequest(els.requestInput.value);
@@ -767,18 +667,24 @@
       const link = buildShareUrl();
       try {
         await navigator.clipboard.writeText(link);
-        showToast('Link copied!');
+        showToast('Link copied');
       } catch (_) {
+        els.shareUrl.value = link;
+        els.shareUrl.hidden = false;
         els.shareUrl.select();
         document.execCommand('copy');
-        showToast('Link copied!');
+        els.shareUrl.hidden = true;
+        showToast('Link copied');
       }
     });
 
-    els.groupPill.textContent = 'Group: ' + groupId;
     els.shareUrl.value = buildShareUrl();
     initFirebase();
-    scheduleWeekCheck();
+    setInterval(() => {
+      const before = state.weekKey;
+      maybeResetWeek();
+      if (before !== state.weekKey) { scheduleSave(); render(); }
+    }, 60000);
   })();
   </script>
 </body>
