@@ -542,12 +542,6 @@
       line-height: 1.5;
       color: var(--muted);
     }
-    .verse-prompt {
-      margin: 8px 0 0;
-      font-size: 0.82rem;
-      color: var(--accent);
-      font-weight: 600;
-    }
     .verse-actions {
       display: flex;
       flex-wrap: wrap;
@@ -687,57 +681,6 @@
       border-style: dashed;
       background: #f8fafc;
     }
-    .add-form-row {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 8px;
-      padding: 10px 14px 0;
-    }
-    .add-form-row select {
-      border: 1px solid var(--border);
-      border-radius: 8px;
-      padding: 8px 10px;
-      font: inherit;
-      font-size: 0.85rem;
-      background: #fff;
-      color: var(--text);
-    }
-    .request-item.pinned {
-      background: rgba(254,243,199,0.35);
-      border: 1px solid #fde68a;
-    }
-    .request-item.answered-item { opacity: 0.85; }
-    .request-actions {
-      display: flex;
-      flex-direction: column;
-      gap: 2px;
-      flex-shrink: 0;
-    }
-    .request-actions .btn-icon {
-      width: 28px;
-      height: 28px;
-      font-size: 0.95rem;
-    }
-    .request-actions .btn-icon.pin-active { color: #b45309; }
-    .request-actions .btn-icon.answered-btn { color: #16a34a; }
-    .request-actions .btn-icon.answered-btn:hover { background: #f0fdf4; }
-    .category-tag {
-      display: inline-block;
-      font-size: 0.65rem;
-      font-weight: 700;
-      text-transform: uppercase;
-      letter-spacing: 0.04em;
-      padding: 2px 6px;
-      border-radius: 4px;
-      background: #f1f5f9;
-      color: var(--muted);
-      margin-bottom: 4px;
-    }
-    .category-tag.health { background: #fef2f2; color: #b91c1c; }
-    .category-tag.family { background: #fdf4ff; color: #a21caf; }
-    .category-tag.church { background: #eff6ff; color: #1d4ed8; }
-    .category-tag.work { background: #f0fdf4; color: #15803d; }
-    .category-tag.other { background: #f1f5f9; color: #475569; }
     .answered-section {
       border-top: 1px solid var(--border);
       margin-top: 4px;
@@ -751,6 +694,28 @@
       text-decoration: line-through;
       color: var(--muted);
     }
+    .request-actions {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      flex-shrink: 0;
+      align-items: flex-end;
+    }
+    .request-link {
+      background: none;
+      border: none;
+      font: inherit;
+      font-size: 0.72rem;
+      font-weight: 600;
+      cursor: pointer;
+      padding: 2px 0;
+      color: var(--muted);
+      white-space: nowrap;
+    }
+    .request-link:hover { color: var(--accent); }
+    .request-link.answered-link { color: #16a34a; }
+    .request-link.answered-link:hover { color: #15803d; }
+    .request-link.remove-link:hover { color: var(--danger); }
     .modal-backdrop {
       position: fixed;
       inset: 0;
@@ -868,7 +833,6 @@
       </div>
       <cite class="verse-ref" id="verse-ref"></cite>
       <p class="verse-text" id="verse-text"></p>
-      <p class="verse-prompt">Pray this over the requests below.</p>
       <p class="verse-intro hidden" id="verse-intro"></p>
       <div class="verse-actions">
         <button type="button" class="btn btn-ghost" id="copy-verse-btn">Copy verse</button>
@@ -879,16 +843,6 @@
       <section class="panel">
         <div class="panel-inner">
           <div class="panel-label">Requests</div>
-          <div class="add-form-row">
-            <select id="category-select" aria-label="Category">
-              <option value="">Category (optional)</option>
-              <option value="health">Health</option>
-              <option value="family">Family</option>
-              <option value="church">Church</option>
-              <option value="work">Work</option>
-              <option value="other">Other</option>
-            </select>
-          </div>
           <form class="add-form" id="add-form">
             <input type="text" id="request-input" placeholder="Add a prayer need…" maxlength="200" required>
             <button type="submit" class="btn btn-primary">Add</button>
@@ -986,7 +940,6 @@
       Sunday: 'sun',
     };
     const VERSE_EPOCH = '2025-06-16';
-    const CATEGORIES = ['health', 'family', 'church', 'work', 'other'];
     const PREFS_KEY = 'uts-ui-prefs';
     const PWA_DISMISS_KEY = 'uts-pwa-dismissed';
 
@@ -1048,7 +1001,6 @@
       gridWrap: document.getElementById('grid-wrap'),
       addForm: document.getElementById('add-form'),
       requestInput: document.getElementById('request-input'),
-      categorySelect: document.getElementById('category-select'),
       shareUrl: document.getElementById('share-url'),
       copyLinkBtn: document.getElementById('copy-link-btn'),
       copyMessageBtn: document.getElementById('copy-message-btn'),
@@ -1173,18 +1125,13 @@
     function activeRequests() {
       return state.requests
         .filter(r => !r.answered)
-        .sort((a, b) => (b.pinned ? 1 : 0) - (a.pinned ? 1 : 0) || (a.createdAt || 0) - (b.createdAt || 0));
+        .sort((a, b) => (a.createdAt || 0) - (b.createdAt || 0));
     }
 
     function answeredRequests() {
       return state.requests
         .filter(r => r.answered)
         .sort((a, b) => (b.answeredAt || 0) - (a.answeredAt || 0));
-    }
-
-    function categoryLabel(cat) {
-      const labels = { health: 'Health', family: 'Family', church: 'Church', work: 'Work', other: 'Other' };
-      return labels[cat] || '';
     }
 
     function renderStatusBar() {
@@ -1404,12 +1351,10 @@
       }
     }
 
-    function addRequest(text, category) {
+    function addRequest(text) {
       const trimmed = text.trim();
       if (!trimmed) return;
-      const req = { id: uid(), text: trimmed, createdAt: Date.now() };
-      if (category && CATEGORIES.includes(category)) req.category = category;
-      state.requests.push(req);
+      state.requests.push({ id: uid(), text: trimmed, createdAt: Date.now() });
       scheduleSave();
       render();
       showToast('Added');
@@ -1425,22 +1370,12 @@
       render();
     }
 
-    function togglePin(id) {
-      const req = state.requests.find(r => r.id === id);
-      if (!req || req.answered) return;
-      req.pinned = !req.pinned;
-      scheduleSave();
-      render();
-      showToast(req.pinned ? 'Pinned' : 'Unpinned');
-    }
-
     function markAnswered(id) {
       const req = state.requests.find(r => r.id === id);
       if (!req || req.answered) return;
       if (!confirm('Mark this request as answered?')) return;
       req.answered = true;
       req.answeredAt = Date.now();
-      req.pinned = false;
       scheduleSave();
       render();
       showToast('Marked as answered');
@@ -1475,36 +1410,26 @@
       return n === 1 ? '1 person prayed' : n + ' people prayed';
     }
 
-    function renderRequestItem(r, options = {}) {
+    function renderRequestItem(r) {
       const answered = !!r.answered;
       const n = answered ? 0 : countUniquePrayersForRequest(r.id);
-      const cat = r.category && CATEGORIES.includes(r.category)
-        ? '<span class="category-tag ' + r.category + '">' + categoryLabel(r.category) + '</span>'
-        : '';
-      const pinBtn = answered ? '' : `<button type="button" class="btn-icon pin-btn${r.pinned ? ' pin-active' : ''}" data-pin="${r.id}" title="${r.pinned ? 'Unpin' : 'Pin urgent'}">★</button>`;
-      const answeredBtn = answered
-        ? `<button type="button" class="btn-icon" data-restore="${r.id}" title="Restore">↩</button>`
-        : `<button type="button" class="btn-icon answered-btn" data-answered="${r.id}" title="Mark answered">✓</button>`;
-      return `<li class="request-item${r.pinned ? ' pinned' : ''}${answered ? ' answered-row' : ''}">
+      const actions = answered
+        ? `<button type="button" class="request-link" data-restore="${r.id}">Restore</button>
+           <button type="button" class="request-link remove-link" data-delete="${r.id}">Remove</button>`
+        : `<button type="button" class="request-link answered-link" data-answered="${r.id}">Answered</button>
+           <button type="button" class="request-link remove-link" data-delete="${r.id}">Remove</button>`;
+      return `<li class="request-item${answered ? ' answered-row' : ''}">
           <div class="request-body">
-            ${cat}
             <div class="request-text">${escapeHtml(r.text)}</div>
             <div class="request-count${n ? ' has' : ''}">${answered ? 'Answered' : (countLabel(n) || 'No prayers yet')}</div>
           </div>
-          <div class="request-actions">
-            ${pinBtn}
-            ${answeredBtn}
-            <button type="button" class="btn-icon" data-delete="${r.id}" title="Remove">×</button>
-          </div>
+          <div class="request-actions">${actions}</div>
         </li>`;
     }
 
     function bindRequestListEvents(listEl) {
       listEl.querySelectorAll('[data-delete]').forEach(btn => {
         btn.addEventListener('click', () => deleteRequest(btn.dataset.delete));
-      });
-      listEl.querySelectorAll('[data-pin]').forEach(btn => {
-        btn.addEventListener('click', () => togglePin(btn.dataset.pin));
       });
       listEl.querySelectorAll('[data-answered]').forEach(btn => {
         btn.addEventListener('click', () => markAnswered(btn.dataset.answered));
@@ -1576,12 +1501,8 @@
             </button>
           </td>`;
         }).join('');
-        const cat = r.category && CATEGORIES.includes(r.category)
-          ? `<span class="category-tag ${r.category}">${categoryLabel(r.category)}</span> `
-          : '';
-        const pin = r.pinned ? '★ ' : '';
         return `<tr>
-          <td class="request-col">${cat}${pin}${escapeHtml(r.text)}</td>
+          <td class="request-col">${escapeHtml(r.text)}</td>
           ${cells}
         </tr>`;
       }).join('');
@@ -1635,9 +1556,8 @@
 
     els.addForm.addEventListener('submit', e => {
       e.preventDefault();
-      addRequest(els.requestInput.value, els.categorySelect.value);
+      addRequest(els.requestInput.value);
       els.requestInput.value = '';
-      els.categorySelect.value = '';
       els.requestInput.focus();
     });
 
