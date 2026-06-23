@@ -1,9 +1,8 @@
-// Placeholder — replace with your Firebase config (see firebase-config.example.js)
 window.FIREBASE_CONFIG = {
-  apiKey: 'YOUR_API_KEY',
-  authDomain: 'YOUR_PROJECT.firebaseapp.com',
-  projectId: 'YOUR_PROJECT_ID',
-  storageBucket: 'YOUR_PROJECT.appspot.com',
-  messagingSenderId: 'YOUR_SENDER_ID',
-  appId: 'YOUR_APP_ID',
+  apiKey: 'AIzaSyBukyZceQ8EeDL9j7QJNQahEm3zqKPxj6c',
+  authDomain: 'united-to-serve-prayer.firebaseapp.com',
+  projectId: 'united-to-serve-prayer',
+  storageBucket: 'united-to-serve-prayer.firebasestorage.app',
+  messagingSenderId: '989477297340',
+  appId: '1:989477297340:web:ce88c3c98c435a83a6c4b9',
 };
