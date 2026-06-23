@@ -538,7 +538,7 @@
           <button type="button" class="btn btn-ghost" id="copy-link-btn">Copy link</button>
         </div>
       </div>
-      <p class="hint">Tap <strong>Pray</strong> on a day when you prayed — it turns green <strong>✓ Prayed</strong>. Counts are anonymous. Resets Sunday midnight Pacific.</p>
+      <p class="hint">Tap <strong>Pray</strong> on a day when you prayed — it turns green <strong>✓ Prayed</strong>. Counts are anonymous. Resets Monday midnight Pacific.</p>
     </header>
 
     <section class="verse-panel" id="verse-panel" aria-label="Scripture of the week">
@@ -576,13 +576,13 @@
 
       <section class="panel">
         <div class="panel-inner">
-          <div class="panel-label">This week · Sun – Sat</div>
+          <div class="panel-label">This week · Mon – Sun</div>
           <div class="grid-wrap">
             <table>
               <thead>
                 <tr>
                   <th class="request-col">Request</th>
-                  <th>Su</th><th>M</th><th>T</th><th>W</th><th>Th</th><th>F</th><th>Sa</th>
+                  <th>M</th><th>T</th><th>W</th><th>Th</th><th>F</th><th>Sa</th><th>Su</th>
                 </tr>
               </thead>
               <tbody id="grid-body"></tbody>
@@ -591,9 +591,9 @@
           <div class="panel-fill">
             <div class="fill-card">
               <strong>Week at a glance</strong>
-              Green <strong>✓ Prayed</strong> = you prayed that day · Number below = total people who prayed · Resets Sunday midnight PT
+              Green <strong>✓ Prayed</strong> = you prayed that day · Number below = total people who prayed · Resets Monday midnight PT
               <div class="week-key">
-                <span>Sun</span><span>Mon</span><span>Tue</span><span>Wed</span><span>Thu</span><span>Fri</span><span>Sat</span>
+                <span>Mon</span><span>Tue</span><span>Wed</span><span>Thu</span><span>Fri</span><span>Sat</span><span>Sun</span>
               </div>
             </div>
           </div>
@@ -604,10 +604,10 @@
     <div class="info-row">
       <div class="info-tile"><div class="icon">🔗</div><strong>Same link</strong>Everyone opens the same page — requests stay in sync.</div>
       <div class="info-tile"><div class="icon">🤍</div><strong>Anonymous</strong>Only prayer counts are shared, never names.</div>
-      <div class="info-tile"><div class="icon">🔄</div><strong>Fresh start</strong>Prayer marks reset every Sunday at midnight Pacific.</div>
+      <div class="info-tile"><div class="icon">🔄</div><strong>Fresh start</strong>Prayer marks reset every Monday at midnight Pacific.</div>
     </div>
 
-    <p class="footer-note">Week runs Sun–Sat · Resets Sunday midnight PT · by Kevin Raphael</p>
+    <p class="footer-note">Week runs Mon–Sun · Resets Monday midnight PT · by Kevin Raphael</p>
 
     <div class="setup-note hidden" id="setup-note">
       Sync not connected — changes stay on this device only.
@@ -623,8 +623,8 @@
   <script>
   (() => {
     const PT = 'America/Los_Angeles';
-    const DAYS = ['sun', 'mon', 'tue', 'wed', 'thu', 'fri', 'sat'];
-    const VERSE_EPOCH = '2025-01-05';
+    const DAYS = ['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun'];
+    const VERSE_EPOCH = '2025-01-06';
 
     const WEEKLY_VERSES = [
       { ref: 'Philippians 4:8', text: 'Finally, brothers and sisters, whatever is true, whatever is noble, whatever is right, whatever is pure, whatever is lovely, whatever is admirable—if anything is excellent or praiseworthy—think about such things.', intro: 'One way to "think about such things" is to turn to God through scripture not just when times are tough, but as often as you can. With that in mind, we invite you to prayerfully spend time with the following bible verses, and may you find the encouragement, strength and hope that you are looking for today.' },
@@ -724,7 +724,7 @@
       for (let i = 0; i <= 7; i++) {
         const d = new Date(date.getTime() - i * 86400000);
         const p = getPacificParts(d);
-        if (p.weekday === 'Sunday') return padDate(p);
+        if (p.weekday === 'Monday') return padDate(p);
       }
       return padDate(getPacificParts(date));
     }
@@ -744,7 +744,7 @@
       const verse = WEEKLY_VERSES[idx];
       els.verseRef.textContent = verse.ref;
       els.verseText.textContent = `"${verse.text}"`;
-      els.verseBadge.textContent = `Week ${idx + 1} of ${WEEKLY_VERSES.length} · New verse each Sunday`;
+      els.verseBadge.textContent = `Week ${idx + 1} of ${WEEKLY_VERSES.length} · New verse each Monday`;
       if (verse.intro) {
         els.verseIntro.textContent = verse.intro;
         els.verseIntro.classList.remove('hidden');

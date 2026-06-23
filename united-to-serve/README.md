@@ -105,7 +105,7 @@ After deploy, open the site — the top badge should say **Live — synced with 
 2. **Add** a prayer request (name, need, situation)  
 3. Tap **☆** on the days you pray — your ★ shows only for you; everyone else sees counts only (anonymous)  
 4. Each request shows **“X people prayed”** — no names are shared  
-5. **All stars reset every Saturday at midnight Pacific Time**  
+5. **All prayer marks reset every Monday at midnight Pacific Time**  
 6. **Copy link** and send to your prayer group  
 
 Made by Kevin Raphael.
