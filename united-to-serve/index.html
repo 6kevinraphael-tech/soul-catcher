@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>United to Serve — Prayer Chain</title>
+  <title>United to Serve Prayer Chain</title>
   <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Libre+Baskerville:wght@700&display=swap" rel="stylesheet">
   <style>
     *, *::before, *::after { box-sizing: border-box; }
@@ -90,10 +90,10 @@
       line-height: 1.2;
     }
     .byline {
-      margin: 4px 0 0;
-      font-size: 0.8rem;
-      color: var(--muted);
-      font-weight: 500;
+      margin: 6px 0 0;
+      font-size: 0.95rem;
+      color: var(--text);
+      font-weight: 600;
     }
     .header-actions {
       display: flex;
@@ -429,6 +429,33 @@
       border-radius: var(--radius);
       border: 1px solid var(--border);
     }
+    .contact-panel {
+      margin-top: 14px;
+      padding: 14px 16px;
+      text-align: center;
+      background: linear-gradient(135deg, rgba(255,255,255,0.97), rgba(239,246,255,0.95));
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      box-shadow: 0 4px 24px rgba(30,41,59,0.04);
+    }
+    .contact-panel strong {
+      display: block;
+      font-size: 0.88rem;
+      color: var(--text);
+      margin-bottom: 4px;
+    }
+    .contact-panel p {
+      margin: 0;
+      font-size: 0.82rem;
+      color: var(--muted);
+      line-height: 1.45;
+    }
+    .contact-panel a {
+      color: var(--accent);
+      font-weight: 600;
+      text-decoration: none;
+    }
+    .contact-panel a:hover { text-decoration: underline; }
     .setup-note {
       margin-top: 12px;
       padding: 12px 14px;
@@ -530,8 +557,8 @@
     <header>
       <div class="header-top">
         <div>
-          <h1>United to Serve</h1>
-          <p class="byline">Prayer Chain · by Kevin Raphael</p>
+          <h1>United to Serve Prayer Chain</h1>
+          <p class="byline">by Kevin Raphael</p>
         </div>
         <div class="header-actions">
           <span class="sync-dot" id="sync-pill">Connecting…</span>
@@ -544,7 +571,7 @@
     <section class="verse-panel" id="verse-panel" aria-label="Scripture of the week">
       <div class="verse-head">
         <span class="verse-title">Scripture of the Week</span>
-        <span class="verse-badge" id="verse-badge">Week 1 of 30</span>
+        <span class="verse-badge" id="verse-badge">1 out of 30</span>
       </div>
       <cite class="verse-ref" id="verse-ref"></cite>
       <p class="verse-text" id="verse-text"></p>
@@ -607,6 +634,11 @@
       <div class="info-tile"><div class="icon">🔄</div><strong>Fresh start</strong>Prayer marks reset every Monday at midnight Pacific.</div>
     </div>
 
+    <div class="contact-panel">
+      <strong>Problems or glitches?</strong>
+      <p>Let me know — <a href="mailto:6KevinRaphael@gmail.com">6KevinRaphael@gmail.com</a></p>
+    </div>
+
     <p class="footer-note">Week runs Mon–Sun · Resets Monday midnight PT · by Kevin Raphael</p>
 
     <div class="setup-note hidden" id="setup-note">
@@ -624,7 +656,7 @@
   (() => {
     const PT = 'America/Los_Angeles';
     const DAYS = ['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun'];
-    const VERSE_EPOCH = '2025-01-06';
+    const VERSE_EPOCH = '2025-06-16';
 
     const WEEKLY_VERSES = [
       { ref: 'Philippians 4:8', text: 'Finally, brothers and sisters, whatever is true, whatever is noble, whatever is right, whatever is pure, whatever is lovely, whatever is admirable—if anything is excellent or praiseworthy—think about such things.', intro: 'One way to "think about such things" is to turn to God through scripture not just when times are tough, but as often as you can. With that in mind, we invite you to prayerfully spend time with the following bible verses, and may you find the encouragement, strength and hope that you are looking for today.' },
@@ -744,7 +776,7 @@
       const verse = WEEKLY_VERSES[idx];
       els.verseRef.textContent = verse.ref;
       els.verseText.textContent = `"${verse.text}"`;
-      els.verseBadge.textContent = `Week ${idx + 1} of ${WEEKLY_VERSES.length} · New verse each Monday`;
+      els.verseBadge.textContent = `${idx + 1} out of ${WEEKLY_VERSES.length} · New verse each Monday`;
       if (verse.intro) {
         els.verseIntro.textContent = verse.intro;
         els.verseIntro.classList.remove('hidden');
