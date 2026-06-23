@@ -325,11 +325,8 @@
       }
       .verse-text { font-size: 0.88rem; }
       .panel-label { padding: 10px 12px 0; }
-      .add-form {
-        flex-direction: column;
-        padding: 8px 12px 12px;
-        gap: 10px;
-      }
+      .add-form { padding: 8px 12px 12px; gap: 10px; }
+      .add-form-row { flex-direction: column; gap: 10px; }
       .add-form input {
         padding: 12px;
         font-size: 16px;
@@ -494,11 +491,17 @@
     }
     .add-form {
       display: flex;
+      flex-direction: column;
       gap: 8px;
       padding: 10px 14px 14px;
     }
+    .add-form-row {
+      display: flex;
+      gap: 8px;
+    }
+    .add-form-row input { flex: 1; }
     .add-form input {
-      flex: 1;
+      width: 100%;
       border: 1px solid var(--border);
       border-radius: 8px;
       padding: 10px 11px;
@@ -508,6 +511,7 @@
       background: var(--surface);
       color: var(--text);
     }
+    .add-form input::placeholder { color: var(--muted); opacity: 0.85; }
     .add-form input:focus {
       outline: 2px solid rgba(37,99,235,0.2);
       border-color: var(--accent);
@@ -534,6 +538,25 @@
       font-size: 0.9rem;
       line-height: 1.35;
       word-break: break-word;
+    }
+    .request-name {
+      display: block;
+      font-size: 0.72rem;
+      font-weight: 700;
+      letter-spacing: 0.03em;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 3px;
+    }
+    .request-name.anonymous { color: var(--muted); font-weight: 600; }
+    .request-col .request-name {
+      font-size: 0.65rem;
+      margin-bottom: 2px;
+    }
+    .request-col .request-text {
+      font-size: inherit;
+      font-weight: inherit;
+      line-height: inherit;
     }
     .request-count {
       font-size: 0.72rem;
@@ -1090,8 +1113,11 @@
         <div class="panel-inner">
           <div class="panel-label">Requests</div>
           <form class="add-form" id="add-form">
-            <input type="text" id="request-input" placeholder="Add a prayer need…" maxlength="200" required>
-            <button type="submit" class="btn btn-primary">Add</button>
+            <input type="text" id="name-input" placeholder="Name (optional — leave blank for anonymous)" maxlength="80" autocomplete="name">
+            <div class="add-form-row">
+              <input type="text" id="request-input" placeholder="Prayer need…" maxlength="200" required>
+              <button type="submit" class="btn btn-primary">Add</button>
+            </div>
           </form>
           <ul class="request-list" id="request-list"></ul>
           <div class="answered-section hidden" id="answered-section">
@@ -1221,6 +1247,7 @@
       gridBody: document.getElementById('grid-body'),
       gridWrap: document.getElementById('grid-wrap'),
       addForm: document.getElementById('add-form'),
+      nameInput: document.getElementById('name-input'),
       requestInput: document.getElementById('request-input'),
       shareUrl: document.getElementById('share-url'),
       copyLinkBtn: document.getElementById('copy-link-btn'),
@@ -1556,10 +1583,13 @@
       }
     }
 
-    function addRequest(text) {
+    function addRequest(text, name) {
       const trimmed = text.trim();
       if (!trimmed) return;
-      state.requests.push({ id: uid(), text: trimmed, createdAt: Date.now() });
+      const req = { id: uid(), text: trimmed, createdAt: Date.now() };
+      const trimmedName = (name || '').trim();
+      if (trimmedName) req.name = trimmedName;
+      state.requests.push(req);
       scheduleSave();
       render();
       showToast('Added');
@@ -1615,6 +1645,22 @@
       return n === 1 ? '1 person prayed' : n + ' people prayed';
     }
 
+    function requestNameHtml(r) {
+      const name = r.name && String(r.name).trim();
+      if (name) {
+        return `<span class="request-name">${escapeHtml(name)}</span>`;
+      }
+      return '<span class="request-name anonymous">Anonymous</span>';
+    }
+
+    function requestBodyHtml(r) {
+      return requestNameHtml(r) + `<div class="request-text">${escapeHtml(r.text)}</div>`;
+    }
+
+    function requestColHtml(r) {
+      return requestNameHtml(r) + `<span class="request-text">${escapeHtml(r.text)}</span>`;
+    }
+
     function renderRequestItem(r) {
       const answered = !!r.answered;
       const n = answered ? 0 : countUniquePrayersForRequest(r.id);
@@ -1625,7 +1671,7 @@
            <button type="button" class="request-link remove-link" data-delete="${r.id}">Remove</button>`;
       return `<li class="request-item${answered ? ' answered-row' : ''}">
           <div class="request-body">
-            <div class="request-text">${escapeHtml(r.text)}</div>
+            ${requestBodyHtml(r)}
             <div class="request-count${n ? ' has' : ''}">${answered ? 'Answered' : (countLabel(n) || 'No prayers yet')}</div>
           </div>
           <div class="request-actions">${actions}</div>
@@ -1707,7 +1753,7 @@
           </td>`;
         }).join('');
         return `<tr>
-          <td class="request-col">${escapeHtml(r.text)}</td>
+          <td class="request-col">${requestColHtml(r)}</td>
           ${cells}
         </tr>`;
       }).join('');
@@ -1761,8 +1807,9 @@
 
     els.addForm.addEventListener('submit', e => {
       e.preventDefault();
-      addRequest(els.requestInput.value);
+      addRequest(els.requestInput.value, els.nameInput.value);
       els.requestInput.value = '';
+      els.nameInput.value = '';
       els.requestInput.focus();
     });
 
