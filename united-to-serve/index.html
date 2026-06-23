@@ -162,7 +162,7 @@
     }
     .layout {
       display: grid;
-      grid-template-columns: minmax(280px, 320px) 1fr;
+      grid-template-columns: 1fr minmax(280px, 320px);
       gap: 16px;
       align-items: stretch;
       flex: 1;
@@ -915,32 +915,6 @@
     <div class="layout">
       <section class="panel">
         <div class="panel-inner">
-          <div class="panel-label">Requests</div>
-          <form class="add-form" id="add-form">
-            <input type="text" id="request-input" placeholder="Add a prayer need…" maxlength="200" required>
-            <button type="submit" class="btn btn-primary">Add</button>
-          </form>
-          <ul class="request-list" id="request-list"></ul>
-          <div class="answered-section hidden" id="answered-section">
-            <div class="panel-label">Answered · Praise</div>
-            <ul class="request-list" id="answered-list"></ul>
-          </div>
-          <div class="panel-fill">
-            <div class="fill-card">
-              <strong>Pray together</strong>
-              Share a need — your group lifts it up through the week.
-              <ul class="fill-steps">
-                <li><span class="n">1</span> Add a prayer request</li>
-                <li><span class="n">2</span> Tap <strong>Pray</strong> → turns <strong>✓ Prayed</strong></li>
-                <li><span class="n">3</span> See how many prayed (anonymous)</li>
-              </ul>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      <section class="panel">
-        <div class="panel-inner">
           <div class="panel-label" id="week-panel-label">This week</div>
           <div class="grid-wrap" id="grid-wrap">
             <table>
@@ -960,6 +934,32 @@
               <div class="week-key">
                 <span>Mon</span><span>Tue</span><span>Wed</span><span>Thu</span><span>Fri</span><span>Sat</span><span>Sun</span>
               </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="panel">
+        <div class="panel-inner">
+          <div class="panel-label">Requests</div>
+          <form class="add-form" id="add-form">
+            <input type="text" id="request-input" placeholder="Add a prayer need…" maxlength="200" required>
+            <button type="submit" class="btn btn-primary">Add</button>
+          </form>
+          <ul class="request-list" id="request-list"></ul>
+          <div class="answered-section hidden" id="answered-section">
+            <div class="panel-label">Answered · Praise</div>
+            <ul class="request-list" id="answered-list"></ul>
+          </div>
+          <div class="panel-fill">
+            <div class="fill-card">
+              <strong>Pray together</strong>
+              Share a need — your group lifts it up through the week.
+              <ul class="fill-steps">
+                <li><span class="n">1</span> Add a prayer request</li>
+                <li><span class="n">2</span> Tap <strong>Pray</strong> → turns <strong>✓ Prayed</strong></li>
+                <li><span class="n">3</span> See how many prayed (anonymous)</li>
+              </ul>
             </div>
           </div>
         </div>
