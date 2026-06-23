@@ -323,13 +323,6 @@
       margin-bottom: 8px;
       opacity: 0.5;
     }
-    .grid-wrap {
-      flex: 1;
-      overflow-x: auto;
-      overflow-y: auto;
-      padding: 0 0 8px;
-      min-height: 200px;
-    }
     table {
       width: 100%;
       border-collapse: collapse;
@@ -549,7 +542,273 @@
       line-height: 1.5;
       color: var(--muted);
     }
+    .verse-prompt {
+      margin: 8px 0 0;
+      font-size: 0.82rem;
+      color: var(--accent);
+      font-weight: 600;
+    }
+    .verse-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 12px;
+    }
+    .verse-actions .btn { font-size: 0.78rem; padding: 6px 12px; }
+    .verse-ref a {
+      color: inherit;
+      text-decoration: none;
+    }
+    .verse-ref a:hover { color: var(--accent); text-decoration: underline; }
+    .status-bar {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 14px;
+      padding: 10px 14px;
+      background: rgba(255,255,255,0.92);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      font-size: 0.82rem;
+    }
+    .status-bar .pulse {
+      font-weight: 600;
+      color: var(--accent);
+    }
+    .status-bar .week-meta {
+      color: var(--muted);
+    }
+    .status-bar .reset-countdown {
+      margin-left: auto;
+      font-size: 0.78rem;
+      color: var(--muted);
+      font-weight: 600;
+    }
+    .banner {
+      margin-bottom: 12px;
+      padding: 10px 14px;
+      border-radius: var(--radius);
+      font-size: 0.82rem;
+      line-height: 1.45;
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 10px;
+    }
+    .banner.hidden { display: none; }
+    .banner-offline {
+      background: #fffbeb;
+      border: 1px solid #fde68a;
+      color: #92400e;
+    }
+    .banner-pwa {
+      background: var(--accent-soft);
+      border: 1px solid #bfdbfe;
+      color: #1e40af;
+    }
+    .banner-dismiss {
+      background: transparent;
+      border: none;
+      font-size: 1.1rem;
+      line-height: 1;
+      cursor: pointer;
+      color: inherit;
+      opacity: 0.6;
+      padding: 0 4px;
+    }
+    .banner-dismiss:hover { opacity: 1; }
+    .view-toolbar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-bottom: 14px;
+    }
+    .view-toolbar .btn-toggle {
+      font-size: 0.75rem;
+      padding: 6px 10px;
+      border-radius: 999px;
+      background: rgba(255,255,255,0.92);
+      border: 1px solid var(--border);
+      color: var(--muted);
+      cursor: pointer;
+      font-weight: 600;
+    }
+    .view-toolbar .btn-toggle.active {
+      background: var(--accent-soft);
+      border-color: #93c5fd;
+      color: var(--accent);
+    }
+    .share-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 10px;
+    }
+    .share-row .btn { font-size: 0.78rem; padding: 6px 12px; }
+    .grid-wrap {
+      flex: 1;
+      overflow-x: auto;
+      overflow-y: auto;
+      padding: 0 0 8px;
+      min-height: 200px;
+      position: relative;
+    }
+    .grid-wrap.can-scroll-x::after {
+      content: 'Scroll →';
+      position: sticky;
+      right: 8px;
+      bottom: 8px;
+      float: right;
+      margin-top: -28px;
+      margin-right: 8px;
+      font-size: 0.68rem;
+      font-weight: 700;
+      color: var(--muted);
+      background: rgba(255,255,255,0.95);
+      border: 1px solid var(--border);
+      border-radius: 999px;
+      padding: 4px 10px;
+      pointer-events: none;
+      z-index: 4;
+    }
+    thead th {
+      position: sticky;
+      top: 0;
+      z-index: 2;
+    }
+    th.request-col { z-index: 3; }
+    tr.example-row td {
+      opacity: 0.45;
+      pointer-events: none;
+      font-style: italic;
+    }
+    tr.example-row .pray-btn {
+      border-style: dashed;
+      background: #f8fafc;
+    }
+    .add-form-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      padding: 10px 14px 0;
+    }
+    .add-form-row select {
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 8px 10px;
+      font: inherit;
+      font-size: 0.85rem;
+      background: #fff;
+      color: var(--text);
+    }
+    .request-item.pinned {
+      background: rgba(254,243,199,0.35);
+      border: 1px solid #fde68a;
+    }
+    .request-item.answered-item { opacity: 0.85; }
+    .request-actions {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+      flex-shrink: 0;
+    }
+    .request-actions .btn-icon {
+      width: 28px;
+      height: 28px;
+      font-size: 0.95rem;
+    }
+    .request-actions .btn-icon.pin-active { color: #b45309; }
+    .request-actions .btn-icon.answered-btn { color: #16a34a; }
+    .request-actions .btn-icon.answered-btn:hover { background: #f0fdf4; }
+    .category-tag {
+      display: inline-block;
+      font-size: 0.65rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      padding: 2px 6px;
+      border-radius: 4px;
+      background: #f1f5f9;
+      color: var(--muted);
+      margin-bottom: 4px;
+    }
+    .category-tag.health { background: #fef2f2; color: #b91c1c; }
+    .category-tag.family { background: #fdf4ff; color: #a21caf; }
+    .category-tag.church { background: #eff6ff; color: #1d4ed8; }
+    .category-tag.work { background: #f0fdf4; color: #15803d; }
+    .category-tag.other { background: #f1f5f9; color: #475569; }
+    .answered-section {
+      border-top: 1px solid var(--border);
+      margin-top: 4px;
+      padding-top: 8px;
+    }
+    .answered-section .panel-label {
+      padding-top: 8px;
+      color: #16a34a;
+    }
+    .request-item.answered-row .request-text {
+      text-decoration: line-through;
+      color: var(--muted);
+    }
+    .modal-backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(15,23,42,0.45);
+      z-index: 200;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 16px;
+    }
+    .modal-backdrop.hidden { display: none; }
+    .modal {
+      background: #fff;
+      border-radius: var(--radius);
+      padding: 20px;
+      max-width: 320px;
+      width: 100%;
+      text-align: center;
+      box-shadow: 0 20px 50px rgba(0,0,0,0.2);
+    }
+    .modal h2 {
+      margin: 0 0 8px;
+      font-size: 1rem;
+    }
+    .modal p {
+      margin: 0 0 14px;
+      font-size: 0.82rem;
+      color: var(--muted);
+    }
+    .modal img {
+      display: block;
+      margin: 0 auto 14px;
+      border-radius: 8px;
+      border: 1px solid var(--border);
+    }
+    .sync-dot.offline-mode { color: #b45309; border-color: #fde68a; background: #fffbeb; }
+    body.view-compact .pray-btn { min-height: 34px; padding: 4px 2px; font-size: 0.58rem; }
+    body.view-compact td.request-col { padding: 8px 12px; font-size: 0.82rem; }
+    body.view-compact td.day-cell { padding: 4px 2px; min-width: 58px; }
+    body.view-comfortable .pray-btn { min-height: 48px; font-size: 0.68rem; }
+    body.a11y-large .pray-btn { min-height: 52px; font-size: 0.72rem; }
+    body.a11y-large .btn { padding: 10px 16px; }
+    body.a11y-contrast {
+      --bg: #fff;
+      --text: #000;
+      --muted: #333;
+      --border: #000;
+      --accent: #0000cc;
+    }
+    body.a11y-contrast .pray-btn { border-width: 3px; }
+    body.a11y-contrast .pray-btn.done { background: #006400; border-color: #004d00; }
+    .pray-btn:focus-visible {
+      outline: 3px solid var(--accent);
+      outline-offset: 2px;
+    }
+    .hidden { display: none !important; }
   </style>
+  <link rel="manifest" href="manifest.webmanifest">
 </head>
 <body>
   <div class="page-bg" aria-hidden="true"></div>
@@ -563,6 +822,14 @@
   </div>
 
   <div class="app">
+    <div class="banner banner-offline hidden" id="offline-banner">
+      <span>You're offline — changes will sync when you're back.</span>
+    </div>
+    <div class="banner banner-pwa hidden" id="pwa-banner">
+      <span><strong>Tip:</strong> Add to Home Screen on your phone for quick access.</span>
+      <button type="button" class="banner-dismiss" id="pwa-dismiss" aria-label="Dismiss">×</button>
+    </div>
+
     <header>
       <div class="header-top">
         <div>
@@ -575,7 +842,24 @@
         </div>
       </div>
       <p class="hint">Tap <strong>Pray</strong> on a day when you prayed — it turns green <strong>✓ Prayed</strong>. Counts are anonymous. Resets Monday midnight Pacific.</p>
+      <div class="share-row">
+        <button type="button" class="btn btn-ghost" id="copy-message-btn">Copy invite message</button>
+        <button type="button" class="btn btn-ghost" id="qr-btn">Show QR code</button>
+      </div>
     </header>
+
+    <div class="status-bar" id="status-bar">
+      <span class="pulse" id="today-pulse">— prayers logged today</span>
+      <span class="week-meta" id="week-meta"></span>
+      <span class="reset-countdown" id="reset-countdown"></span>
+    </div>
+
+    <div class="view-toolbar" aria-label="Display options">
+      <button type="button" class="btn-toggle" data-view="comfortable" id="view-comfortable">Comfortable</button>
+      <button type="button" class="btn-toggle" data-view="compact" id="view-compact">Compact</button>
+      <button type="button" class="btn-toggle" id="toggle-large">Larger buttons</button>
+      <button type="button" class="btn-toggle" id="toggle-contrast">High contrast</button>
+    </div>
 
     <section class="verse-panel" id="verse-panel" aria-label="Scripture of the week">
       <div class="verse-head">
@@ -584,18 +868,36 @@
       </div>
       <cite class="verse-ref" id="verse-ref"></cite>
       <p class="verse-text" id="verse-text"></p>
+      <p class="verse-prompt">Pray this over the requests below.</p>
       <p class="verse-intro hidden" id="verse-intro"></p>
+      <div class="verse-actions">
+        <button type="button" class="btn btn-ghost" id="copy-verse-btn">Copy verse</button>
+      </div>
     </section>
 
     <div class="layout">
       <section class="panel">
         <div class="panel-inner">
           <div class="panel-label">Requests</div>
+          <div class="add-form-row">
+            <select id="category-select" aria-label="Category">
+              <option value="">Category (optional)</option>
+              <option value="health">Health</option>
+              <option value="family">Family</option>
+              <option value="church">Church</option>
+              <option value="work">Work</option>
+              <option value="other">Other</option>
+            </select>
+          </div>
           <form class="add-form" id="add-form">
             <input type="text" id="request-input" placeholder="Add a prayer need…" maxlength="200" required>
             <button type="submit" class="btn btn-primary">Add</button>
           </form>
           <ul class="request-list" id="request-list"></ul>
+          <div class="answered-section hidden" id="answered-section">
+            <div class="panel-label">Answered · Praise</div>
+            <ul class="request-list" id="answered-list"></ul>
+          </div>
           <div class="panel-fill">
             <div class="fill-card">
               <strong>Pray together</strong>
@@ -612,8 +914,8 @@
 
       <section class="panel">
         <div class="panel-inner">
-          <div class="panel-label">This week · Mon – Sun</div>
-          <div class="grid-wrap">
+          <div class="panel-label" id="week-panel-label">This week</div>
+          <div class="grid-wrap" id="grid-wrap">
             <table>
               <thead>
                 <tr>
@@ -648,7 +950,7 @@
       <p>Let me know — <a href="mailto:6KevinRaphael@gmail.com">6KevinRaphael@gmail.com</a></p>
     </div>
 
-    <p class="footer-note">Week runs Mon–Sun · Resets Monday midnight PT · by Kevin Raphael</p>
+    <p class="footer-note">Week runs Mon–Sun · All times Pacific · Resets Monday midnight PT · by Kevin Raphael</p>
 
     <div class="setup-note hidden" id="setup-note">
       Sync not connected — changes stay on this device only.
@@ -657,6 +959,15 @@
 
   <div class="toast" id="toast"></div>
   <input type="text" id="share-url" hidden readonly>
+
+  <div class="modal-backdrop hidden" id="qr-modal" role="dialog" aria-labelledby="qr-title">
+    <div class="modal">
+      <h2 id="qr-title">Scan to join</h2>
+      <p>Point your phone camera at this code to open the prayer chain.</p>
+      <img id="qr-image" width="180" height="180" alt="QR code for prayer chain link">
+      <button type="button" class="btn btn-primary" id="qr-close">Close</button>
+    </div>
+  </div>
 
   <script src="firebase-config.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
@@ -675,6 +986,9 @@
       Sunday: 'sun',
     };
     const VERSE_EPOCH = '2025-06-16';
+    const CATEGORIES = ['health', 'family', 'church', 'work', 'other'];
+    const PREFS_KEY = 'uts-ui-prefs';
+    const PWA_DISMISS_KEY = 'uts-pwa-dismissed';
 
     const WEEKLY_VERSES = [
       { ref: 'Philippians 4:8', text: 'Finally, brothers and sisters, whatever is true, whatever is noble, whatever is right, whatever is pure, whatever is lovely, whatever is admirable—if anything is excellent or praiseworthy—think about such things.', intro: 'One way to "think about such things" is to turn to God through scripture not just when times are tough, but as often as you can. With that in mind, we invite you to prayerfully spend time with the following bible verses, and may you find the encouragement, strength and hope that you are looking for today.' },
@@ -723,22 +1037,43 @@
     let state = { requests: [], marks: {}, weekKey: '' };
     let docRef = null;
     let saveTimer = null;
-    let resetTimer = null;
+    let lastSyncedAt = null;
 
     const els = {
       syncPill: document.getElementById('sync-pill'),
       requestList: document.getElementById('request-list'),
+      answeredList: document.getElementById('answered-list'),
+      answeredSection: document.getElementById('answered-section'),
       gridBody: document.getElementById('grid-body'),
+      gridWrap: document.getElementById('grid-wrap'),
       addForm: document.getElementById('add-form'),
       requestInput: document.getElementById('request-input'),
+      categorySelect: document.getElementById('category-select'),
       shareUrl: document.getElementById('share-url'),
       copyLinkBtn: document.getElementById('copy-link-btn'),
+      copyMessageBtn: document.getElementById('copy-message-btn'),
+      copyVerseBtn: document.getElementById('copy-verse-btn'),
+      qrBtn: document.getElementById('qr-btn'),
+      qrModal: document.getElementById('qr-modal'),
+      qrImage: document.getElementById('qr-image'),
+      qrClose: document.getElementById('qr-close'),
       setupNote: document.getElementById('setup-note'),
       toast: document.getElementById('toast'),
       verseRef: document.getElementById('verse-ref'),
       verseText: document.getElementById('verse-text'),
       verseIntro: document.getElementById('verse-intro'),
       verseBadge: document.getElementById('verse-badge'),
+      todayPulse: document.getElementById('today-pulse'),
+      weekMeta: document.getElementById('week-meta'),
+      resetCountdown: document.getElementById('reset-countdown'),
+      weekPanelLabel: document.getElementById('week-panel-label'),
+      offlineBanner: document.getElementById('offline-banner'),
+      pwaBanner: document.getElementById('pwa-banner'),
+      pwaDismiss: document.getElementById('pwa-dismiss'),
+      viewComfortable: document.getElementById('view-comfortable'),
+      viewCompact: document.getElementById('view-compact'),
+      toggleLarge: document.getElementById('toggle-large'),
+      toggleContrast: document.getElementById('toggle-contrast'),
     };
 
     function markKey(requestId, day) {
@@ -800,12 +1135,120 @@
       return ((weeks % WEEKLY_VERSES.length) + WEEKLY_VERSES.length) % WEEKLY_VERSES.length;
     }
 
+    function bibleUrl(ref) {
+      return 'https://www.biblegateway.com/passage/?search=' + encodeURIComponent(ref) + '&version=NIV';
+    }
+
+    function formatPacificDate(date) {
+      return new Intl.DateTimeFormat('en-US', { month: 'short', day: 'numeric', timeZone: PT }).format(date);
+    }
+
+    function getWeekDateRangeLabel() {
+      const [y, m, d] = getWeekStartKey().split('-').map(Number);
+      const start = new Date(Date.UTC(y, m - 1, d));
+      const end = new Date(start.getTime() + 6 * 86400000);
+      return formatPacificDate(start) + ' – ' + formatPacificDate(end);
+    }
+
+    function getResetCountdownText() {
+      const dayIndex = DAYS.indexOf(getTodayDayKey());
+      if (dayIndex < 0) return '';
+      const daysLeft = (7 - dayIndex) % 7 || 7;
+      if (daysLeft === 1) return 'New week tomorrow';
+      if (daysLeft === 7) return 'New week in 7 days';
+      return 'New week in ' + daysLeft + ' days';
+    }
+
+    function countTodayPrayers() {
+      const today = getTodayDayKey();
+      if (!today) return 0;
+      let total = 0;
+      activeRequests().forEach(r => {
+        const cell = state.marks[markKey(r.id, today)];
+        if (cell) total += Object.keys(cell).length;
+      });
+      return total;
+    }
+
+    function activeRequests() {
+      return state.requests
+        .filter(r => !r.answered)
+        .sort((a, b) => (b.pinned ? 1 : 0) - (a.pinned ? 1 : 0) || (a.createdAt || 0) - (b.createdAt || 0));
+    }
+
+    function answeredRequests() {
+      return state.requests
+        .filter(r => r.answered)
+        .sort((a, b) => (b.answeredAt || 0) - (a.answeredAt || 0));
+    }
+
+    function categoryLabel(cat) {
+      const labels = { health: 'Health', family: 'Family', church: 'Church', work: 'Work', other: 'Other' };
+      return labels[cat] || '';
+    }
+
+    function renderStatusBar() {
+      const n = countTodayPrayers();
+      els.todayPulse.textContent = n === 1 ? '1 prayer logged today' : n + ' prayers logged today';
+      els.weekMeta.textContent = 'Week of ' + getWeekDateRangeLabel();
+      els.resetCountdown.textContent = getResetCountdownText();
+      els.weekPanelLabel.textContent = 'This week · ' + getWeekDateRangeLabel();
+    }
+
+    function updateScrollHint() {
+      if (!els.gridWrap) return;
+      const canScroll = els.gridWrap.scrollWidth > els.gridWrap.clientWidth + 4;
+      els.gridWrap.classList.toggle('can-scroll-x', canScroll);
+    }
+
+    function updateOfflineBanner() {
+      const offline = !navigator.onLine;
+      els.offlineBanner.classList.toggle('hidden', !offline);
+    }
+
+    function showPwaHint() {
+      if (localStorage.getItem(PWA_DISMISS_KEY)) return;
+      if (window.matchMedia('(display-mode: standalone)').matches) return;
+      if (/iPhone|iPad|iPod|Android/i.test(navigator.userAgent)) {
+        els.pwaBanner.classList.remove('hidden');
+      }
+    }
+
+    function loadPrefs() {
+      try { return JSON.parse(localStorage.getItem(PREFS_KEY)) || {}; } catch (_) { return {}; }
+    }
+
+    function savePrefs(prefs) {
+      localStorage.setItem(PREFS_KEY, JSON.stringify(prefs));
+    }
+
+    function applyPrefs() {
+      const prefs = loadPrefs();
+      const view = prefs.view || 'comfortable';
+      document.body.classList.toggle('view-compact', view === 'compact');
+      document.body.classList.toggle('view-comfortable', view !== 'compact');
+      document.body.classList.toggle('a11y-large', !!prefs.large);
+      document.body.classList.toggle('a11y-contrast', !!prefs.contrast);
+      els.viewComfortable.classList.toggle('active', view !== 'compact');
+      els.viewCompact.classList.toggle('active', view === 'compact');
+      els.toggleLarge.classList.toggle('active', !!prefs.large);
+      els.toggleContrast.classList.toggle('active', !!prefs.contrast);
+    }
+
+    function setPref(key, value) {
+      const prefs = loadPrefs();
+      prefs[key] = value;
+      savePrefs(prefs);
+      applyPrefs();
+      updateScrollHint();
+    }
+
     function renderVerse() {
       const idx = getWeekVerseIndex();
       const verse = WEEKLY_VERSES[idx];
-      els.verseRef.textContent = verse.ref;
-      els.verseText.textContent = `"${verse.text}"`;
-      els.verseBadge.textContent = `${idx + 1} out of ${WEEKLY_VERSES.length} · New verse each Monday`;
+      els.verseRef.innerHTML = '<a href="' + bibleUrl(verse.ref) + '" target="_blank" rel="noopener noreferrer">' + escapeHtml(verse.ref) + '</a>';
+      els.verseText.textContent = '"' + verse.text + '"';
+      els.verseBadge.textContent = (idx + 1) + ' out of ' + WEEKLY_VERSES.length + ' · New verse each Monday';
       if (verse.intro) {
         els.verseIntro.textContent = verse.intro;
         els.verseIntro.classList.remove('hidden');
@@ -897,8 +1340,23 @@
 
     function setSyncStatus(mode, text) {
       els.syncPill.className = 'sync-dot ' + mode;
-      els.syncPill.textContent = text;
+      if (mode === 'live') {
+        lastSyncedAt = Date.now();
+        updateSyncPillLabel();
+      } else {
+        els.syncPill.textContent = text;
+      }
       els.setupNote.classList.toggle('hidden', mode === 'live');
+      updateOfflineBanner();
+    }
+
+    function updateSyncPillLabel() {
+      if (!lastSyncedAt) {
+        els.syncPill.textContent = 'Live';
+        return;
+      }
+      const mins = Math.floor((Date.now() - lastSyncedAt) / 60000);
+      els.syncPill.textContent = mins < 1 ? 'Live' : 'Synced ' + mins + 'm ago';
     }
 
     function applyState(data) {
@@ -946,10 +1404,12 @@
       }
     }
 
-    function addRequest(text) {
+    function addRequest(text, category) {
       const trimmed = text.trim();
       if (!trimmed) return;
-      state.requests.push({ id: uid(), text: trimmed, createdAt: Date.now() });
+      const req = { id: uid(), text: trimmed, createdAt: Date.now() };
+      if (category && CATEGORIES.includes(category)) req.category = category;
+      state.requests.push(req);
       scheduleSave();
       render();
       showToast('Added');
@@ -963,6 +1423,37 @@
       });
       scheduleSave();
       render();
+    }
+
+    function togglePin(id) {
+      const req = state.requests.find(r => r.id === id);
+      if (!req || req.answered) return;
+      req.pinned = !req.pinned;
+      scheduleSave();
+      render();
+      showToast(req.pinned ? 'Pinned' : 'Unpinned');
+    }
+
+    function markAnswered(id) {
+      const req = state.requests.find(r => r.id === id);
+      if (!req || req.answered) return;
+      if (!confirm('Mark this request as answered?')) return;
+      req.answered = true;
+      req.answeredAt = Date.now();
+      req.pinned = false;
+      scheduleSave();
+      render();
+      showToast('Marked as answered');
+    }
+
+    function restoreRequest(id) {
+      const req = state.requests.find(r => r.id === id);
+      if (!req || !req.answered) return;
+      req.answered = false;
+      delete req.answeredAt;
+      scheduleSave();
+      render();
+      showToast('Restored to active');
     }
 
     function togglePray(requestId, day) {
@@ -984,27 +1475,65 @@
       return n === 1 ? '1 person prayed' : n + ' people prayed';
     }
 
+    function renderRequestItem(r, options = {}) {
+      const answered = !!r.answered;
+      const n = answered ? 0 : countUniquePrayersForRequest(r.id);
+      const cat = r.category && CATEGORIES.includes(r.category)
+        ? '<span class="category-tag ' + r.category + '">' + categoryLabel(r.category) + '</span>'
+        : '';
+      const pinBtn = answered ? '' : `<button type="button" class="btn-icon pin-btn${r.pinned ? ' pin-active' : ''}" data-pin="${r.id}" title="${r.pinned ? 'Unpin' : 'Pin urgent'}">★</button>`;
+      const answeredBtn = answered
+        ? `<button type="button" class="btn-icon" data-restore="${r.id}" title="Restore">↩</button>`
+        : `<button type="button" class="btn-icon answered-btn" data-answered="${r.id}" title="Mark answered">✓</button>`;
+      return `<li class="request-item${r.pinned ? ' pinned' : ''}${answered ? ' answered-row' : ''}">
+          <div class="request-body">
+            ${cat}
+            <div class="request-text">${escapeHtml(r.text)}</div>
+            <div class="request-count${n ? ' has' : ''}">${answered ? 'Answered' : (countLabel(n) || 'No prayers yet')}</div>
+          </div>
+          <div class="request-actions">
+            ${pinBtn}
+            ${answeredBtn}
+            <button type="button" class="btn-icon" data-delete="${r.id}" title="Remove">×</button>
+          </div>
+        </li>`;
+    }
+
+    function bindRequestListEvents(listEl) {
+      listEl.querySelectorAll('[data-delete]').forEach(btn => {
+        btn.addEventListener('click', () => deleteRequest(btn.dataset.delete));
+      });
+      listEl.querySelectorAll('[data-pin]').forEach(btn => {
+        btn.addEventListener('click', () => togglePin(btn.dataset.pin));
+      });
+      listEl.querySelectorAll('[data-answered]').forEach(btn => {
+        btn.addEventListener('click', () => markAnswered(btn.dataset.answered));
+      });
+      listEl.querySelectorAll('[data-restore]').forEach(btn => {
+        btn.addEventListener('click', () => restoreRequest(btn.dataset.restore));
+      });
+    }
+
     function renderRequestList() {
-      if (!state.requests.length) {
+      const active = activeRequests();
+      const answered = answeredRequests();
+      if (!active.length) {
         els.requestList.innerHTML = `<li class="empty">
           <div class="empty-icon">🙏</div>
           No requests yet<br>Add the first prayer need above
         </li>`;
-        return;
+      } else {
+        els.requestList.innerHTML = active.map(r => renderRequestItem(r)).join('');
+        bindRequestListEvents(els.requestList);
       }
-      els.requestList.innerHTML = state.requests.map(r => {
-        const n = countUniquePrayersForRequest(r.id);
-        return `<li class="request-item">
-          <div class="request-body">
-            <div class="request-text">${escapeHtml(r.text)}</div>
-            <div class="request-count${n ? ' has' : ''}">${countLabel(n) || 'No prayers yet'}</div>
-          </div>
-          <button type="button" class="btn-icon" data-delete="${r.id}" title="Remove">×</button>
-        </li>`;
-      }).join('');
-      els.requestList.querySelectorAll('[data-delete]').forEach(btn => {
-        btn.addEventListener('click', () => deleteRequest(btn.dataset.delete));
-      });
+      if (answered.length) {
+        els.answeredSection.classList.remove('hidden');
+        els.answeredList.innerHTML = answered.map(r => renderRequestItem(r)).join('');
+        bindRequestListEvents(els.answeredList);
+      } else {
+        els.answeredSection.classList.add('hidden');
+        els.answeredList.innerHTML = '';
+      }
     }
 
     function prayBtnLabel(mine, count) {
@@ -1016,16 +1545,28 @@
       return { main, people };
     }
 
+    function renderExampleRow() {
+      const cells = DAYS.map(day => {
+        const isToday = day === getTodayDayKey();
+        return `<td class="day-cell${isToday ? ' today-col' : ''}" data-day="${day}">
+          <button type="button" class="pray-btn" tabindex="-1">Pray</button>
+        </td>`;
+      }).join('');
+      return `<tr class="example-row">
+        <td class="request-col">Example request (add one to start)</td>
+        ${cells}
+      </tr>`;
+    }
+
     function renderGrid() {
-      if (!state.requests.length) {
-        els.gridBody.innerHTML = `<tr><td class="request-col empty" colspan="8">
-          <div class="empty-icon">📋</div>
-          Your week chart appears here<br><span style="font-size:0.8rem">Add a request to begin tracking prayers</span>
-        </td></tr>`;
+      const active = activeRequests();
+      if (!active.length) {
+        els.gridBody.innerHTML = renderExampleRow();
         applyTodayHighlight();
+        updateScrollHint();
         return;
       }
-      els.gridBody.innerHTML = state.requests.map(r => {
+      els.gridBody.innerHTML = active.map(r => {
         const cells = DAYS.map(day => {
           const { count, mine } = getCellPrayers(r.id, day);
           const { main, people } = prayBtnLabel(mine, count);
@@ -1035,8 +1576,12 @@
             </button>
           </td>`;
         }).join('');
+        const cat = r.category && CATEGORIES.includes(r.category)
+          ? `<span class="category-tag ${r.category}">${categoryLabel(r.category)}</span> `
+          : '';
+        const pin = r.pinned ? '★ ' : '';
         return `<tr>
-          <td class="request-col">${escapeHtml(r.text)}</td>
+          <td class="request-col">${cat}${pin}${escapeHtml(r.text)}</td>
           ${cells}
         </tr>`;
       }).join('');
@@ -1044,10 +1589,12 @@
         btn.addEventListener('click', () => togglePray(btn.dataset.id, btn.dataset.day));
       });
       applyTodayHighlight();
+      updateScrollHint();
     }
 
     function render() {
       renderVerse();
+      renderStatusBar();
       renderRequestList();
       renderGrid();
     }
@@ -1062,36 +1609,85 @@
       return url.toString();
     }
 
-    els.addForm.addEventListener('submit', e => {
-      e.preventDefault();
-      addRequest(els.requestInput.value);
-      els.requestInput.value = '';
-      els.requestInput.focus();
-    });
+    function buildInviteMessage() {
+      return 'Join our prayer chain — tap Pray when you lift someone up.\n\n' + buildShareUrl();
+    }
 
-    els.copyLinkBtn.addEventListener('click', async () => {
-      const link = buildShareUrl();
+    async function copyText(text, toastMsg) {
       try {
-        await navigator.clipboard.writeText(link);
-        showToast('Link copied');
+        await navigator.clipboard.writeText(text);
+        showToast(toastMsg);
       } catch (_) {
-        els.shareUrl.value = link;
+        els.shareUrl.value = text;
         els.shareUrl.hidden = false;
         els.shareUrl.select();
         document.execCommand('copy');
         els.shareUrl.hidden = true;
-        showToast('Link copied');
+        showToast(toastMsg);
       }
+    }
+
+    function openQrModal() {
+      const link = buildShareUrl();
+      els.qrImage.src = 'https://api.qrserver.com/v1/create-qr-code/?size=180x180&data=' + encodeURIComponent(link);
+      els.qrModal.classList.remove('hidden');
+    }
+
+    els.addForm.addEventListener('submit', e => {
+      e.preventDefault();
+      addRequest(els.requestInput.value, els.categorySelect.value);
+      els.requestInput.value = '';
+      els.categorySelect.value = '';
+      els.requestInput.focus();
     });
 
+    els.copyLinkBtn.addEventListener('click', () => copyText(buildShareUrl(), 'Link copied'));
+    els.copyMessageBtn.addEventListener('click', () => copyText(buildInviteMessage(), 'Invite copied'));
+    els.copyVerseBtn.addEventListener('click', () => {
+      const idx = getWeekVerseIndex();
+      const verse = WEEKLY_VERSES[idx];
+      copyText(verse.ref + '\n\n"' + verse.text + '"', 'Verse copied');
+    });
+    els.qrBtn.addEventListener('click', openQrModal);
+    els.qrClose.addEventListener('click', () => els.qrModal.classList.add('hidden'));
+    els.qrModal.addEventListener('click', e => {
+      if (e.target === els.qrModal) els.qrModal.classList.add('hidden');
+    });
+    els.pwaDismiss.addEventListener('click', () => {
+      localStorage.setItem(PWA_DISMISS_KEY, '1');
+      els.pwaBanner.classList.add('hidden');
+    });
+
+    els.viewComfortable.addEventListener('click', () => setPref('view', 'comfortable'));
+    els.viewCompact.addEventListener('click', () => setPref('view', 'compact'));
+    els.toggleLarge.addEventListener('click', () => {
+      const prefs = loadPrefs();
+      setPref('large', !prefs.large);
+    });
+    els.toggleContrast.addEventListener('click', () => {
+      const prefs = loadPrefs();
+      setPref('contrast', !prefs.contrast);
+    });
+
+    window.addEventListener('online', updateOfflineBanner);
+    window.addEventListener('offline', updateOfflineBanner);
+    window.addEventListener('resize', updateScrollHint);
+    if (els.gridWrap) els.gridWrap.addEventListener('scroll', updateScrollHint);
+
+    applyPrefs();
+    showPwaHint();
+    updateOfflineBanner();
     els.shareUrl.value = buildShareUrl();
     renderVerse();
     initFirebase();
     setInterval(() => {
       const before = state.weekKey;
       maybeResetWeek();
-        if (before !== state.weekKey) { scheduleSave(); render(); }
-        else renderVerse();
+      if (before !== state.weekKey) { scheduleSave(); render(); }
+      else {
+        renderStatusBar();
+        updateSyncPillLabel();
+      }
     }, 60000);
   })();
   </script>
