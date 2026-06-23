@@ -24,15 +24,57 @@
       min-height: 100vh;
       font-family: 'DM Sans', system-ui, sans-serif;
       color: var(--text);
-      background: var(--bg);
+      background: #eef2f8;
+    }
+    .page-bg {
+      position: fixed;
+      inset: 0;
+      z-index: 0;
+      pointer-events: none;
+      background:
+        radial-gradient(ellipse 55% 45% at 10% 8%, rgba(37,99,235,0.12), transparent 70%),
+        radial-gradient(ellipse 50% 40% at 90% 92%, rgba(251,191,36,0.14), transparent 70%),
+        radial-gradient(ellipse 40% 35% at 85% 15%, rgba(147,197,253,0.18), transparent 65%),
+        linear-gradient(165deg, #eef2f8 0%, #e8eef6 45%, #dfe8f4 100%);
+    }
+    .page-bg::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      opacity: 0.35;
+      background-image: radial-gradient(rgba(37,99,235,0.1) 1px, transparent 1px);
+      background-size: 24px 24px;
+    }
+    .page-deco {
+      position: fixed;
+      inset: 0;
+      z-index: 0;
+      pointer-events: none;
+      overflow: hidden;
+    }
+    .page-deco span {
+      position: absolute;
+      opacity: 0.14;
+      font-size: 1.4rem;
+      filter: blur(0.2px);
     }
     .app {
-      max-width: 1100px;
+      position: relative;
+      z-index: 1;
+      max-width: 1280px;
       margin: 0 auto;
-      padding: 24px 16px 32px;
+      padding: 16px 16px 28px;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
     }
     header {
-      margin-bottom: 20px;
+      margin-bottom: 16px;
+      background: linear-gradient(135deg, rgba(255,255,255,0.97), rgba(239,246,255,0.95));
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 18px 20px;
+      box-shadow: 0 4px 24px rgba(30,41,59,0.06);
     }
     .header-top {
       display: flex;
@@ -119,19 +161,101 @@
     }
     .layout {
       display: grid;
-      grid-template-columns: 280px 1fr;
+      grid-template-columns: minmax(280px, 320px) 1fr;
       gap: 16px;
-      align-items: start;
+      align-items: stretch;
+      flex: 1;
+      min-height: 0;
     }
     @media (max-width: 800px) {
       .layout { grid-template-columns: 1fr; }
     }
     .panel {
-      background: var(--surface);
+      background: linear-gradient(180deg, #ffffff 0%, #fafcff 100%);
       border: 1px solid var(--border);
       border-radius: var(--radius);
       overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      min-height: min(520px, calc(100vh - 220px));
+      box-shadow: 0 4px 20px rgba(30,41,59,0.05);
     }
+    .panel-inner { flex: 1; display: flex; flex-direction: column; min-height: 0; }
+    .panel-fill {
+      margin-top: auto;
+      padding: 14px 16px 16px;
+      border-top: 1px solid #eef2f7;
+      background: linear-gradient(180deg, transparent, rgba(239,246,255,0.65));
+    }
+    .fill-card {
+      background: rgba(255,255,255,0.85);
+      border: 1px dashed #cbd5e1;
+      border-radius: 10px;
+      padding: 14px;
+      font-size: 0.82rem;
+      color: var(--muted);
+      line-height: 1.5;
+    }
+    .fill-card strong { color: var(--text); display: block; margin-bottom: 6px; font-size: 0.88rem; }
+    .fill-steps { list-style: none; margin: 8px 0 0; padding: 0; }
+    .fill-steps li {
+      padding: 6px 0;
+      border-bottom: 1px solid #f1f5f9;
+      display: flex;
+      gap: 8px;
+      align-items: flex-start;
+    }
+    .fill-steps li:last-child { border-bottom: none; }
+    .fill-steps .n {
+      flex-shrink: 0;
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      background: var(--accent-soft);
+      color: var(--accent);
+      font-size: 0.7rem;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .week-key {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      gap: 6px;
+      margin-top: 10px;
+    }
+    .week-key span {
+      text-align: center;
+      font-size: 0.68rem;
+      font-weight: 700;
+      color: var(--muted);
+      padding: 6px 2px;
+      background: #f8fafc;
+      border-radius: 6px;
+      border: 1px solid #e2e8f0;
+    }
+    .info-row {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
+      margin-top: 14px;
+    }
+    @media (max-width: 700px) {
+      .info-row { grid-template-columns: 1fr; }
+    }
+    .info-tile {
+      background: rgba(255,255,255,0.92);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 14px 16px;
+      font-size: 0.8rem;
+      color: var(--muted);
+      line-height: 1.45;
+      box-shadow: 0 2px 12px rgba(30,41,59,0.04);
+    }
+    .info-tile .icon { font-size: 1.2rem; margin-bottom: 4px; }
+    .info-tile strong { display: block; color: var(--text); font-size: 0.85rem; margin-bottom: 2px; }
     .panel-label {
       padding: 12px 14px 0;
       font-size: 0.72rem;
@@ -162,8 +286,9 @@
       list-style: none;
       margin: 0;
       padding: 0 8px 8px;
-      max-height: 360px;
+      flex: 1;
       overflow-y: auto;
+      min-height: 120px;
     }
     .request-item {
       display: flex;
@@ -188,13 +313,22 @@
     .request-count.has { color: var(--accent); font-weight: 600; }
     .empty {
       text-align: center;
-      padding: 24px 14px;
+      padding: 32px 18px;
       color: var(--muted);
       font-size: 0.88rem;
+      line-height: 1.5;
+    }
+    .empty .empty-icon {
+      font-size: 2rem;
+      margin-bottom: 8px;
+      opacity: 0.5;
     }
     .grid-wrap {
+      flex: 1;
       overflow-x: auto;
+      overflow-y: auto;
       padding: 0 0 8px;
+      min-height: 200px;
     }
     table {
       width: 100%;
@@ -236,12 +370,14 @@
     }
     td.day-cell {
       text-align: center;
-      padding: 6px 4px;
-      width: 52px;
+      padding: 8px 4px;
+      width: 56px;
     }
+    tbody tr:hover td { background: rgba(239,246,255,0.45); }
+    tbody tr:hover td.request-col { background: #f8fbff; }
     .star-btn {
-      width: 40px;
-      height: 40px;
+      width: 44px;
+      height: 44px;
       border: 1px solid var(--border);
       border-radius: 10px;
       background: #fafbfc;
@@ -266,10 +402,14 @@
       line-height: 1;
     }
     .footer-note {
-      margin-top: 16px;
+      margin-top: 14px;
       text-align: center;
       font-size: 0.75rem;
       color: var(--muted);
+      padding: 12px;
+      background: rgba(255,255,255,0.7);
+      border-radius: var(--radius);
+      border: 1px solid var(--border);
     }
     .setup-note {
       margin-top: 12px;
@@ -303,6 +443,16 @@
   </style>
 </head>
 <body>
+  <div class="page-bg" aria-hidden="true"></div>
+  <div class="page-deco" aria-hidden="true">
+    <span style="top:6%;left:4%">🕊️</span>
+    <span style="top:12%;right:6%">✨</span>
+    <span style="bottom:18%;left:3%">🙏</span>
+    <span style="bottom:8%;right:5%">✨</span>
+    <span style="top:45%;left:2%;font-size:1rem">☆</span>
+    <span style="top:55%;right:3%;font-size:1rem">☆</span>
+  </div>
+
   <div class="app">
     <header>
       <div class="header-top">
@@ -320,28 +470,58 @@
 
     <div class="layout">
       <section class="panel">
-        <div class="panel-label">Requests</div>
-        <form class="add-form" id="add-form">
-          <input type="text" id="request-input" placeholder="Add a prayer need…" maxlength="200" required>
-          <button type="submit" class="btn btn-primary">Add</button>
-        </form>
-        <ul class="request-list" id="request-list"></ul>
+        <div class="panel-inner">
+          <div class="panel-label">Requests</div>
+          <form class="add-form" id="add-form">
+            <input type="text" id="request-input" placeholder="Add a prayer need…" maxlength="200" required>
+            <button type="submit" class="btn btn-primary">Add</button>
+          </form>
+          <ul class="request-list" id="request-list"></ul>
+          <div class="panel-fill">
+            <div class="fill-card">
+              <strong>Pray together</strong>
+              Share a need — your group lifts it up through the week.
+              <ul class="fill-steps">
+                <li><span class="n">1</span> Add a request on the left</li>
+                <li><span class="n">2</span> Tap ☆ when you pray each day</li>
+                <li><span class="n">3</span> See how many prayed (anonymous)</li>
+              </ul>
+            </div>
+          </div>
+        </div>
       </section>
 
       <section class="panel">
-        <div class="panel-label">This week</div>
-        <div class="grid-wrap">
-          <table>
-            <thead>
-              <tr>
-                <th class="request-col">Request</th>
-                <th>S</th><th>S</th><th>M</th><th>T</th><th>W</th><th>T</th><th>F</th>
-              </tr>
-            </thead>
-            <tbody id="grid-body"></tbody>
-          </table>
+        <div class="panel-inner">
+          <div class="panel-label">This week · Sat – Fri</div>
+          <div class="grid-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th class="request-col">Request</th>
+                  <th>Sa</th><th>Su</th><th>M</th><th>T</th><th>W</th><th>Th</th><th>F</th>
+                </tr>
+              </thead>
+              <tbody id="grid-body"></tbody>
+            </table>
+          </div>
+          <div class="panel-fill">
+            <div class="fill-card">
+              <strong>Week at a glance</strong>
+              Gold ★ = you prayed · Number = others who prayed · Resets Saturday midnight PT
+              <div class="week-key">
+                <span>Sat</span><span>Sun</span><span>Mon</span><span>Tue</span><span>Wed</span><span>Thu</span><span>Fri</span>
+              </div>
+            </div>
+          </div>
         </div>
       </section>
+    </div>
+
+    <div class="info-row">
+      <div class="info-tile"><div class="icon">🔗</div><strong>Same link</strong>Everyone opens the same page — requests stay in sync.</div>
+      <div class="info-tile"><div class="icon">🤍</div><strong>Anonymous</strong>Only prayer counts are shared, never names.</div>
+      <div class="info-tile"><div class="icon">🔄</div><strong>Fresh start</strong>Stars reset every Saturday at midnight Pacific.</div>
     </div>
 
     <p class="footer-note">Week runs Sat–Fri · Resets Saturday midnight PT · by Kevin Raphael</p>
@@ -599,7 +779,10 @@
 
     function renderRequestList() {
       if (!state.requests.length) {
-        els.requestList.innerHTML = '<li class="empty">No requests yet</li>';
+        els.requestList.innerHTML = `<li class="empty">
+          <div class="empty-icon">🙏</div>
+          No requests yet<br>Add the first prayer need above
+        </li>`;
         return;
       }
       els.requestList.innerHTML = state.requests.map(r => {
@@ -619,7 +802,10 @@
 
     function renderGrid() {
       if (!state.requests.length) {
-        els.gridBody.innerHTML = '<tr><td class="request-col empty" colspan="8">Add a request to start</td></tr>';
+        els.gridBody.innerHTML = `<tr><td class="request-col empty" colspan="8">
+          <div class="empty-icon">☆</div>
+          Your week chart appears here<br><span style="font-size:0.8rem">Add a request to begin tracking prayers</span>
+        </td></tr>`;
         return;
       }
       els.gridBody.innerHTML = state.requests.map(r => {
