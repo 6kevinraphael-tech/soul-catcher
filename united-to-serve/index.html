@@ -1,31 +1,131 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="light">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-  <meta name="theme-color" content="#2563eb">
-  <title>United to Serve Prayer Chain</title>
+  <meta name="theme-color" content="#2563eb" id="meta-theme-color">
+  <title>Prayer Chain Log</title>
+  <script>(function(){var t=localStorage.getItem('uts-theme');if(t)document.documentElement.setAttribute('data-theme',t);})();</script>
   <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Libre+Baskerville:wght@700&display=swap" rel="stylesheet">
   <style>
     *, *::before, *::after { box-sizing: border-box; }
-    :root {
-      --bg: #f6f8fb;
+    :root, [data-theme="light"] {
+      --bg-body: #eef2f8;
       --surface: #ffffff;
+      --surface-alt: #fafbfc;
+      --surface-card: rgba(255,255,255,0.92);
       --border: #e2e8f0;
       --text: #1e293b;
       --muted: #64748b;
       --accent: #2563eb;
       --accent-soft: #eff6ff;
+      --accent-hover: #1d4ed8;
       --gold-soft: #fffbeb;
       --danger: #dc2626;
       --radius: 12px;
+      --header-bg: linear-gradient(135deg, rgba(255,255,255,0.97), rgba(239,246,255,0.95));
+      --panel-bg: linear-gradient(180deg, #ffffff 0%, #fafcff 100%);
+      --verse-bg: linear-gradient(135deg, rgba(255,255,255,0.98), rgba(239,246,255,0.92));
+      --status-bg: rgba(255,255,255,0.92);
+      --footer-bg: rgba(255,255,255,0.7);
+      --contact-bg: linear-gradient(135deg, rgba(255,255,255,0.97), rgba(239,246,255,0.95));
+      --fill-bg: rgba(255,255,255,0.85);
+      --panel-fill-bg: linear-gradient(180deg, transparent, rgba(239,246,255,0.65));
+      --fill-dash: #cbd5e1;
+      --verse-text: #334155;
+      --verse-badge-bg: #f1f5f9;
+      --week-key-bg: #f8fafc;
+      --week-key-border: #e2e8f0;
+      --pray-bg: #fff;
+      --pray-border: #cbd5e1;
+      --pray-text: #64748b;
+      --shadow: rgba(30,41,59,0.06);
+      --today-head: rgba(37,99,235,0.1);
+      --today-cell: rgba(37,99,235,0.06);
+      --today-cell-hover: rgba(37,99,235,0.1);
+      --row-hover: rgba(239,246,255,0.45);
+      --row-hover-col: #f8fbff;
+      --sticky-shadow: rgba(15,23,42,0.06);
+      --page-dot: rgba(37,99,235,0.1);
+    }
+    [data-theme="dark"] {
+      --bg-body: #0b1120;
+      --surface: #1e293b;
+      --surface-alt: #334155;
+      --surface-card: rgba(30,41,59,0.95);
+      --border: #475569;
+      --text: #f1f5f9;
+      --muted: #94a3b8;
+      --accent: #60a5fa;
+      --accent-soft: #1e3a5f;
+      --accent-hover: #93c5fd;
+      --header-bg: linear-gradient(135deg, #1e293b, #0f172a);
+      --panel-bg: linear-gradient(180deg, #1e293b 0%, #172033 100%);
+      --verse-bg: linear-gradient(135deg, #1e293b, #1a2744);
+      --status-bg: rgba(30,41,59,0.95);
+      --footer-bg: rgba(30,41,59,0.85);
+      --contact-bg: linear-gradient(135deg, #1e293b, #0f172a);
+      --fill-bg: rgba(15,23,42,0.6);
+      --panel-fill-bg: linear-gradient(180deg, transparent, rgba(15,23,42,0.5));
+      --fill-dash: #475569;
+      --verse-text: #cbd5e1;
+      --verse-badge-bg: #334155;
+      --week-key-bg: #334155;
+      --week-key-border: #475569;
+      --pray-bg: #334155;
+      --pray-border: #64748b;
+      --pray-text: #cbd5e1;
+      --shadow: rgba(0,0,0,0.35);
+      --today-head: rgba(96,165,250,0.2);
+      --today-cell: rgba(96,165,250,0.1);
+      --today-cell-hover: rgba(96,165,250,0.18);
+      --row-hover: rgba(51,65,85,0.55);
+      --row-hover-col: #334155;
+      --sticky-shadow: rgba(0,0,0,0.35);
+      --page-dot: rgba(96,165,250,0.15);
+    }
+    [data-theme="forest"] {
+      --bg-body: #eef4ef;
+      --surface: #ffffff;
+      --surface-alt: #f4faf4;
+      --surface-card: rgba(255,255,255,0.94);
+      --border: #c9dcc7;
+      --text: #1a2e1a;
+      --muted: #5c6f5c;
+      --accent: #15803d;
+      --accent-soft: #dcfce7;
+      --accent-hover: #166534;
+      --header-bg: linear-gradient(135deg, rgba(255,255,255,0.97), rgba(220,252,231,0.95));
+      --panel-bg: linear-gradient(180deg, #ffffff 0%, #f4faf4 100%);
+      --verse-bg: linear-gradient(135deg, rgba(255,255,255,0.98), rgba(220,252,231,0.92));
+      --status-bg: rgba(255,255,255,0.94);
+      --footer-bg: rgba(255,255,255,0.75);
+      --contact-bg: linear-gradient(135deg, rgba(255,255,255,0.97), rgba(220,252,231,0.95));
+      --fill-bg: rgba(255,255,255,0.88);
+      --panel-fill-bg: linear-gradient(180deg, transparent, rgba(220,252,231,0.55));
+      --fill-dash: #b8d4b5;
+      --verse-text: #2d4a2d;
+      --verse-badge-bg: #e8f5e6;
+      --week-key-bg: #f0f7ef;
+      --week-key-border: #c9dcc7;
+      --pray-bg: #fff;
+      --pray-border: #b8d4b5;
+      --pray-text: #5c6f5c;
+      --shadow: rgba(26,46,26,0.08);
+      --today-head: rgba(21,128,61,0.15);
+      --today-cell: rgba(21,128,61,0.08);
+      --today-cell-hover: rgba(21,128,61,0.14);
+      --row-hover: rgba(220,252,231,0.55);
+      --row-hover-col: #f4faf4;
+      --sticky-shadow: rgba(26,46,26,0.08);
+      --page-dot: rgba(21,128,61,0.12);
     }
     body {
       margin: 0;
       min-height: 100vh;
       font-family: 'DM Sans', system-ui, sans-serif;
       color: var(--text);
-      background: #eef2f8;
+      background: var(--bg-body);
     }
     .page-bg {
       position: fixed;
@@ -33,17 +133,29 @@
       z-index: 0;
       pointer-events: none;
       background:
-        radial-gradient(ellipse 55% 45% at 10% 8%, rgba(37,99,235,0.12), transparent 70%),
+        radial-gradient(ellipse 55% 45% at 10% 8%, color-mix(in srgb, var(--accent) 12%, transparent), transparent 70%),
         radial-gradient(ellipse 50% 40% at 90% 92%, rgba(251,191,36,0.14), transparent 70%),
-        radial-gradient(ellipse 40% 35% at 85% 15%, rgba(147,197,253,0.18), transparent 65%),
-        linear-gradient(165deg, #eef2f8 0%, #e8eef6 45%, #dfe8f4 100%);
+        radial-gradient(ellipse 40% 35% at 85% 15%, color-mix(in srgb, var(--accent) 18%, transparent), transparent 65%),
+        linear-gradient(165deg, var(--bg-body) 0%, color-mix(in srgb, var(--bg-body) 92%, var(--accent)) 100%);
+    }
+    [data-theme="dark"] .page-bg {
+      background:
+        radial-gradient(ellipse 55% 45% at 10% 8%, rgba(96,165,250,0.08), transparent 70%),
+        radial-gradient(ellipse 50% 40% at 90% 92%, rgba(30,41,59,0.5), transparent 70%),
+        linear-gradient(165deg, #0b1120 0%, #0f172a 100%);
+    }
+    [data-theme="forest"] .page-bg {
+      background:
+        radial-gradient(ellipse 55% 45% at 10% 8%, rgba(21,128,61,0.1), transparent 70%),
+        radial-gradient(ellipse 50% 40% at 90% 92%, rgba(180,200,120,0.12), transparent 70%),
+        linear-gradient(165deg, #eef4ef 0%, #e4ede3 100%);
     }
     .page-bg::before {
       content: '';
       position: absolute;
       inset: 0;
       opacity: 0.35;
-      background-image: radial-gradient(rgba(37,99,235,0.1) 1px, transparent 1px);
+      background-image: radial-gradient(var(--page-dot) 1px, transparent 1px);
       background-size: 24px 24px;
     }
     .page-deco {
@@ -71,11 +183,11 @@
     }
     header {
       margin-bottom: 16px;
-      background: linear-gradient(135deg, rgba(255,255,255,0.97), rgba(239,246,255,0.95));
+      background: var(--header-bg);
       border: 1px solid var(--border);
       border-radius: var(--radius);
       padding: 18px 20px;
-      box-shadow: 0 4px 24px rgba(30,41,59,0.06);
+      box-shadow: 0 4px 24px var(--shadow);
     }
     .header-top {
       display: flex;
@@ -134,7 +246,7 @@
       transition: background 0.12s;
     }
     .btn-primary { background: var(--accent); color: #fff; }
-    .btn-primary:hover { background: #1d4ed8; }
+    .btn-primary:hover { background: var(--accent-hover); }
     .btn-ghost {
       background: var(--surface);
       color: var(--accent);
@@ -255,7 +367,7 @@
       }
       th.request-col,
       td.request-col {
-        box-shadow: 2px 0 8px rgba(15, 23, 42, 0.06);
+        box-shadow: 2px 0 8px var(--sticky-shadow);
       }
       th { padding: 8px 4px; font-size: 0.7rem; }
       td.day-cell {
@@ -287,25 +399,25 @@
       .btn { touch-action: manipulation; }
     }
     .panel {
-      background: linear-gradient(180deg, #ffffff 0%, #fafcff 100%);
+      background: var(--panel-bg);
       border: 1px solid var(--border);
       border-radius: var(--radius);
       overflow: hidden;
       display: flex;
       flex-direction: column;
       min-height: min(520px, calc(100vh - 220px));
-      box-shadow: 0 4px 20px rgba(30,41,59,0.05);
+      box-shadow: 0 4px 20px var(--shadow);
     }
     .panel-inner { flex: 1; display: flex; flex-direction: column; min-height: 0; }
     .panel-fill {
       margin-top: auto;
       padding: 14px 16px 16px;
-      border-top: 1px solid #eef2f7;
-      background: linear-gradient(180deg, transparent, rgba(239,246,255,0.65));
+      border-top: 1px solid var(--border);
+      background: var(--panel-fill-bg);
     }
     .fill-card {
-      background: rgba(255,255,255,0.85);
-      border: 1px dashed #cbd5e1;
+      background: var(--fill-bg);
+      border: 1px dashed var(--fill-dash);
       border-radius: 10px;
       padding: 14px;
       font-size: 0.82rem;
@@ -347,9 +459,9 @@
       font-weight: 700;
       color: var(--muted);
       padding: 6px 2px;
-      background: #f8fafc;
+      background: var(--week-key-bg);
       border-radius: 6px;
-      border: 1px solid #e2e8f0;
+      border: 1px solid var(--week-key-border);
     }
     .info-row {
       display: grid;
@@ -361,14 +473,14 @@
       .info-row { grid-template-columns: 1fr; }
     }
     .info-tile {
-      background: rgba(255,255,255,0.92);
+      background: var(--surface-card);
       border: 1px solid var(--border);
       border-radius: var(--radius);
       padding: 14px 16px;
       font-size: 0.8rem;
       color: var(--muted);
       line-height: 1.45;
-      box-shadow: 0 2px 12px rgba(30,41,59,0.04);
+      box-shadow: 0 2px 12px var(--shadow);
     }
     .info-tile .icon { font-size: 1.2rem; margin-bottom: 4px; }
     .info-tile strong { display: block; color: var(--text); font-size: 0.85rem; margin-bottom: 2px; }
@@ -393,6 +505,8 @@
       font: inherit;
       font-size: 0.9rem;
       min-width: 0;
+      background: var(--surface);
+      color: var(--text);
     }
     .add-form input:focus {
       outline: 2px solid rgba(37,99,235,0.2);
@@ -412,7 +526,7 @@
       gap: 8px;
       padding: 10px 8px;
       border-radius: 8px;
-      border-bottom: 1px solid #f1f5f9;
+      border-bottom: 1px solid var(--border);
     }
     .request-item:last-child { border-bottom: none; }
     .request-body { flex: 1; min-width: 0; }
@@ -450,7 +564,7 @@
       color: var(--muted);
       padding: 10px 6px;
       border-bottom: 1px solid var(--border);
-      background: #fafbfc;
+      background: var(--surface-alt);
     }
     th.request-col {
       text-align: left;
@@ -458,16 +572,16 @@
       min-width: 140px;
       position: sticky;
       left: 0;
-      background: #fafbfc;
+      background: var(--surface-alt);
       z-index: 1;
     }
     th.today-col {
       color: var(--accent);
-      background: rgba(37, 99, 235, 0.1);
+      background: var(--today-head);
       box-shadow: inset 0 -2px 0 var(--accent);
     }
     td {
-      border-bottom: 1px solid #f1f5f9;
+      border-bottom: 1px solid var(--border);
       vertical-align: middle;
     }
     td.request-col {
@@ -488,19 +602,19 @@
       min-width: 68px;
     }
     td.day-cell.today-col {
-      background: rgba(37, 99, 235, 0.06);
+      background: var(--today-cell);
     }
-    tbody tr:hover td { background: rgba(239,246,255,0.45); }
-    tbody tr:hover td.today-col { background: rgba(37, 99, 235, 0.1); }
-    tbody tr:hover td.request-col { background: #f8fbff; }
+    tbody tr:hover td { background: var(--row-hover); }
+    tbody tr:hover td.today-col { background: var(--today-cell-hover); }
+    tbody tr:hover td.request-col { background: var(--row-hover-col); }
     .pray-btn {
       width: 100%;
       min-width: 58px;
       min-height: 40px;
       padding: 6px 4px;
-      border: 2px solid #cbd5e1;
+      border: 2px solid var(--pray-border);
       border-radius: 8px;
-      background: #fff;
+      background: var(--pray-bg);
       cursor: pointer;
       font-family: inherit;
       font-size: 0.62rem;
@@ -508,7 +622,7 @@
       line-height: 1.15;
       letter-spacing: 0.03em;
       text-transform: uppercase;
-      color: #64748b;
+      color: var(--pray-text);
       transition: background 0.12s, border-color 0.12s, color 0.12s;
     }
     .pray-btn:hover {
@@ -543,7 +657,7 @@
       font-size: 0.75rem;
       color: var(--muted);
       padding: 12px;
-      background: rgba(255,255,255,0.7);
+      background: var(--footer-bg);
       border-radius: var(--radius);
       border: 1px solid var(--border);
     }
@@ -551,10 +665,10 @@
       margin-top: 14px;
       padding: 14px 16px;
       text-align: center;
-      background: linear-gradient(135deg, rgba(255,255,255,0.97), rgba(239,246,255,0.95));
+      background: var(--contact-bg);
       border: 1px solid var(--border);
       border-radius: var(--radius);
-      box-shadow: 0 4px 24px rgba(30,41,59,0.04);
+      box-shadow: 0 4px 24px var(--shadow);
     }
     .contact-panel strong {
       display: block;
@@ -606,11 +720,11 @@
     .verse-panel {
       margin-bottom: 16px;
       padding: 18px 20px;
-      background: linear-gradient(135deg, rgba(255,255,255,0.98), rgba(239,246,255,0.92));
+      background: var(--verse-bg);
       border: 1px solid var(--border);
       border-left: 4px solid var(--accent);
       border-radius: var(--radius);
-      box-shadow: 0 4px 20px rgba(30,41,59,0.05);
+      box-shadow: 0 4px 20px var(--shadow);
     }
     .verse-head {
       display: flex;
@@ -631,7 +745,7 @@
       font-size: 0.72rem;
       font-weight: 600;
       color: var(--muted);
-      background: #f1f5f9;
+      background: var(--verse-badge-bg);
       padding: 4px 10px;
       border-radius: 999px;
     }
@@ -648,12 +762,12 @@
       margin: 0;
       font-size: 0.92rem;
       line-height: 1.55;
-      color: #334155;
+      color: var(--verse-text);
     }
     .verse-intro {
       margin: 10px 0 0;
       padding-top: 10px;
-      border-top: 1px solid #e2e8f0;
+      border-top: 1px solid var(--border);
       font-size: 0.82rem;
       line-height: 1.5;
       color: var(--muted);
@@ -677,7 +791,7 @@
       gap: 10px;
       margin-bottom: 14px;
       padding: 10px 14px;
-      background: rgba(255,255,255,0.92);
+      background: var(--status-bg);
       border: 1px solid var(--border);
       border-radius: var(--radius);
       font-size: 0.82rem;
@@ -728,6 +842,32 @@
       padding: 0 4px;
     }
     .banner-dismiss:hover { opacity: 1; }
+    .theme-toolbar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-bottom: 14px;
+    }
+    .theme-toolbar .btn-toggle {
+      font-size: 0.75rem;
+      padding: 6px 12px;
+      border-radius: 999px;
+      background: var(--surface-card);
+      border: 1px solid var(--border);
+      color: var(--muted);
+      cursor: pointer;
+      font-weight: 600;
+      font-family: inherit;
+    }
+    .theme-toolbar .btn-toggle.active {
+      background: var(--accent-soft);
+      border-color: color-mix(in srgb, var(--accent) 40%, var(--border));
+      color: var(--accent);
+    }
+    .theme-toolbar .btn-toggle:hover:not(.active) {
+      background: var(--accent-soft);
+      color: var(--accent);
+    }
     .share-row {
       display: flex;
       flex-wrap: wrap;
@@ -774,7 +914,7 @@
     }
     tr.example-row .pray-btn {
       border-style: dashed;
-      background: #f8fafc;
+      background: var(--surface-alt);
     }
     .answered-section {
       border-top: 1px solid var(--border);
@@ -823,13 +963,14 @@
     }
     .modal-backdrop.hidden { display: none; }
     .modal {
-      background: #fff;
+      background: var(--surface);
       border-radius: var(--radius);
       padding: 20px;
       max-width: 320px;
       width: 100%;
       text-align: center;
-      box-shadow: 0 20px 50px rgba(0,0,0,0.2);
+      box-shadow: 0 20px 50px var(--shadow);
+      border: 1px solid var(--border);
     }
     .modal h2 {
       margin: 0 0 8px;
@@ -878,7 +1019,7 @@
     <header>
       <div class="header-top">
         <div>
-          <h1>United to Serve Prayer Chain</h1>
+          <h1>Prayer Chain Log</h1>
           <p class="byline">by Kevin Raphael</p>
         </div>
         <div class="header-actions">
@@ -897,6 +1038,12 @@
       <span class="pulse" id="today-pulse">— prayers logged today</span>
       <span class="week-meta" id="week-meta"></span>
       <span class="reset-countdown" id="reset-countdown"></span>
+    </div>
+
+    <div class="theme-toolbar" aria-label="Color scheme">
+      <button type="button" class="btn-toggle active" data-theme="light">Default</button>
+      <button type="button" class="btn-toggle" data-theme="dark">Dark</button>
+      <button type="button" class="btn-toggle" data-theme="forest">Forest</button>
     </div>
 
     <section class="verse-panel" id="verse-panel" aria-label="Scripture of the week">
@@ -1014,6 +1161,8 @@
     };
     const VERSE_EPOCH = '2025-06-16';
     const PWA_DISMISS_KEY = 'uts-pwa-dismissed';
+    const THEME_KEY = 'uts-theme';
+    const THEME_COLORS = { light: '#2563eb', dark: '#0b1120', forest: '#15803d' };
 
     const WEEKLY_VERSES = [
       { ref: 'Philippians 4:8', text: 'Finally, brothers and sisters, whatever is true, whatever is noble, whatever is right, whatever is pure, whatever is lovely, whatever is admirable—if anything is excellent or praiseworthy—think about such things.', intro: 'One way to "think about such things" is to turn to God through scripture not just when times are tough, but as often as you can. With that in mind, we invite you to prayerfully spend time with the following bible verses, and may you find the encouragement, strength and hope that you are looking for today.' },
@@ -1227,6 +1376,23 @@
       if (/iPhone|iPad|iPod|Android/i.test(navigator.userAgent)) {
         els.pwaBanner.classList.remove('hidden');
       }
+    }
+
+    function applyTheme(theme) {
+      const valid = ['light', 'dark', 'forest'];
+      const chosen = valid.includes(theme) ? theme : 'light';
+      document.documentElement.setAttribute('data-theme', chosen);
+      localStorage.setItem(THEME_KEY, chosen);
+      document.querySelectorAll('.theme-toolbar .btn-toggle').forEach(btn => {
+        btn.classList.toggle('active', btn.dataset.theme === chosen);
+      });
+      const meta = document.getElementById('meta-theme-color');
+      if (meta) meta.setAttribute('content', THEME_COLORS[chosen]);
+    }
+
+    function initTheme() {
+      const saved = localStorage.getItem(THEME_KEY) || 'light';
+      applyTheme(saved);
     }
 
     function renderVerse() {
@@ -1617,11 +1783,16 @@
       els.pwaBanner.classList.add('hidden');
     });
 
+    document.querySelectorAll('.theme-toolbar .btn-toggle').forEach(btn => {
+      btn.addEventListener('click', () => applyTheme(btn.dataset.theme));
+    });
+
     window.addEventListener('online', updateOfflineBanner);
     window.addEventListener('offline', updateOfflineBanner);
     window.addEventListener('resize', updateScrollHint);
     if (els.gridWrap) els.gridWrap.addEventListener('scroll', updateScrollHint);
 
+    initTheme();
     showPwaHint();
     updateOfflineBanner();
     els.shareUrl.value = buildShareUrl();

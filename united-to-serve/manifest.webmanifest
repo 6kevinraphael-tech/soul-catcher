@@ -1,6 +1,6 @@
 {
-  "name": "United to Serve Prayer Chain",
-  "short_name": "Prayer Chain",
+  "name": "Prayer Chain Log",
+  "short_name": "Prayer Log",
   "description": "Anonymous group prayer chain",
   "start_url": "./index.html",
   "display": "standalone",
