@@ -352,6 +352,11 @@
       background: #fafbfc;
       z-index: 1;
     }
+    th.today-col {
+      color: var(--accent);
+      background: rgba(37, 99, 235, 0.1);
+      box-shadow: inset 0 -2px 0 var(--accent);
+    }
     td {
       border-bottom: 1px solid #f1f5f9;
       vertical-align: middle;
@@ -373,7 +378,11 @@
       padding: 8px 4px;
       min-width: 68px;
     }
+    td.day-cell.today-col {
+      background: rgba(37, 99, 235, 0.06);
+    }
     tbody tr:hover td { background: rgba(239,246,255,0.45); }
+    tbody tr:hover td.today-col { background: rgba(37, 99, 235, 0.1); }
     tbody tr:hover td.request-col { background: #f8fbff; }
     .pray-btn {
       width: 100%;
@@ -609,7 +618,7 @@
               <thead>
                 <tr>
                   <th class="request-col">Request</th>
-                  <th>M</th><th>T</th><th>W</th><th>Th</th><th>F</th><th>Sa</th><th>Su</th>
+                  <th data-day="mon">M</th><th data-day="tue">T</th><th data-day="wed">W</th><th data-day="thu">Th</th><th data-day="fri">F</th><th data-day="sat">Sa</th><th data-day="sun">Su</th>
                 </tr>
               </thead>
               <tbody id="grid-body"></tbody>
@@ -656,6 +665,15 @@
   (() => {
     const PT = 'America/Los_Angeles';
     const DAYS = ['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun'];
+    const WEEKDAY_TO_DAY = {
+      Monday: 'mon',
+      Tuesday: 'tue',
+      Wednesday: 'wed',
+      Thursday: 'thu',
+      Friday: 'fri',
+      Saturday: 'sat',
+      Sunday: 'sun',
+    };
     const VERSE_EPOCH = '2025-06-16';
 
     const WEEKLY_VERSES = [
@@ -750,6 +768,17 @@
         day: +get('day'),
         weekday: get('weekday'),
       };
+    }
+
+    function getTodayDayKey() {
+      return WEEKDAY_TO_DAY[getPacificParts().weekday] || null;
+    }
+
+    function applyTodayHighlight() {
+      const today = getTodayDayKey();
+      document.querySelectorAll('th[data-day], td[data-day]').forEach(el => {
+        el.classList.toggle('today-col', el.dataset.day === today);
+      });
     }
 
     function getWeekStartKey(date = new Date()) {
@@ -993,13 +1022,14 @@
           <div class="empty-icon">📋</div>
           Your week chart appears here<br><span style="font-size:0.8rem">Add a request to begin tracking prayers</span>
         </td></tr>`;
+        applyTodayHighlight();
         return;
       }
       els.gridBody.innerHTML = state.requests.map(r => {
         const cells = DAYS.map(day => {
           const { count, mine } = getCellPrayers(r.id, day);
           const { main, people } = prayBtnLabel(mine, count);
-          return `<td class="day-cell">
+          return `<td class="day-cell" data-day="${day}">
             <button type="button" class="pray-btn${mine ? ' done' : ''}" data-id="${r.id}" data-day="${day}" aria-label="${mine ? 'You prayed this day' : 'Mark as prayed'}">
               ${main}${people ? `<span class="people">${people}</span>` : ''}
             </button>
@@ -1013,6 +1043,7 @@
       els.gridBody.querySelectorAll('.pray-btn').forEach(btn => {
         btn.addEventListener('click', () => togglePray(btn.dataset.id, btn.dataset.day));
       });
+      applyTodayHighlight();
     }
 
     function render() {
