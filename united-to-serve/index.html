@@ -1,0 +1,785 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>United to Serve — Prayer Chain</title>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Libre+Baskerville:wght@700&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; }
+    :root {
+      --bg: #f4f7fb;
+      --surface: #ffffff;
+      --border: #d8e2ef;
+      --text: #1a2b42;
+      --muted: #5a6d85;
+      --accent: #2b6cb0;
+      --accent-soft: #ebf4ff;
+      --gold: #c9a227;
+      --gold-soft: #fff8e6;
+      --danger: #c53030;
+      --danger-soft: #fff5f5;
+      --star: #e8b923;
+      --shadow: 0 8px 30px rgba(26, 43, 66, 0.08);
+      --radius: 14px;
+    }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family: 'DM Sans', system-ui, sans-serif;
+      color: var(--text);
+      background:
+        radial-gradient(ellipse 60% 50% at 0% 0%, rgba(43,108,176,0.08), transparent 70%),
+        radial-gradient(ellipse 50% 40% at 100% 100%, rgba(201,162,39,0.1), transparent 70%),
+        var(--bg);
+    }
+    .app {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 20px 16px 40px;
+    }
+    header {
+      text-align: center;
+      margin-bottom: 24px;
+    }
+    header h1 {
+      font-family: 'Libre Baskerville', Georgia, serif;
+      font-size: clamp(1.6rem, 4vw, 2.2rem);
+      margin: 0 0 6px;
+      color: var(--text);
+    }
+    header p {
+      margin: 0;
+      color: var(--muted);
+      font-size: 0.95rem;
+    }
+    .status-bar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      justify-content: center;
+      align-items: center;
+      margin-top: 14px;
+    }
+    .pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 6px 12px;
+      border-radius: 999px;
+      font-size: 0.78rem;
+      font-weight: 600;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      color: var(--muted);
+    }
+    .pill.live { background: #ecfdf5; border-color: #a7f3d0; color: #047857; }
+    .pill.local { background: var(--gold-soft); border-color: #f6e05e; color: #975a16; }
+    .pill.error { background: var(--danger-soft); border-color: #feb2b2; color: var(--danger); }
+    .layout {
+      display: grid;
+      grid-template-columns: minmax(260px, 320px) 1fr;
+      gap: 18px;
+      align-items: start;
+    }
+    @media (max-width: 860px) {
+      .layout { grid-template-columns: 1fr; }
+    }
+    .panel {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      overflow: hidden;
+    }
+    .panel-head {
+      padding: 16px 18px 12px;
+      border-bottom: 1px solid var(--border);
+      background: linear-gradient(180deg, #fafcff, var(--surface));
+    }
+    .panel-head h2 {
+      margin: 0;
+      font-size: 1.05rem;
+    }
+    .panel-head p {
+      margin: 4px 0 0;
+      font-size: 0.82rem;
+      color: var(--muted);
+    }
+    .add-form {
+      display: flex;
+      gap: 8px;
+      padding: 14px 16px;
+      border-bottom: 1px solid var(--border);
+    }
+    .add-form input {
+      flex: 1;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 11px 12px;
+      font: inherit;
+      font-size: 0.92rem;
+    }
+    .add-form input:focus {
+      outline: 2px solid rgba(43,108,176,0.25);
+      border-color: var(--accent);
+    }
+    .btn {
+      border: none;
+      border-radius: 10px;
+      padding: 10px 14px;
+      font: inherit;
+      font-weight: 600;
+      font-size: 0.88rem;
+      cursor: pointer;
+      transition: transform 0.12s, background 0.12s;
+    }
+    .btn:active { transform: scale(0.98); }
+    .btn-primary { background: var(--accent); color: #fff; }
+    .btn-primary:hover { background: #255fa0; }
+    .btn-ghost {
+      background: var(--accent-soft);
+      color: var(--accent);
+    }
+    .btn-ghost:hover { background: #dbeafe; }
+    .btn-danger {
+      background: var(--danger-soft);
+      color: var(--danger);
+      padding: 6px 10px;
+      font-size: 0.78rem;
+    }
+    .request-list {
+      list-style: none;
+      margin: 0;
+      padding: 8px;
+      max-height: 420px;
+      overflow-y: auto;
+    }
+    .request-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      padding: 12px 12px;
+      border-radius: 10px;
+      margin-bottom: 4px;
+    }
+    .request-item:hover { background: #f8fafc; }
+    .request-text {
+      flex: 1;
+      font-size: 0.92rem;
+      line-height: 1.35;
+      word-break: break-word;
+    }
+    .empty {
+      text-align: center;
+      padding: 28px 16px;
+      color: var(--muted);
+      font-size: 0.9rem;
+    }
+    .grid-wrap {
+      overflow-x: auto;
+      padding: 12px;
+    }
+    table {
+      width: 100%;
+      border-collapse: separate;
+      border-spacing: 0;
+      min-width: 640px;
+    }
+    th, td {
+      border: 1px solid var(--border);
+      text-align: center;
+      vertical-align: middle;
+    }
+    th {
+      background: var(--accent-soft);
+      color: var(--accent);
+      font-size: 0.82rem;
+      font-weight: 700;
+      padding: 12px 8px;
+    }
+    th.request-col {
+      text-align: left;
+      padding-left: 16px;
+      min-width: 180px;
+      position: sticky;
+      left: 0;
+      z-index: 2;
+      background: var(--accent-soft);
+    }
+    td.request-col {
+      text-align: left;
+      padding: 14px 16px;
+      font-size: 0.92rem;
+      line-height: 1.35;
+      font-weight: 500;
+      position: sticky;
+      left: 0;
+      z-index: 1;
+      background: var(--surface);
+      word-break: break-word;
+    }
+    tr:nth-child(even) td.request-col { background: #fbfdff; }
+    td.day-cell { padding: 8px; width: 72px; }
+    .star-btn {
+      width: 52px;
+      min-height: 52px;
+      border: none;
+      border-radius: 12px;
+      background: #f8fafc;
+      cursor: pointer;
+      font-size: 1.35rem;
+      line-height: 1;
+      transition: background 0.12s, transform 0.12s;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 2px;
+      padding: 4px;
+    }
+    .star-btn:hover { background: var(--gold-soft); transform: scale(1.06); }
+    .star-btn.on {
+      background: var(--gold-soft);
+      box-shadow: inset 0 0 0 2px rgba(201,162,39,0.35);
+    }
+    .pray-count {
+      font-size: 0.68rem;
+      font-weight: 700;
+      color: var(--accent);
+      line-height: 1;
+    }
+    .pray-count.zero { color: #cbd5e0; }
+    .request-meta {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      flex: 1;
+      min-width: 0;
+    }
+    .prayer-total {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      font-size: 0.76rem;
+      font-weight: 600;
+      color: var(--accent);
+      background: var(--accent-soft);
+      padding: 3px 8px;
+      border-radius: 999px;
+      width: fit-content;
+    }
+    .prayer-total.none { color: var(--muted); background: #f1f5f9; }
+    .credit {
+      text-align: center;
+      margin-top: 28px;
+      font-size: 0.82rem;
+      color: var(--muted);
+    }
+    .legend {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 14px;
+      padding: 12px 16px 16px;
+      font-size: 0.82rem;
+      color: var(--muted);
+      border-top: 1px solid var(--border);
+    }
+    .share-box {
+      margin-top: 18px;
+      padding: 16px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+    }
+    .share-box label {
+      display: block;
+      font-size: 0.82rem;
+      font-weight: 600;
+      color: var(--muted);
+      margin-bottom: 6px;
+    }
+    .share-row {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+    .share-row input {
+      flex: 1;
+      min-width: 200px;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 10px 12px;
+      font: inherit;
+      font-size: 0.85rem;
+      background: #f8fafc;
+    }
+    .setup-note {
+      margin-top: 16px;
+      padding: 14px 16px;
+      border-radius: var(--radius);
+      background: var(--gold-soft);
+      border: 1px solid #f6e05e;
+      font-size: 0.86rem;
+      color: #744210;
+      line-height: 1.45;
+    }
+    .setup-note.hidden { display: none; }
+    .setup-note a { color: var(--accent); }
+    .toast {
+      position: fixed;
+      bottom: 20px;
+      left: 50%;
+      transform: translateX(-50%) translateY(80px);
+      background: var(--text);
+      color: #fff;
+      padding: 10px 18px;
+      border-radius: 999px;
+      font-size: 0.85rem;
+      font-weight: 600;
+      opacity: 0;
+      transition: transform 0.25s, opacity 0.25s;
+      z-index: 100;
+      pointer-events: none;
+    }
+    .toast.show {
+      transform: translateX(-50%) translateY(0);
+      opacity: 1;
+    }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <header>
+      <h1>United to Serve</h1>
+      <p>Prayer Chain — anonymous, synced, resets every Saturday midnight PT</p>
+      <div class="status-bar">
+        <span class="pill" id="sync-pill">Connecting…</span>
+        <span class="pill" id="group-pill">Group: …</span>
+        <span class="pill" id="reset-pill">Resets Sat midnight PT</span>
+      </div>
+    </header>
+
+    <div class="layout">
+      <section class="panel">
+        <div class="panel-head">
+          <h2>Prayer requests</h2>
+          <p>Add names or needs. Everyone in your group sees the same list.</p>
+        </div>
+        <form class="add-form" id="add-form">
+          <input type="text" id="request-input" placeholder="e.g. Healing for Maria" maxlength="200" required>
+          <button type="submit" class="btn btn-primary">Add</button>
+        </form>
+        <ul class="request-list" id="request-list"></ul>
+      </section>
+
+      <section class="panel">
+        <div class="panel-head">
+          <h2>This week</h2>
+          <p>Tap ☆ when you prayed. Your star is private — only counts are shared.</p>
+        </div>
+        <div class="grid-wrap">
+          <table id="grid">
+            <thead>
+              <tr>
+                <th class="request-col">Prayer request</th>
+                <th>Prayed</th>
+                <th>Sat</th><th>Sun</th><th>Mon</th><th>Tue</th><th>Wed</th><th>Thu</th><th>Fri</th>
+              </tr>
+            </thead>
+            <tbody id="grid-body"></tbody>
+          </table>
+        </div>
+        <div class="legend">
+          <span>★ = you prayed &nbsp;·&nbsp; number = people who prayed (anonymous) &nbsp;·&nbsp; resets <strong>Saturday midnight Pacific</strong></span>
+        </div>
+      </section>
+    </div>
+
+    <div class="share-box">
+      <label>Share this link with your prayer group (same link = same list on every phone &amp; computer)</label>
+      <div class="share-row">
+        <input type="text" id="share-url" readonly>
+        <button type="button" class="btn btn-ghost" id="copy-link-btn">Copy link</button>
+      </div>
+    </div>
+
+    <div class="setup-note hidden" id="setup-note">
+      <strong>Sync not set up yet.</strong> This device is saving locally only.
+      To sync with phones and other computers, follow
+      <a href="README.md" target="_blank">README.md</a> to connect Firebase (free, ~5 minutes).
+    </div>
+
+    <p class="credit">Made by Kevin Raphael</p>
+  </div>
+
+  <div class="toast" id="toast"></div>
+
+  <script src="firebase-config.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js"></script>
+  <script>
+  (() => {
+    const PT = 'America/Los_Angeles';
+    const DAYS = ['sat', 'sun', 'mon', 'tue', 'wed', 'thu', 'fri'];
+    const DAY_LABELS = ['Sat', 'Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri'];
+
+    const params = new URLSearchParams(location.search);
+    const groupId = (params.get('group') || 'united-to-serve').trim().replace(/[^\w-]/g, '-').slice(0, 64) || 'united-to-serve';
+    const storageKey = 'uts-prayer-' + groupId;
+    const userIdKey = 'uts-user-id';
+
+    let userId = localStorage.getItem(userIdKey);
+    if (!userId) {
+      userId = Date.now().toString(36) + Math.random().toString(36).slice(2, 10);
+      localStorage.setItem(userIdKey, userId);
+    }
+
+    let state = { requests: [], marks: {}, weekKey: '' };
+    let db = null;
+    let docRef = null;
+    let saveTimer = null;
+    let resetTimer = null;
+
+    const els = {
+      syncPill: document.getElementById('sync-pill'),
+      groupPill: document.getElementById('group-pill'),
+      requestList: document.getElementById('request-list'),
+      gridBody: document.getElementById('grid-body'),
+      addForm: document.getElementById('add-form'),
+      requestInput: document.getElementById('request-input'),
+      shareUrl: document.getElementById('share-url'),
+      copyLinkBtn: document.getElementById('copy-link-btn'),
+      setupNote: document.getElementById('setup-note'),
+      toast: document.getElementById('toast'),
+    };
+
+    function markKey(requestId, day) {
+      return requestId + '_' + day;
+    }
+
+    function uid() {
+      return Date.now().toString(36) + Math.random().toString(36).slice(2, 8);
+    }
+
+    function padDate(p) {
+      return `${p.year}-${String(p.month).padStart(2, '0')}-${String(p.day).padStart(2, '0')}`;
+    }
+
+    function getPacificParts(date = new Date()) {
+      const parts = new Intl.DateTimeFormat('en-US', {
+        timeZone: PT,
+        year: 'numeric',
+        month: '2-digit',
+        day: '2-digit',
+        weekday: 'long',
+      }).formatToParts(date);
+      const get = t => parts.find(x => x.type === t)?.value;
+      return {
+        year: +get('year'),
+        month: +get('month'),
+        day: +get('day'),
+        weekday: get('weekday'),
+      };
+    }
+
+    function getWeekStartKey(date = new Date()) {
+      for (let i = 0; i <= 7; i++) {
+        const d = new Date(date.getTime() - i * 86400000);
+        const p = getPacificParts(d);
+        if (p.weekday === 'Saturday') return padDate(p);
+      }
+      return padDate(getPacificParts(date));
+    }
+
+    function normalizeMarks(marks) {
+      if (!marks || typeof marks !== 'object') return {};
+      const out = {};
+      Object.keys(marks).forEach(key => {
+        const val = marks[key];
+        if (val && typeof val === 'object' && !Array.isArray(val)) {
+          const cell = {};
+          Object.keys(val).forEach(uid => { cell[uid] = true; });
+          out[key] = cell;
+        }
+      });
+      return out;
+    }
+
+    function maybeResetWeek() {
+      const current = getWeekStartKey();
+      if (state.weekKey && state.weekKey !== current) {
+        state.marks = {};
+        showToast('New week — prayer stars reset');
+      }
+      state.weekKey = current;
+    }
+
+    function getCellPrayers(requestId, day) {
+      const cell = state.marks[markKey(requestId, day)];
+      if (!cell || typeof cell !== 'object') return { count: 0, mine: false };
+      const ids = Object.keys(cell);
+      return { count: ids.length, mine: !!cell[userId] };
+    }
+
+    function countUniquePrayersForRequest(requestId) {
+      const users = new Set();
+      DAYS.forEach(day => {
+        const cell = state.marks[markKey(requestId, day)];
+        if (cell && typeof cell === 'object') {
+          Object.keys(cell).forEach(id => users.add(id));
+        }
+      });
+      return users.size;
+    }
+
+    function showToast(msg) {
+      els.toast.textContent = msg;
+      els.toast.classList.add('show');
+      setTimeout(() => els.toast.classList.remove('show'), 2200);
+    }
+
+    function firebaseReady() {
+      const c = window.FIREBASE_CONFIG;
+      if (!c || !c.apiKey || c.apiKey === 'YOUR_API_KEY') return false;
+      return true;
+    }
+
+    function loadLocal() {
+      try {
+        const raw = localStorage.getItem(storageKey);
+        if (raw) return JSON.parse(raw);
+      } catch (_) {}
+      return { requests: [], marks: {}, weekKey: getWeekStartKey() };
+    }
+
+    function saveLocal() {
+      localStorage.setItem(storageKey, JSON.stringify(state));
+    }
+
+    function scheduleSave() {
+      saveLocal();
+      if (!docRef) return;
+      clearTimeout(saveTimer);
+      saveTimer = setTimeout(async () => {
+        try {
+          await docRef.set({
+            requests: state.requests,
+            marks: state.marks,
+            weekKey: state.weekKey,
+            updatedAt: firebase.firestore.FieldValue.serverTimestamp(),
+          }, { merge: true });
+        } catch (e) {
+          console.error(e);
+          setSyncStatus('error', 'Sync error — saved on this device');
+        }
+      }, 350);
+    }
+
+    function setSyncStatus(mode, text) {
+      els.syncPill.className = 'pill ' + (mode === 'live' ? 'live' : mode === 'error' ? 'error' : 'local');
+      els.syncPill.textContent = text;
+      els.setupNote.classList.toggle('hidden', mode === 'live');
+    }
+
+    function applyState(data) {
+      state = {
+        requests: Array.isArray(data.requests) ? data.requests : [],
+        marks: normalizeMarks(data.marks),
+        weekKey: data.weekKey || getWeekStartKey(),
+      };
+      maybeResetWeek();
+      render();
+    }
+
+    function initFirebase() {
+      if (!firebaseReady()) {
+        applyState(loadLocal());
+        setSyncStatus('local', 'This device only — set up sync');
+        return;
+      }
+      try {
+        firebase.initializeApp(window.FIREBASE_CONFIG);
+        db = firebase.firestore();
+        docRef = db.collection('prayerChains').doc(groupId);
+        docRef.onSnapshot(snap => {
+          if (snap.exists) {
+            applyState(snap.data());
+            setSyncStatus('live', 'Live — synced with group');
+          } else {
+            state = loadLocal();
+            maybeResetWeek();
+            docRef.set({
+              requests: state.requests,
+              marks: state.marks,
+              weekKey: state.weekKey,
+              updatedAt: firebase.firestore.FieldValue.serverTimestamp(),
+            });
+            setSyncStatus('live', 'Live — synced with group');
+            render();
+          }
+        }, err => {
+          console.error(err);
+          applyState(loadLocal());
+          setSyncStatus('error', 'Offline — using this device');
+        });
+      } catch (e) {
+        console.error(e);
+        applyState(loadLocal());
+        setSyncStatus('local', 'This device only');
+      }
+    }
+
+    function addRequest(text) {
+      const trimmed = text.trim();
+      if (!trimmed) return;
+      state.requests.push({ id: uid(), text: trimmed, createdAt: Date.now() });
+      scheduleSave();
+      render();
+      showToast('Prayer request added');
+    }
+
+    function deleteRequest(id) {
+      if (!confirm('Remove this prayer request?')) return;
+      state.requests = state.requests.filter(r => r.id !== id);
+      const prefix = id + '_';
+      Object.keys(state.marks).forEach(k => {
+        if (k.startsWith(prefix)) delete state.marks[k];
+      });
+      scheduleSave();
+      render();
+      showToast('Request removed');
+    }
+
+    function toggleStar(requestId, day) {
+      maybeResetWeek();
+      const key = markKey(requestId, day);
+      if (!state.marks[key] || typeof state.marks[key] !== 'object') {
+        state.marks[key] = {};
+      }
+      if (state.marks[key][userId]) {
+        delete state.marks[key][userId];
+        if (!Object.keys(state.marks[key]).length) delete state.marks[key];
+      } else {
+        state.marks[key][userId] = true;
+      }
+      scheduleSave();
+      render();
+    }
+
+    function prayerTotalLabel(count) {
+      if (count === 0) return 'No prayers yet';
+      if (count === 1) return '1 person prayed';
+      return count + ' people prayed';
+    }
+
+    function renderRequestList() {
+      if (!state.requests.length) {
+        els.requestList.innerHTML = '<li class="empty">No requests yet. Add one above.</li>';
+        return;
+      }
+      els.requestList.innerHTML = state.requests.map(r => {
+        const total = countUniquePrayersForRequest(r.id);
+        return `
+        <li class="request-item">
+          <div class="request-meta">
+            <span class="request-text">${escapeHtml(r.text)}</span>
+            <span class="prayer-total${total ? '' : ' none'}">${prayerTotalLabel(total)}</span>
+          </div>
+          <button type="button" class="btn btn-danger" data-delete="${r.id}">Remove</button>
+        </li>`;
+      }).join('');
+      els.requestList.querySelectorAll('[data-delete]').forEach(btn => {
+        btn.addEventListener('click', () => deleteRequest(btn.dataset.delete));
+      });
+    }
+
+    function renderGrid() {
+      if (!state.requests.length) {
+        els.gridBody.innerHTML = `<tr><td class="request-col empty" colspan="9">Add a prayer request to see the week chart.</td></tr>`;
+        return;
+      }
+      els.gridBody.innerHTML = state.requests.map(r => {
+        const total = countUniquePrayersForRequest(r.id);
+        const totalCell = `<td class="day-cell">
+          <span class="prayer-total${total ? '' : ' none'}" style="font-size:0.72rem">${total || '—'}</span>
+        </td>`;
+        const cells = DAYS.map(day => {
+          const { count, mine } = getCellPrayers(r.id, day);
+          return `<td class="day-cell">
+            <button type="button" class="star-btn${mine ? ' on' : ''}" data-id="${r.id}" data-day="${day}" aria-label="Prayed on ${day}">
+              <span>${mine ? '★' : '☆'}</span>
+              <span class="pray-count${count ? '' : ' zero'}">${count || '·'}</span>
+            </button>
+          </td>`;
+        }).join('');
+        return `<tr>
+          <td class="request-col">
+            ${escapeHtml(r.text)}
+            <div class="prayer-total${total ? '' : ' none'}" style="margin-top:6px;font-size:0.75rem">${prayerTotalLabel(total)}</div>
+          </td>
+          ${totalCell}
+          ${cells}
+        </tr>`;
+      }).join('');
+      els.gridBody.querySelectorAll('.star-btn').forEach(btn => {
+        btn.addEventListener('click', () => toggleStar(btn.dataset.id, btn.dataset.day));
+      });
+    }
+
+    function render() {
+      renderRequestList();
+      renderGrid();
+    }
+
+    function escapeHtml(str) {
+      return str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+    }
+
+    function buildShareUrl() {
+      const url = new URL(location.href);
+      url.searchParams.set('group', groupId);
+      return url.toString();
+    }
+
+    function scheduleWeekCheck() {
+      clearInterval(resetTimer);
+      resetTimer = setInterval(() => {
+        const before = state.weekKey;
+        maybeResetWeek();
+        if (before !== state.weekKey) {
+          scheduleSave();
+          render();
+        }
+      }, 60000);
+    }
+
+    els.addForm.addEventListener('submit', e => {
+      e.preventDefault();
+      addRequest(els.requestInput.value);
+      els.requestInput.value = '';
+      els.requestInput.focus();
+    });
+
+    els.copyLinkBtn.addEventListener('click', async () => {
+      const link = buildShareUrl();
+      try {
+        await navigator.clipboard.writeText(link);
+        showToast('Link copied!');
+      } catch (_) {
+        els.shareUrl.select();
+        document.execCommand('copy');
+        showToast('Link copied!');
+      }
+    });
+
+    els.groupPill.textContent = 'Group: ' + groupId;
+    els.shareUrl.value = buildShareUrl();
+    initFirebase();
+    scheduleWeekCheck();
+  })();
+  </script>
+</body>
+</html>
