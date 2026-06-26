@@ -140,6 +140,121 @@
 
     .table-btn.all-btn { grid-column: span 5; padding: 12px; }
 
+    /* Welcome splash */
+    .welcome-card {
+      background: white; border-radius: 32px; padding: 36px 24px 32px;
+      box-shadow: 0 14px 48px var(--card-shadow);
+      text-align: center; position: relative; overflow: hidden;
+    }
+
+    .welcome-card::before {
+      content: ''; position: absolute; inset: 0; pointer-events: none;
+      background:
+        radial-gradient(circle at 20% 15%, rgba(249,168,212,0.35) 0%, transparent 45%),
+        radial-gradient(circle at 80% 85%, rgba(165,180,252,0.3) 0%, transparent 45%);
+    }
+
+    .welcome-sparkles {
+      font-size: 1.1rem; letter-spacing: 10px; margin-bottom: 8px;
+      animation: sparkle 2s ease-in-out infinite;
+    }
+
+    @keyframes sparkle {
+      0%, 100% { opacity: 0.7; transform: scale(1); }
+      50% { opacity: 1; transform: scale(1.08); }
+    }
+
+    .welcome-hero {
+      font-size: 5.5rem; line-height: 1; margin-bottom: 8px;
+      animation: heroFloat 3s ease-in-out infinite;
+      filter: drop-shadow(0 8px 16px rgba(232,121,169,0.25));
+    }
+
+    @keyframes heroFloat {
+      0%, 100% { transform: translateY(0) rotate(-3deg); }
+      50% { transform: translateY(-14px) rotate(3deg); }
+    }
+
+    .welcome-pets {
+      font-size: 1.6rem; letter-spacing: 8px; margin-bottom: 16px;
+    }
+
+    .welcome-pets span {
+      display: inline-block; animation: bounce 2.2s ease-in-out infinite;
+    }
+
+    .welcome-pets span:nth-child(2) { animation-delay: -0.3s; }
+    .welcome-pets span:nth-child(3) { animation-delay: -0.6s; }
+    .welcome-pets span:nth-child(4) { animation-delay: -0.9s; }
+    .welcome-pets span:nth-child(5) { animation-delay: -1.2s; }
+
+    .welcome-title {
+      font-size: 2.2rem; font-weight: 700; margin-bottom: 8px;
+      background: linear-gradient(135deg, var(--accent2), var(--accent));
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .welcome-tagline {
+      color: var(--purple); font-size: 1rem; line-height: 1.5;
+      margin-bottom: 24px; max-width: 280px; margin-left: auto; margin-right: auto;
+    }
+
+    .btn-welcome {
+      font-size: 1.15rem; padding: 18px;
+      position: relative; z-index: 1;
+    }
+
+    .setup-header {
+      text-align: center; margin-bottom: 14px;
+    }
+
+    .setup-header .mini-mascot { font-size: 2rem; margin-bottom: 4px; }
+
+    .study-row {
+      display: grid; grid-template-columns: 1fr 1fr; gap: 10px;
+    }
+
+    .study-btn {
+      padding: 14px 10px; border: 3px solid #e9d5ff; border-radius: 16px;
+      background: white; font-family: inherit; font-weight: 600; cursor: pointer;
+      color: var(--purple); transition: all 0.15s; line-height: 1.3;
+    }
+
+    .study-btn small {
+      display: block; font-size: 0.75rem; font-weight: 500; opacity: 0.8; margin-top: 2px;
+    }
+
+    .study-btn.selected {
+      background: linear-gradient(135deg, var(--accent), #f472b6);
+      color: white; border-color: transparent;
+    }
+
+    .study-btn.selected small { opacity: 0.95; }
+
+    .time-bar-wrap { margin-bottom: 12px; }
+
+    .time-bar-label {
+      display: flex; justify-content: space-between; font-size: 0.78rem;
+      font-weight: 600; color: var(--purple); margin-bottom: 4px;
+    }
+
+    .time-bar {
+      height: 10px; background: #ede9fe; border-radius: 10px; overflow: hidden;
+    }
+
+    .time-bar-fill {
+      height: 100%; background: linear-gradient(90deg, #a5b4fc, var(--accent));
+      border-radius: 10px; transition: width 1s linear;
+    }
+
+    .timer-low { color: #ef4444 !important; animation: pulse 1s infinite; }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.6; }
+    }
+
     .picker-row {
       display: flex; gap: 10px; flex-wrap: wrap; justify-content: center;
     }
@@ -535,14 +650,28 @@
   </div>
 
   <div class="app">
-    <!-- START SCREEN -->
-    <div class="screen active" id="startScreen">
-      <div class="card">
-        <div class="mascot-row">
-          <span>🐱</span><span>🐶</span><span>🐹</span><span>🦄</span>
+    <!-- WELCOME SPLASH -->
+    <div class="screen active" id="welcomeScreen">
+      <div class="welcome-card">
+        <div class="welcome-sparkles">✨ 🌟 ✨</div>
+        <div class="welcome-hero">🦄</div>
+        <div class="welcome-pets">
+          <span>🐱</span><span>🐶</span><span>🐹</span><span>🐰</span><span>🦊</span>
         </div>
-        <h1 class="logo">Magical Pet Treats ✨</h1>
-        <p class="subtitle">Pick the right times table to feed hungry magical pets!</p>
+        <h1 class="welcome-title">Magical Pet Treats</h1>
+        <p class="welcome-tagline">Feed adorable pets, practice times tables, and collect stars!</p>
+        <button class="btn btn-primary btn-welcome" id="welcomeBtn">Let's Play! ✨</button>
+      </div>
+    </div>
+
+    <!-- SETUP SCREEN -->
+    <div class="screen" id="startScreen">
+      <div class="card">
+        <div class="setup-header">
+          <div class="mini-mascot">🍪</div>
+          <h1 class="logo">Get Ready!</h1>
+          <p class="subtitle">Set up your practice session</p>
+        </div>
 
         <div class="meta-row">
           <span class="meta-pill" id="bestPill">🏆 Best: 0</span>
@@ -556,8 +685,18 @@
         </div>
 
         <div class="section">
-          <label>Which times tables?</label>
+          <label>Which times tables? (up to ×15)</label>
           <div class="table-grid" id="tableGrid"></div>
+        </div>
+
+        <div class="section">
+          <label>How long do you want to study?</label>
+          <div class="study-row" id="studyPicker">
+            <button class="study-btn" data-minutes="5">5 minutes<small>Quick snack ⚡</small></button>
+            <button class="study-btn selected" data-minutes="10">10 minutes<small>Good practice 📖</small></button>
+            <button class="study-btn" data-minutes="15">15 minutes<small>Super study 🌟</small></button>
+            <button class="study-btn" data-minutes="20">20 minutes<small>Pet master 💪</small></button>
+          </div>
         </div>
 
         <div class="section">
@@ -575,15 +714,6 @@
           </div>
         </div>
 
-        <div class="section">
-          <label>How many pets to feed?</label>
-          <div class="goal-row" id="goalPicker">
-            <button class="goal-btn" data-goal="5">5 🍪</button>
-            <button class="goal-btn selected" data-goal="10">10 🍪</button>
-            <button class="goal-btn" data-goal="15">15 🍪</button>
-          </div>
-        </div>
-
         <div class="toggle-row">
           <span>🎵 Background music</span>
           <button class="toggle on" id="musicSettingToggle" aria-label="Toggle music"></button>
@@ -595,6 +725,7 @@
         </div>
 
         <button class="btn btn-primary" id="startBtn">Start Feeding! 🍪</button>
+        <button class="btn btn-secondary" id="backBtn">← Back</button>
         <button class="btn btn-share" id="shareBtn">Share Game Link 💌</button>
         <button class="btn btn-remind" id="reminderBtn">🔔 Set Practice Reminder</button>
       </div>
@@ -608,18 +739,22 @@
       </div>
 
       <div class="hud">
-        <div class="hud-item">🍪 <span id="roundNum">1</span>/<span id="roundGoal">10</span></div>
+        <div class="hud-item" id="timerHud">⏱️ <span id="timerDisplay">10:00</span></div>
+        <div class="hud-item">🍪 <span id="roundNum">0</span> fed</div>
         <div class="hud-item">⭐ <span id="sessionStars">0</span></div>
         <div class="hud-item hidden" id="comboHud"><span class="combo-badge">🔥 <span id="comboCount">0</span></span></div>
         <div class="hud-item">Lvl <span id="levelNum">1</span></div>
+      </div>
+
+      <div class="time-bar-wrap">
+        <div class="time-bar-label"><span>Study time</span><span id="timeBarLabel">0%</span></div>
+        <div class="time-bar"><div class="time-bar-fill" id="timeBarFill" style="width:0%"></div></div>
       </div>
 
       <div class="xp-wrap">
         <div class="xp-label"><span>Pet Trainer XP</span><span id="xpText">0 / 50</span></div>
         <div class="xp-bar"><div class="xp-fill" id="xpFill" style="width:0%"></div></div>
       </div>
-
-      <div class="progress-dots" id="progressDots"></div>
 
       <div class="pet-area" id="petArea">
         <div class="bonus-tag hidden" id="bonusTag">✨ Golden Treat Round — double stars!</div>
@@ -671,6 +806,7 @@
 
   <script>
     const GAME_URL = 'https://6kevinraphael-tech.github.io/soul-catcher/magical-pet-treats.html';
+    const TABLE_MAX = 15;
 
     const PETS = [
       { emoji: '🐱', names: ['Whiskers', 'Mittens', 'Luna'] },
@@ -723,6 +859,7 @@
     let musicEngine = null;
     let musicPlaying = false;
     let musicOn = true;
+    let sessionTimer = null;
 
     function init() {
       buildTableGrid();
@@ -737,7 +874,7 @@
 
     function buildTableGrid() {
       const grid = $('tableGrid');
-      for (let n = 2; n <= 10; n++) {
+      for (let n = 2; n <= TABLE_MAX; n++) {
         const btn = document.createElement('button');
         btn.className = 'table-btn' + (n <= 5 ? ' selected' : '');
         btn.textContent = '×' + n;
@@ -747,7 +884,7 @@
       }
       const all = document.createElement('button');
       all.className = 'table-btn all-btn';
-      all.textContent = 'All Tables (2–10)';
+      all.textContent = 'All Tables (2–15)';
       all.onclick = () => {
         grid.querySelectorAll('.table-btn:not(.all-btn)').forEach(b => b.classList.add('selected'));
       };
@@ -776,7 +913,7 @@
         tables: store.get('mpt_tables', [2, 3, 4, 5]),
         favPet: store.get('mpt_favPet', 0),
         theme: store.get('mpt_theme', 'blossom'),
-        goal: store.get('mpt_goal', 10),
+        studyMinutes: store.get('mpt_studyMinutes', 10),
         sound: store.get('mpt_sound', true),
         music: store.get('mpt_music', true),
         xp: store.get('mpt_xp', 0),
@@ -801,8 +938,8 @@
         btn.classList.toggle('selected', btn.dataset.theme === state.theme);
       });
 
-      $('goalPicker').querySelectorAll('.goal-btn').forEach(btn => {
-        btn.classList.toggle('selected', +btn.dataset.goal === state.goal);
+      $('studyPicker').querySelectorAll('.study-btn').forEach(btn => {
+        btn.classList.toggle('selected', +btn.dataset.minutes === state.studyMinutes);
       });
 
       $('soundToggle').classList.toggle('on', state.sound);
@@ -812,6 +949,8 @@
     }
 
     function bindEvents() {
+      $('welcomeBtn').onclick = () => showScreen('startScreen');
+      $('backBtn').onclick = () => showScreen('welcomeScreen');
       $('startBtn').onclick = startGame;
       $('playerName').onkeydown = e => { if (e.key === 'Enter') startGame(); };
       $('reminderBtn').onclick = openReminder;
@@ -823,9 +962,9 @@
       $('musicToggle').onclick = toggleMusic;
       $('sfxToggle').onclick = toggleSound;
       $('shareBtn').onclick = $('shareBtn2').onclick = shareGame;
-      $('pauseBtn').onclick = () => showScreen('startScreen');
+      $('pauseBtn').onclick = () => { stopSessionTimer(); showScreen('startScreen'); };
       $('playAgainBtn').onclick = startGame;
-      $('homeBtn').onclick = () => showScreen('startScreen');
+      $('homeBtn').onclick = () => { stopSessionTimer(); showScreen('startScreen'); };
       $('closeLevelUp').onclick = () => $('levelUpModal').classList.add('hidden');
 
       $('themePicker').querySelectorAll('.theme-btn').forEach(btn => {
@@ -837,11 +976,11 @@
         };
       });
 
-      $('goalPicker').querySelectorAll('.goal-btn').forEach(btn => {
+      $('studyPicker').querySelectorAll('.study-btn').forEach(btn => {
         btn.onclick = () => {
-          $('goalPicker').querySelectorAll('.goal-btn').forEach(b => b.classList.remove('selected'));
+          $('studyPicker').querySelectorAll('.study-btn').forEach(b => b.classList.remove('selected'));
           btn.classList.add('selected');
-          state.goal = +btn.dataset.goal;
+          state.studyMinutes = +btn.dataset.minutes;
         };
       });
     }
@@ -1199,17 +1338,49 @@
       while (wrong.size < 2 && tries < 300) {
         tries++;
         const a = tables[randInt(0, tables.length - 1)];
-        const b = randInt(2, 10);
+        const b = randInt(2, TABLE_MAX);
         const formula = makeFormula(a, b);
         if (a * b !== target && formula !== correct) wrong.add(formula);
       }
       while (wrong.size < 2) {
-        const a = randInt(2, 10);
-        const b = randInt(2, 10);
+        const a = randInt(2, TABLE_MAX);
+        const b = randInt(2, TABLE_MAX);
         const formula = makeFormula(a, b);
         if (a * b !== target && formula !== correct) wrong.add(formula);
       }
       return [...wrong];
+    }
+
+    function formatTime(secs) {
+      const m = Math.floor(secs / 60);
+      const s = secs % 60;
+      return m + ':' + String(s).padStart(2, '0');
+    }
+
+    function updateTimerDisplay() {
+      $('timerDisplay').textContent = formatTime(state.timeLeft);
+      const elapsed = state.studySeconds - state.timeLeft;
+      const pct = Math.min(100, Math.round((elapsed / state.studySeconds) * 100));
+      $('timeBarFill').style.width = pct + '%';
+      $('timeBarLabel').textContent = pct + '%';
+      $('timerHud').classList.toggle('timer-low', state.timeLeft <= 30 && state.timeLeft > 0);
+    }
+
+    function startSessionTimer() {
+      stopSessionTimer();
+      sessionTimer = setInterval(() => {
+        if (locked) return;
+        state.timeLeft--;
+        updateTimerDisplay();
+        if (state.timeLeft <= 0) {
+          stopSessionTimer();
+          endGame(true);
+        }
+      }, 1000);
+    }
+
+    function stopSessionTimer() {
+      if (sessionTimer) { clearInterval(sessionTimer); sessionTimer = null; }
     }
 
     function xpForLevel(lvl) { return lvl * 50; }
@@ -1250,7 +1421,7 @@
       state.tables = getSelectedTables();
       state.favPet = +($('petPicker').querySelector('.pick-btn.selected')?.dataset.pet || 0);
       state.theme = $('themePicker').querySelector('.theme-btn.selected')?.dataset.theme || 'blossom';
-      state.goal = +($('goalPicker').querySelector('.goal-btn.selected')?.dataset.goal || 10);
+      state.studyMinutes = +($('studyPicker').querySelector('.study-btn.selected')?.dataset.minutes || 10);
       state.sound = $('soundToggle').classList.contains('on');
       musicOn = $('musicSettingToggle').classList.contains('on');
       state.music = musicOn;
@@ -1259,12 +1430,14 @@
       store.set('mpt_tables', state.tables);
       store.set('mpt_favPet', state.favPet);
       store.set('mpt_theme', state.theme);
-      store.set('mpt_goal', state.goal);
+      store.set('mpt_studyMinutes', state.studyMinutes);
       store.set('mpt_sound', state.sound);
       store.set('mpt_music', state.music);
       updateAudioButtons();
 
       state.round = 0;
+      state.studySeconds = state.studyMinutes * 60;
+      state.timeLeft = state.studySeconds;
       state.sessionStars = 0;
       state.combo = 0;
       state.bestCombo = 0;
@@ -1273,34 +1446,20 @@
       state.sessionXP = 0;
 
       $('greetName').textContent = state.name;
-      $('roundGoal').textContent = state.goal;
+      $('roundNum').textContent = '0';
       $('sessionStars').textContent = '0';
       $('comboHud').classList.add('hidden');
+      updateTimerDisplay();
+      $('timeBarFill').style.width = '0%';
+      $('timeBarLabel').textContent = '0%';
+      $('timerHud').classList.remove('timer-low');
 
-      buildProgressDots();
       updateXPBar();
       showScreen('gameScreen');
+      startSessionTimer();
       newRound();
       startMusic();
       playTone(440, 0.1);
-    }
-
-    function buildProgressDots() {
-      const wrap = $('progressDots');
-      wrap.innerHTML = '';
-      for (let i = 0; i < state.goal; i++) {
-        const d = document.createElement('div');
-        d.className = 'dot' + (i === 0 ? ' current' : '');
-        wrap.appendChild(d);
-      }
-    }
-
-    function updateProgressDots() {
-      $('progressDots').querySelectorAll('.dot').forEach((d, i) => {
-        d.classList.remove('done', 'current');
-        if (i < state.round) d.classList.add('done');
-        else if (i === state.round) d.classList.add('current');
-      });
     }
 
     function pickPet() {
@@ -1313,12 +1472,12 @@
     }
 
     function newRound() {
-      if (state.round >= state.goal) { endGame(); return; }
+      if (state.timeLeft <= 0) { endGame(true); return; }
 
       locked = false;
       state.isBonus = state.round > 0 && state.round % 5 === 0;
       const tableA = state.tables[randInt(0, state.tables.length - 1)];
-      const b = randInt(2, 10);
+      const b = randInt(2, TABLE_MAX);
       state.currentTarget = tableA * b;
       state.correctFormula = makeFormula(tableA, b);
 
@@ -1333,9 +1492,6 @@
 
       $('petArea').classList.toggle('bonus', state.isBonus);
       $('bonusTag').classList.toggle('hidden', !state.isBonus);
-
-      $('roundNum').textContent = state.round + 1;
-      updateProgressDots();
 
       const wrongFormulas = pickWrongFormulas(state.currentTarget, state.correctFormula, state.tables);
       const options = shuffle([
@@ -1395,7 +1551,8 @@
 
         setTimeout(() => {
           $('popup').classList.remove('show');
-          if (state.round >= state.goal) endGame();
+          $('roundNum').textContent = state.round;
+          if (state.timeLeft <= 0) endGame(true);
           else newRound();
         }, 1400);
       } else {
@@ -1446,11 +1603,13 @@
       }
     }
 
-    function endGame() {
+    function endGame(timedOut) {
+      stopSessionTimer();
       recordStreak();
 
-      const accuracy = state.goal > 0
-        ? Math.round((state.goal / (state.goal + state.wrongTries)) * 100)
+      const totalAttempts = state.round + state.wrongTries;
+      const accuracy = totalAttempts > 0
+        ? Math.round((state.round / totalAttempts) * 100)
         : 100;
 
       if (state.sessionStars > state.bestSession) {
@@ -1458,16 +1617,16 @@
         store.set('mpt_bestSession', state.bestSession);
       }
 
-      unlockAch('perfect', state.wrongTries === 0);
+      unlockAch('perfect', state.wrongTries === 0 && state.round > 0);
 
       const emojis = accuracy >= 90 ? '🎉' : accuracy >= 70 ? '🌟' : '💪';
       $('resultsEmoji').textContent = emojis;
-      $('resultsTitle').textContent = 'Great job, ' + state.name + '!';
-      $('resultsMsg').textContent = state.wrongTries === 0
-        ? 'Perfect feeding — every pet is happy!'
-        : 'You fed all ' + state.goal + ' pets!';
+      $('resultsTitle').textContent = timedOut ? 'Time\'s up, ' + state.name + '!' : 'Great job, ' + state.name + '!';
+      $('resultsMsg').textContent = state.round === 0
+        ? 'Try again — your pets are waiting!'
+        : 'You fed ' + state.round + ' pets in ' + state.studyMinutes + ' minutes!';
       $('resultsScore').textContent = '⭐ ' + state.sessionStars;
-      $('statCorrect').textContent = state.goal;
+      $('statCorrect').textContent = state.round;
       $('statCombo').textContent = state.bestCombo;
       $('statLevel').textContent = state.level;
       $('statAccuracy').textContent = accuracy + '%';
