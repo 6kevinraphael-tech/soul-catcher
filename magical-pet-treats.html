@@ -702,6 +702,35 @@
     .audio-controls button:active { transform: scale(0.94); }
     .audio-controls button.off { opacity: 0.5; }
 
+    .rescue-grid {
+      display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px;
+      margin: 16px 0; max-height: 340px; overflow-y: auto;
+    }
+
+    .rescue-card {
+      background: linear-gradient(135deg, var(--bubble-bg), white);
+      border: 3px solid var(--bubble-border); border-radius: 18px;
+      padding: 14px 8px; text-align: center;
+    }
+
+    .rescue-emoji { font-size: 2.4rem; line-height: 1; margin-bottom: 6px; }
+    .rescue-name { font-weight: 600; font-size: 0.85rem; color: var(--accent2); }
+    .rescue-fed { font-size: 0.75rem; color: var(--purple); margin-top: 4px; }
+
+    .rescue-empty {
+      grid-column: 1 / -1; padding: 24px; color: var(--purple); font-size: 0.95rem;
+    }
+
+    .now-playing {
+      font-size: 0.78rem; color: var(--purple); text-align: center;
+      margin-bottom: 10px; opacity: 0.85;
+    }
+
+    #ytPlayerWrap {
+      position: fixed; width: 1px; height: 1px; overflow: hidden;
+      opacity: 0; pointer-events: none; left: -9999px;
+    }
+
     @media (max-width: 380px) {
       .table-grid { grid-template-columns: repeat(4, 1fr); }
       .table-btn.all-btn { grid-column: span 4; }
@@ -711,9 +740,12 @@
 </head>
 <body>
   <div class="audio-controls">
+    <button id="muteAllBtn" title="Mute all audio">🔊</button>
     <button id="musicToggle" title="Toggle music">🎵</button>
-    <button id="sfxToggle" title="Toggle sound effects">🔊</button>
+    <button id="sfxToggle" title="Toggle sound effects">🔔</button>
   </div>
+
+  <div id="ytPlayerWrap" aria-hidden="true"><div id="ytPlayer"></div></div>
 
   <div class="bg-shapes">
     <div class="shape"></div><div class="shape"></div>
@@ -765,6 +797,13 @@
         </div>
         <h1 class="welcome-title">Magical Pet Treats</h1>
         <p class="welcome-tagline">Feed adorable pets, practice times tables, and collect stars!</p>
+
+        <div class="section" style="margin-bottom:12px">
+          <label for="welcomeName">What's your name?</label>
+          <input type="text" id="welcomeName" placeholder="Type your name..." maxlength="20" autocomplete="off">
+        </div>
+
+        <button class="btn btn-secondary" id="viewRescueBtn">My Rescued Pets 🏠</button>
         <button class="btn btn-primary btn-welcome" id="welcomeBtn">Let's Play! ✨</button>
       </div>
     </div>
@@ -841,13 +880,20 @@
           <span>🎵 Background music</span>
           <button class="toggle on" id="musicSettingToggle" aria-label="Toggle music"></button>
         </div>
+        <p class="now-playing">🎶 Now playing: NOT CUTE ANYMORE — ILLIT</p>
 
         <div class="toggle-row">
-          <span>🔊 Sound effects</span>
+          <span>🔔 Sound effects</span>
           <button class="toggle on" id="soundToggle" aria-label="Toggle sound"></button>
         </div>
 
+        <div class="toggle-row">
+          <span>🔇 Mute all audio</span>
+          <button class="toggle" id="masterMuteToggle" aria-label="Mute all"></button>
+        </div>
+
         <button class="btn btn-primary" id="startBtn">Start Feeding! 🍪</button>
+        <button class="btn btn-secondary" id="viewRescueBtn2">My Rescued Pets 🏠</button>
         <button class="btn btn-secondary" id="backBtn">← Back</button>
         <button class="btn btn-share" id="shareBtn">Share Game Link 💌</button>
         <button class="btn btn-remind" id="reminderBtn">🔔 Set Practice Reminder</button>
@@ -933,8 +979,23 @@
         <div class="ach-list" id="achList"></div>
 
         <button class="btn btn-primary" id="playAgainBtn">Feed More Pets! 🍪</button>
+        <button class="btn btn-secondary" id="viewRescueBtn3">My Rescued Pets 🏠</button>
         <button class="btn btn-share" id="shareBtn2">Share With a Friend 💌</button>
         <button class="btn btn-secondary" id="homeBtn">Change Settings</button>
+      </div>
+    </div>
+
+    <!-- RESCUED PETS SCREEN -->
+    <div class="screen" id="rescueScreen">
+      <div class="card">
+        <div class="setup-header">
+          <div class="mini-mascot">🏠</div>
+          <h1 class="logo"><span id="rescueGreetName">Friend</span>'s Pets</h1>
+          <p class="subtitle" id="rescueCount">Your rescued magical pets</p>
+        </div>
+        <div class="rescue-grid" id="rescueGrid"></div>
+        <button class="btn btn-primary" id="rescuePlayBtn">Feed More Pets! 🍪</button>
+        <button class="btn btn-secondary" id="rescueBackBtn">← Back</button>
       </div>
     </div>
   </div>
@@ -942,6 +1003,7 @@
   <script>
     const GAME_URL = 'https://6kevinraphael-tech.github.io/soul-catcher/magical-pet-treats.html';
     const TABLE_MAX = 15;
+    const YT_VIDEO_ID = 'HP8qpxRpIW8';
 
     const TABLE_PRESETS = [
       { id: 'starter', label: 'Starter ×2–×5', tables: [2, 3, 4, 5] },
@@ -1010,12 +1072,14 @@
     let notifyTimer = null;
     let audioCtx = null;
     let sfxGain = null;
-    let musicGain = null;
-    let musicEngine = null;
     let musicPlaying = false;
     let musicOn = true;
+    let masterMuted = false;
+    let ytPlayer = null;
+    let ytReady = false;
     let sessionTimer = null;
     let gameEnded = false;
+    let rescueReturnScreen = 'welcomeScreen';
 
     function init() {
       buildTablePresets();
@@ -1028,6 +1092,22 @@
       bindEvents();
       applyTheme(state.theme || 'blossom');
       checkPendingReminder();
+      initYouTube();
+      syncNameFields();
+    }
+
+    function syncNameFields() {
+      const name = state.name || store.get('mpt_name', '');
+      if (name) {
+        $('playerName').value = name;
+        $('welcomeName').value = name;
+      }
+      $('welcomeName').oninput = () => { $('playerName').value = $('welcomeName').value; };
+      $('playerName').oninput = () => { $('welcomeName').value = $('playerName').value; };
+    }
+
+    function getPlayerName() {
+      return ($('welcomeName').value || $('playerName').value || state.name || '').trim() || 'Superstar';
     }
 
     function buildTablePresets() {
@@ -1120,6 +1200,7 @@
         studyMinutes: store.get('mpt_studyMinutes', 10),
         sound: store.get('mpt_sound', true),
         music: store.get('mpt_music', true),
+        masterMuted: store.get('mpt_masterMuted', false),
         xp: store.get('mpt_xp', 0),
         level: store.get('mpt_level', 1),
         totalStars: store.get('mpt_totalStars', 0),
@@ -1153,6 +1234,8 @@
       $('soundToggle').classList.toggle('on', state.sound);
       $('musicSettingToggle').classList.toggle('on', state.music);
       musicOn = state.music;
+      masterMuted = state.masterMuted;
+      $('masterMuteToggle').classList.toggle('on', masterMuted);
       updateAudioButtons();
       renderCloset();
       updatePetPreview();
@@ -1168,7 +1251,16 @@
     }
 
     function bindEvents() {
-      $('welcomeBtn').onclick = () => showScreen('startScreen');
+      $('welcomeBtn').onclick = () => {
+        const name = getPlayerName();
+        if (name) store.set('mpt_name', name);
+        showScreen('startScreen');
+      };
+      $('viewRescueBtn').onclick = () => { rescueReturnScreen = 'welcomeScreen'; showRescueScreen(); };
+      $('viewRescueBtn2').onclick = () => { rescueReturnScreen = 'startScreen'; showRescueScreen(); };
+      $('viewRescueBtn3').onclick = () => { rescueReturnScreen = 'resultsScreen'; showRescueScreen(); };
+      $('rescueBackBtn').onclick = () => showScreen(rescueReturnScreen);
+      $('rescuePlayBtn').onclick = () => showScreen('startScreen');
       $('backBtn').onclick = () => showScreen('welcomeScreen');
       $('startBtn').onclick = startGame;
       $('playerName').onkeydown = e => { if (e.key === 'Enter') startGame(); };
@@ -1178,10 +1270,12 @@
       $('calendarBtn').onclick = addToCalendar;
       $('soundToggle').onclick = toggleSound;
       $('musicSettingToggle').onclick = toggleMusicSetting;
+      $('masterMuteToggle').onclick = toggleMasterMute;
       $('musicToggle').onclick = toggleMusic;
+      $('muteAllBtn').onclick = toggleMasterMute;
       $('sfxToggle').onclick = toggleSound;
       $('shareBtn').onclick = $('shareBtn2').onclick = shareGame;
-      $('pauseBtn').onclick = () => { stopSessionTimer(); renderCloset(); updatePetPreview(); showScreen('startScreen'); };
+      $('pauseBtn').onclick = () => { stopSessionTimer(); stopMusic(); renderCloset(); updatePetPreview(); showScreen('startScreen'); };
       $('playAgainBtn').onclick = startGame;
       $('homeBtn').onclick = () => { stopSessionTimer(); renderCloset(); updatePetPreview(); showScreen('startScreen'); };
       $('closeLevelUp').onclick = () => $('levelUpModal').classList.add('hidden');
@@ -1304,14 +1398,20 @@
     }
 
     function toggleSound() {
+      if (masterMuted) return;
       state.sound = !state.sound;
       $('soundToggle').classList.toggle('on', state.sound);
       store.set('mpt_sound', state.sound);
+      applySfxVolume();
       updateAudioButtons();
       if (state.sound) playTone(523, 0.08);
     }
 
     function toggleMusicSetting() {
+      if (masterMuted) {
+        showToast('Unmute audio first, or turn off Mute All');
+        return;
+      }
       musicOn = !musicOn;
       state.music = musicOn;
       $('musicSettingToggle').classList.toggle('on', musicOn);
@@ -1322,6 +1422,13 @@
     }
 
     function toggleMusic() {
+      if (masterMuted) {
+        masterMuted = false;
+        state.masterMuted = false;
+        $('masterMuteToggle').classList.remove('on');
+        store.set('mpt_masterMuted', false);
+        applySfxVolume();
+      }
       musicOn = !musicOn;
       state.music = musicOn;
       $('musicSettingToggle').classList.toggle('on', musicOn);
@@ -1331,215 +1438,149 @@
       updateAudioButtons();
     }
 
+    function toggleMasterMute() {
+      masterMuted = !masterMuted;
+      state.masterMuted = masterMuted;
+      $('masterMuteToggle').classList.toggle('on', masterMuted);
+      store.set('mpt_masterMuted', masterMuted);
+      if (masterMuted) {
+        stopMusic();
+        applySfxVolume();
+      } else {
+        applySfxVolume();
+        if (musicOn) startMusic();
+      }
+      updateAudioButtons();
+    }
+
     function updateAudioButtons() {
-      $('musicToggle').textContent = musicOn ? '🎵' : '🎶';
-      $('musicToggle').classList.toggle('off', !musicOn);
-      $('sfxToggle').textContent = state.sound ? '🔊' : '🔇';
-      $('sfxToggle').classList.toggle('off', !state.sound);
+      $('muteAllBtn').textContent = masterMuted ? '🔇' : '🔊';
+      $('muteAllBtn').classList.toggle('off', masterMuted);
+      $('musicToggle').textContent = (musicOn && !masterMuted) ? '🎵' : '🎶';
+      $('musicToggle').classList.toggle('off', !musicOn || masterMuted);
+      $('sfxToggle').textContent = (state.sound && !masterMuted) ? '🔔' : '🔕';
+      $('sfxToggle').classList.toggle('off', !state.sound || masterMuted);
+    }
+
+    function applySfxVolume() {
+      if (!sfxGain) return;
+      sfxGain.gain.value = (state.sound && !masterMuted) ? 0.85 : 0;
     }
 
     function ensureAudio() {
       if (audioCtx && audioCtx.state !== 'closed') return;
       audioCtx = new (window.AudioContext || window.webkitAudioContext)();
       sfxGain = audioCtx.createGain();
-      sfxGain.gain.value = 0.85;
+      applySfxVolume();
       sfxGain.connect(audioCtx.destination);
-      musicGain = audioCtx.createGain();
-      musicGain.gain.value = 0;
-      const filter = audioCtx.createBiquadFilter();
-      filter.type = 'lowpass';
-      filter.frequency.value = 5200;
-      musicGain.connect(filter);
-      filter.connect(audioCtx.destination);
     }
 
-    function destroyMusic() {
-      if (!musicEngine) return;
-      clearInterval(musicEngine.scheduler);
-      clearInterval(musicEngine.keepAlive);
-      document.removeEventListener('visibilitychange', musicEngine.onVis);
-      musicEngine = null;
+    function initYouTube() {
+      if (window.YT && window.YT.Player) {
+        createYtPlayer();
+        return;
+      }
+      if (document.getElementById('yt-api-script')) return;
+      window.onYouTubeIframeAPIReady = createYtPlayer;
+      const s = document.createElement('script');
+      s.id = 'yt-api-script';
+      s.src = 'https://www.youtube.com/iframe_api';
+      document.head.appendChild(s);
     }
 
-    function createPetMusic() {
-      destroyMusic();
-      ensureAudio();
-
-      const CHORDS = [
-        { notes: [440.00, 554.37, 659.25], bass: 110.00, arp: [440, 554, 659, 880] },
-        { notes: [349.23, 440.00, 523.25], bass: 87.31,  arp: [349, 440, 523, 659] },
-        { notes: [261.63, 329.63, 392.00], bass: 65.41,  arp: [392, 523, 659, 784] },
-        { notes: [392.00, 493.88, 587.33], bass: 98.00,  arp: [392, 494, 587, 784] },
-      ];
-      const HOOK = [4, 5, 6, 5, 4, 2, 4, 5, 6, 7, 6, 5, 4, 2, 0, 2];
-      const SCALE = [440.00, 493.88, 554.37, 587.33, 659.25, 739.99, 830.61, 880.00];
-
-      const bpm = 132;
-      const sixteenth = 60 / bpm / 4;
-      let nextTime = audioCtx.currentTime + 0.1;
-      let step = 0;
-      let bar = 0;
-      let chordIdx = 0;
-
-      const kickPat  = [1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0];
-      const snarePat = [0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0];
-      const hatPat   = [1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 1];
-      const bassPat  = [1, 0, 1, 0, 0, 0, 1, 0, 1, 0, 1, 0, 0, 1, 1, 0];
-      const arpPat   = [1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0];
-      const leadPat  = [1, 0, 0, 1, 0, 1, 0, 0, 1, 0, 0, 1, 0, 1, 1, 0];
-      const padPat   = [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
-
-      function playSynth(t, freq, vol, dur, type) {
-        [0, 0.006, -0.006].forEach((detune, i) => {
-          const o = audioCtx.createOscillator();
-          o.type = type || 'sawtooth';
-          o.frequency.value = freq;
-          o.detune.value = detune * 100;
-          const g = audioCtx.createGain();
-          g.gain.setValueAtTime(0, t);
-          g.gain.linearRampToValueAtTime(vol / (i === 0 ? 1 : 2.8), t + 0.003);
-          g.gain.exponentialRampToValueAtTime(0.001, t + dur);
-          const f = audioCtx.createBiquadFilter();
-          f.type = 'lowpass';
-          f.frequency.setValueAtTime(5200, t);
-          f.frequency.exponentialRampToValueAtTime(1800, t + dur * 0.85);
-          o.connect(f); f.connect(g); g.connect(musicGain);
-          o.start(t); o.stop(t + dur + 0.02);
-        });
-      }
-
-      function playPad(t, chord) {
-        chord.notes.forEach((freq, i) => {
-          const o = audioCtx.createOscillator();
-          o.type = 'sine';
-          o.frequency.value = freq;
-          const g = audioCtx.createGain();
-          g.gain.setValueAtTime(0, t);
-          g.gain.linearRampToValueAtTime(0.03, t + 0.04);
-          g.gain.exponentialRampToValueAtTime(0.001, t + 0.7);
-          o.connect(g); g.connect(musicGain);
-          o.start(t + i * 0.006); o.stop(t + 0.75);
-        });
-      }
-
-      function playBass(t, freq) {
-        const o = audioCtx.createOscillator();
-        o.type = 'sawtooth';
-        o.frequency.value = freq;
-        const g = audioCtx.createGain();
-        g.gain.setValueAtTime(0, t);
-        g.gain.linearRampToValueAtTime(0.11, t + 0.004);
-        g.gain.exponentialRampToValueAtTime(0.001, t + 0.14);
-        const f = audioCtx.createBiquadFilter();
-        f.type = 'lowpass';
-        f.frequency.value = 420;
-        o.connect(f); f.connect(g); g.connect(musicGain);
-        o.start(t); o.stop(t + 0.16);
-      }
-
-      function playKick(t) {
-        const o = audioCtx.createOscillator();
-        const g = audioCtx.createGain();
-        o.type = 'sine';
-        o.frequency.setValueAtTime(150, t);
-        o.frequency.exponentialRampToValueAtTime(42, t + 0.055);
-        g.gain.setValueAtTime(0.34, t);
-        g.gain.exponentialRampToValueAtTime(0.001, t + 0.11);
-        o.connect(g); g.connect(musicGain);
-        o.start(t); o.stop(t + 0.13);
-      }
-
-      function playSnare(t) {
-        const len = Math.floor(audioCtx.sampleRate * 0.04);
-        const buf = audioCtx.createBuffer(1, len, audioCtx.sampleRate);
-        const d = buf.getChannelData(0);
-        for (let i = 0; i < len; i++) d[i] = (Math.random() * 2 - 1) * (1 - i / len);
-        const s = audioCtx.createBufferSource();
-        s.buffer = buf;
-        const g = audioCtx.createGain();
-        g.gain.setValueAtTime(0.12, t);
-        g.gain.exponentialRampToValueAtTime(0.001, t + 0.07);
-        const f = audioCtx.createBiquadFilter();
-        f.type = 'highpass'; f.frequency.value = 1800;
-        s.connect(f); f.connect(g); g.connect(musicGain);
-        s.start(t); s.stop(t + 0.08);
-        playSynth(t, 220, 0.04, 0.05, 'triangle');
-      }
-
-      function playHat(t, vol) {
-        const len = Math.floor(audioCtx.sampleRate * 0.012);
-        const buf = audioCtx.createBuffer(1, len, audioCtx.sampleRate);
-        const d = buf.getChannelData(0);
-        for (let i = 0; i < len; i++) d[i] = (Math.random() * 2 - 1) * (1 - i / len);
-        const s = audioCtx.createBufferSource();
-        s.buffer = buf;
-        const g = audioCtx.createGain();
-        g.gain.value = vol;
-        const f = audioCtx.createBiquadFilter();
-        f.type = 'highpass'; f.frequency.value = 7000;
-        s.connect(f); f.connect(g); g.connect(musicGain);
-        s.start(t); s.stop(t + 0.015);
-      }
-
-      function tick() {
-        const t = nextTime;
-        const s = step % 16;
-        if (s === 0) {
-          chordIdx = bar % 4;
-          if (padPat[0]) playPad(t, CHORDS[chordIdx]);
+    function createYtPlayer() {
+      if (ytPlayer) return;
+      ytPlayer = new YT.Player('ytPlayer', {
+        height: '1',
+        width: '1',
+        videoId: YT_VIDEO_ID,
+        playerVars: {
+          autoplay: 0,
+          controls: 0,
+          disablekb: 1,
+          fs: 0,
+          loop: 1,
+          playlist: YT_VIDEO_ID,
+          modestbranding: 1,
+          rel: 0
+        },
+        events: {
+          onReady: (e) => {
+            ytReady = true;
+            e.target.setVolume(45);
+            if (musicPlaying && musicOn && !masterMuted) e.target.playVideo();
+          },
+          onStateChange: (e) => {
+            if (e.data === YT.PlayerState.ENDED && musicPlaying && musicOn) e.target.playVideo();
+          }
         }
-        const ch = CHORDS[chordIdx];
-        if (kickPat[s]) playKick(t);
-        if (snarePat[s]) playSnare(t);
-        if (hatPat[s]) playHat(t, s === 15 ? 0.05 : 0.028);
-        if (bassPat[s]) playBass(t, ch.bass * (s % 8 === 0 ? 1 : 2));
-        if (arpPat[s]) playSynth(t, ch.arp[s % 4], 0.028, 0.09, 'square');
-        if (leadPat[s]) {
-          const note = SCALE[HOOK[s] % SCALE.length];
-          playSynth(t, note, 0.042, 0.13, 'sawtooth');
-        }
-        if (s === 15) bar++;
-        nextTime += sixteenth;
-        step++;
-      }
-
-      const scheduler = setInterval(() => {
-        if (!musicPlaying || !audioCtx) return;
-        if (audioCtx.state === 'suspended') audioCtx.resume();
-        while (nextTime < audioCtx.currentTime + 1.2) tick();
-      }, 30);
-
-      const keepAlive = setInterval(() => {
-        if (musicPlaying && audioCtx?.state === 'suspended') audioCtx.resume();
-      }, 2000);
-
-      const onVis = () => { if (!document.hidden && musicPlaying) audioCtx?.resume(); };
-      document.addEventListener('visibilitychange', onVis);
-
-      musicEngine = { scheduler, keepAlive, onVis };
+      });
     }
 
     function startMusic() {
-      if (!musicOn) return;
-      ensureAudio();
-      if (audioCtx.state === 'suspended') audioCtx.resume();
-      destroyMusic();
-      createPetMusic();
+      if (!musicOn || masterMuted) return;
       musicPlaying = true;
-      musicGain.gain.cancelScheduledValues(audioCtx.currentTime);
-      musicGain.gain.setValueAtTime(musicGain.gain.value, audioCtx.currentTime);
-      musicGain.gain.linearRampToValueAtTime(0.36, audioCtx.currentTime + 0.5);
+      initYouTube();
+      if (ytReady && ytPlayer && ytPlayer.playVideo) {
+        try {
+          ytPlayer.setVolume(45);
+          ytPlayer.playVideo();
+        } catch {}
+      }
     }
 
     function stopMusic() {
       musicPlaying = false;
-      if (!audioCtx || !musicGain) return;
-      musicGain.gain.cancelScheduledValues(audioCtx.currentTime);
-      musicGain.gain.linearRampToValueAtTime(0, audioCtx.currentTime + 0.5);
+      if (ytReady && ytPlayer && ytPlayer.pauseVideo) {
+        try { ytPlayer.pauseVideo(); } catch {}
+      }
+    }
+
+    function recordRescue(pet) {
+      const playerKey = getPlayerName();
+      const all = store.get('mpt_rescued', {});
+      if (!all[playerKey]) all[playerKey] = {};
+      const key = pet.emoji + '|' + pet.name;
+      if (!all[playerKey][key]) {
+        all[playerKey][key] = { emoji: pet.emoji, name: pet.name, count: 0 };
+      }
+      all[playerKey][key].count++;
+      store.set('mpt_rescued', all);
+    }
+
+    function showRescueScreen() {
+      const name = getPlayerName();
+      $('playerName').value = name;
+      $('welcomeName').value = name;
+      $('rescueGreetName').textContent = name;
+      const all = store.get('mpt_rescued', {});
+      const pets = Object.values(all[name] || {});
+      $('rescueCount').textContent = pets.length
+        ? name + ' rescued ' + pets.length + ' magical pet' + (pets.length === 1 ? '' : 's') + '!'
+        : name + ', feed pets in a practice session to rescue them!';
+      const grid = $('rescueGrid');
+      grid.innerHTML = '';
+      if (!pets.length) {
+        const empty = document.createElement('div');
+        empty.className = 'rescue-empty';
+        empty.textContent = '🍪 No pets rescued yet — start a session and pick the right treats!';
+        grid.appendChild(empty);
+      } else {
+        pets.sort((a, b) => b.count - a.count).forEach(p => {
+          const card = document.createElement('div');
+          card.className = 'rescue-card';
+          card.innerHTML =
+            '<div class="rescue-emoji">' + p.emoji + '</div>' +
+            '<div class="rescue-name">' + p.name + '</div>' +
+            '<div class="rescue-fed">Fed ' + p.count + ' time' + (p.count === 1 ? '' : 's') + '</div>';
+          grid.appendChild(card);
+        });
+      }
+      showScreen('rescueScreen');
     }
 
     function playTone(freq, dur) {
-      if (!state.sound) return;
+      if (!state.sound || masterMuted) return;
       try {
         ensureAudio();
         if (audioCtx.state === 'suspended') audioCtx.resume();
@@ -1712,13 +1753,15 @@
         return;
       }
 
-      state.name = $('playerName').value.trim() || 'Superstar';
+      state.name = getPlayerName();
       state.favPet = +($('petPicker').querySelector('.pick-btn.selected')?.dataset.pet || 0);
       state.theme = $('themePicker').querySelector('.theme-btn.selected')?.dataset.theme || 'blossom';
       state.studyMinutes = +($('studyPicker').querySelector('.study-btn.selected')?.dataset.minutes || 10);
       state.sound = $('soundToggle').classList.contains('on');
       musicOn = $('musicSettingToggle').classList.contains('on');
       state.music = musicOn;
+      masterMuted = $('masterMuteToggle').classList.contains('on');
+      state.masterMuted = masterMuted;
 
       store.set('mpt_name', state.name);
       store.set('mpt_tables', state.tables);
@@ -1727,6 +1770,7 @@
       store.set('mpt_studyMinutes', state.studyMinutes);
       store.set('mpt_sound', state.sound);
       store.set('mpt_music', state.music);
+      store.set('mpt_masterMuted', state.masterMuted);
       updateAudioButtons();
 
       state.round = 0;
@@ -1779,6 +1823,7 @@
       state.correctFormula = makeFormula(tableA, tableB);
 
       const pet = pickPet();
+      state.currentPet = pet;
       state.currentPetEmoji = pet.emoji;
       $('animal').textContent = pet.emoji;
       $('animal').classList.remove('celebrate');
@@ -1817,6 +1862,7 @@
       if (isCorrect) {
         locked = true;
         state.round++;
+        recordRescue(state.currentPet);
         state.combo++;
         if (state.combo > state.bestCombo) state.bestCombo = state.combo;
 
