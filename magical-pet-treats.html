@@ -731,6 +731,58 @@
       opacity: 0; pointer-events: none; left: -9999px;
     }
 
+    .account-badge {
+      display: inline-flex; align-items: center; gap: 6px;
+      background: var(--bubble-bg); border: 2px solid var(--bubble-border);
+      border-radius: 20px; padding: 6px 12px; font-size: 0.85rem;
+      font-weight: 600; color: var(--purple); margin-bottom: 12px;
+    }
+
+    .pin-input {
+      letter-spacing: 8px; text-align: center; font-size: 1.4rem !important;
+      font-weight: 700;
+    }
+
+    .account-tabs {
+      display: flex; gap: 8px; margin-bottom: 12px;
+    }
+
+    .account-tab {
+      flex: 1; padding: 10px; border: 3px solid #e9d5ff; border-radius: 14px;
+      background: white; font-family: inherit; font-weight: 600; font-size: 0.9rem;
+      cursor: pointer; color: var(--purple);
+    }
+
+    .account-tab.active {
+      background: linear-gradient(135deg, var(--accent), #f472b6);
+      color: white; border-color: transparent;
+    }
+
+    .lb-list { display: flex; flex-direction: column; gap: 8px; margin: 12px 0; }
+
+    .lb-row {
+      display: grid; grid-template-columns: 36px 1fr auto; gap: 10px;
+      align-items: center; background: #faf5ff; border-radius: 16px;
+      padding: 12px 14px; border: 2px solid transparent;
+    }
+
+    .lb-row.me { border-color: var(--accent); background: linear-gradient(135deg, #fdf2f8, #faf5ff); }
+    .lb-rank { font-weight: 700; font-size: 1.1rem; color: var(--accent2); text-align: center; }
+    .lb-rank.gold { color: #f59e0b; }
+    .lb-rank.silver { color: #94a3b8; }
+    .lb-rank.bronze { color: #d97706; }
+    .lb-name { font-weight: 600; font-size: 0.95rem; text-align: left; }
+    .lb-meta { font-size: 0.75rem; color: var(--purple); margin-top: 2px; text-align: left; }
+    .lb-score { font-weight: 700; font-size: 1.15rem; color: var(--accent); }
+    .lb-status {
+      font-size: 0.8rem; color: var(--purple); margin-bottom: 8px; min-height: 1.2em;
+    }
+    .room-chip {
+      display: inline-block; background: #ede9fe; color: #5b21b6;
+      padding: 4px 10px; border-radius: 12px; font-size: 0.8rem; font-weight: 600;
+      letter-spacing: 1px;
+    }
+
     @media (max-width: 380px) {
       .table-grid { grid-template-columns: repeat(4, 1fr); }
       .table-btn.all-btn { grid-column: span 4; }
@@ -796,15 +848,45 @@
           <span>🐱</span><span>🐶</span><span>🐹</span><span>🐰</span><span>🦊</span>
         </div>
         <h1 class="welcome-title">Magical Pet Treats</h1>
-        <p class="welcome-tagline">Feed adorable pets, practice times tables, and collect stars!</p>
+        <p class="welcome-tagline">Make an account, practice with friends, and race for the highest score!</p>
 
-        <div class="section" style="margin-bottom:12px">
-          <label for="welcomeName">What's your name?</label>
-          <input type="text" id="welcomeName" placeholder="Type your name..." maxlength="20" autocomplete="off">
+        <div id="loggedOutPanel">
+          <div class="account-tabs">
+            <button type="button" class="account-tab active" data-tab="create" id="tabCreate">Create Account</button>
+            <button type="button" class="account-tab" data-tab="login" id="tabLogin">Log In</button>
+          </div>
+
+          <div class="section" style="margin-bottom:10px">
+            <label for="welcomeName">Your name</label>
+            <input type="text" id="welcomeName" placeholder="e.g. Lily" maxlength="16" autocomplete="off">
+          </div>
+
+          <div class="section" style="margin-bottom:10px">
+            <label for="welcomePin">Secret 4-digit PIN</label>
+            <input type="password" inputmode="numeric" pattern="[0-9]*" maxlength="4"
+              id="welcomePin" class="pin-input" placeholder="••••" autocomplete="off">
+            <p class="table-hint" id="pinHint">Pick a PIN so you can log in on any phone!</p>
+          </div>
+
+          <div class="section" style="margin-bottom:10px">
+            <label for="roomCode">Friend room code</label>
+            <input type="text" id="roomCode" placeholder="FRIENDS" maxlength="10" autocomplete="off"
+              style="text-transform:uppercase; letter-spacing:2px; font-weight:700; text-align:center">
+            <p class="table-hint">Same code = same leaderboard. Share it with friends!</p>
+          </div>
+
+          <button class="btn btn-primary btn-welcome" id="accountSubmitBtn">Create & Play ✨</button>
         </div>
 
-        <button class="btn btn-secondary" id="viewRescueBtn">My Rescued Pets 🏠</button>
-        <button class="btn btn-primary btn-welcome" id="welcomeBtn">Let's Play! ✨</button>
+        <div id="loggedInPanel" class="hidden">
+          <div class="account-badge">👤 <span id="accountBadgeName">Player</span> · room <span class="room-chip" id="accountBadgeRoom">FRIENDS</span></div>
+          <p class="table-hint" style="margin-bottom:12px">Best session: <strong id="accountBestPreview">0⭐</strong></p>
+          <button class="btn btn-primary btn-welcome" id="welcomeBtn">Let's Play! ✨</button>
+          <button class="btn btn-share" id="viewLeaderboardBtn">🏆 Friend Leaderboard</button>
+          <button class="btn btn-secondary" id="viewRescueBtn">My Rescued Pets 🏠</button>
+          <button class="btn btn-secondary" id="shareInviteBtn">Share Game Invite 💌</button>
+          <button class="btn btn-secondary" id="logoutBtn">Switch Account</button>
+        </div>
       </div>
     </div>
 
@@ -822,8 +904,9 @@
           <span class="meta-pill" id="streakPill">🔥 Streak: 0 days</span>
           <span class="meta-pill" id="starsPill">⭐ Total stars: 0</span>
         </div>
+        <div class="account-badge" id="setupAccountBadge">👤 Playing as <span id="setupAccountName">Player</span> · <span class="room-chip" id="setupRoom">FRIENDS</span></div>
 
-        <div class="section">
+        <div class="section hidden" id="nameSectionLegacy">
           <label for="playerName">What's your name?</label>
           <input type="text" id="playerName" placeholder="Type your name..." maxlength="20" autocomplete="off">
         </div>
@@ -893,9 +976,10 @@
         </div>
 
         <button class="btn btn-primary" id="startBtn">Start Feeding! 🍪</button>
+        <button class="btn btn-share" id="viewLeaderboardBtn2">🏆 Friend Leaderboard</button>
         <button class="btn btn-secondary" id="viewRescueBtn2">My Rescued Pets 🏠</button>
         <button class="btn btn-secondary" id="backBtn">← Back</button>
-        <button class="btn btn-share" id="shareBtn">Share Game Link 💌</button>
+        <button class="btn btn-share" id="shareBtn">Invite Friends 💌</button>
         <button class="btn btn-remind" id="reminderBtn">🔔 Set Practice Reminder</button>
       </div>
     </div>
@@ -979,6 +1063,7 @@
         <div class="ach-list" id="achList"></div>
 
         <button class="btn btn-primary" id="playAgainBtn">Feed More Pets! 🍪</button>
+        <button class="btn btn-share" id="viewLeaderboardBtn3">🏆 See Who's Winning</button>
         <button class="btn btn-secondary" id="viewRescueBtn3">My Rescued Pets 🏠</button>
         <button class="btn btn-share" id="shareBtn2">Share With a Friend 💌</button>
         <button class="btn btn-secondary" id="homeBtn">Change Settings</button>
@@ -998,12 +1083,39 @@
         <button class="btn btn-secondary" id="rescueBackBtn">← Back</button>
       </div>
     </div>
+
+    <!-- LEADERBOARD SCREEN -->
+    <div class="screen" id="leaderboardScreen">
+      <div class="card">
+        <div class="setup-header">
+          <div class="mini-mascot">🏆</div>
+          <h1 class="logo">Friend Leaderboard</h1>
+          <p class="subtitle">Room: <span class="room-chip" id="lbRoomLabel">FRIENDS</span></p>
+        </div>
+        <p class="lb-status" id="lbStatus">Loading scores…</p>
+        <div class="lb-list" id="lbList"></div>
+        <button class="btn btn-primary" id="lbRefreshBtn">Refresh Scores 🔄</button>
+        <button class="btn btn-share" id="lbShareBtn">Invite Friends to This Room 💌</button>
+        <button class="btn btn-secondary" id="lbBackBtn">← Back</button>
+      </div>
+    </div>
   </div>
 
+  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js"></script>
   <script>
     const GAME_URL = 'https://6kevinraphael-tech.github.io/soul-catcher/magical-pet-treats.html';
     const TABLE_MAX = 15;
     const YT_VIDEO_ID = 'HP8qpxRpIW8';
+    const DEFAULT_ROOM = 'FRIENDS';
+    const FIREBASE_CONFIG = {
+      apiKey: 'AIzaSyBukyZceQ8EeDL9j7QJNQahEm3zqKPxj6c',
+      authDomain: 'united-to-serve-prayer.firebaseapp.com',
+      projectId: 'united-to-serve-prayer',
+      storageBucket: 'united-to-serve-prayer.firebasestorage.app',
+      messagingSenderId: '989477297340',
+      appId: '1:989477297340:web:ce88c3c98c435a83a6c4b9'
+    };
 
     const TABLE_PRESETS = [
       { id: 'starter', label: 'Starter ×2–×5', tables: [2, 3, 4, 5] },
@@ -1080,24 +1192,281 @@
     let sessionTimer = null;
     let gameEnded = false;
     let rescueReturnScreen = 'welcomeScreen';
+    let leaderboardReturn = 'welcomeScreen';
+    let accountMode = 'create';
+    let db = null;
+    let account = null;
+
+    function roomDocId(room) {
+      return 'mpt-' + sanitizeRoom(room).toLowerCase();
+    }
+
+    function sanitizeRoom(code) {
+      return String(code || DEFAULT_ROOM).toUpperCase().replace(/[^A-Z0-9]/g, '').slice(0, 10) || DEFAULT_ROOM;
+    }
+
+    function sanitizeName(name) {
+      return String(name || '').trim().slice(0, 16);
+    }
+
+    function makePlayerId(name, pin) {
+      const raw = (sanitizeName(name).toLowerCase() + '|' + pin);
+      let h = 0;
+      for (let i = 0; i < raw.length; i++) h = ((h << 5) - h) + raw.charCodeAt(i) | 0;
+      return 'p' + Math.abs(h).toString(36) + raw.length;
+    }
+
+    function inviteUrl() {
+      const room = sanitizeRoom(account?.room || $('roomCode')?.value || DEFAULT_ROOM);
+      return GAME_URL + '?room=' + encodeURIComponent(room);
+    }
+
+    function initFirebase() {
+      try {
+        if (!window.firebase) return false;
+        if (!firebase.apps.length) firebase.initializeApp(FIREBASE_CONFIG);
+        db = firebase.firestore();
+        return true;
+      } catch (e) {
+        console.warn('Firebase init failed', e);
+        return false;
+      }
+    }
+
+    function loadAccount() {
+      account = store.get('mpt_account', null);
+      return account;
+    }
+
+    function saveAccount(acc) {
+      account = acc;
+      store.set('mpt_account', acc);
+      if (acc?.name) store.set('mpt_name', acc.name);
+    }
+
+    function clearAccountLocal() {
+      account = null;
+      store.set('mpt_account', null);
+    }
+
+    function updateAccountUI() {
+      const loggedIn = !!(account && account.name && account.playerId);
+      $('loggedOutPanel').classList.toggle('hidden', loggedIn);
+      $('loggedInPanel').classList.toggle('hidden', !loggedIn);
+      if (loggedIn) {
+        $('accountBadgeName').textContent = account.name;
+        $('accountBadgeRoom').textContent = account.room || DEFAULT_ROOM;
+        $('accountBestPreview').textContent = (account.bestSession || state.bestSession || 0) + '⭐';
+        $('welcomeName').value = account.name;
+        if ($('playerName')) $('playerName').value = account.name;
+        if ($('roomCode')) $('roomCode').value = account.room || DEFAULT_ROOM;
+        if ($('setupAccountName')) $('setupAccountName').textContent = account.name;
+        if ($('setupRoom')) $('setupRoom').textContent = account.room || DEFAULT_ROOM;
+      }
+    }
+
+    function setAccountTab(mode) {
+      accountMode = mode;
+      $('tabCreate').classList.toggle('active', mode === 'create');
+      $('tabLogin').classList.toggle('active', mode === 'login');
+      $('accountSubmitBtn').textContent = mode === 'create' ? 'Create & Play ✨' : 'Log In ✨';
+      $('pinHint').textContent = mode === 'create'
+        ? 'Pick a PIN so you can log in on any phone!'
+        : 'Enter the PIN you chose when you made your account.';
+    }
+
+    async function createOrLoginAccount() {
+      const name = sanitizeName($('welcomeName').value);
+      const pin = String($('welcomePin').value || '').replace(/\D/g, '');
+      const room = sanitizeRoom($('roomCode').value);
+
+      if (name.length < 2) {
+        showToast('Please enter a name (at least 2 letters).');
+        return;
+      }
+      if (pin.length !== 4) {
+        showToast('PIN must be exactly 4 numbers.');
+        return;
+      }
+
+      const playerId = makePlayerId(name, pin);
+      const localAccounts = store.get('mpt_accounts', {});
+
+      if (accountMode === 'create') {
+        if (localAccounts[playerId] && localAccounts[playerId].pin !== pin) {
+          showToast('That name+PIN combo already exists. Try Log In!');
+          return;
+        }
+        localAccounts[playerId] = { name, pin, room, createdAt: Date.now() };
+        store.set('mpt_accounts', localAccounts);
+        saveAccount({
+          playerId, name, pin, room,
+          bestSession: state.bestSession || 0,
+          totalStars: state.totalStars || 0,
+          totalPetsFed: 0,
+          petEmoji: PETS[state.favPet || 0].emoji
+        });
+        showToast('Account created, ' + name + '! Room: ' + room);
+      } else {
+        let found = localAccounts[playerId];
+        if (!found && db) {
+          try {
+            const snap = await db.collection('prayerChains').doc(roomDocId(room)).get();
+            const players = snap.exists ? (snap.data().players || {}) : {};
+            const remote = players[playerId];
+            if (remote && remote.pin === pin) {
+              found = { name: remote.name, pin, room };
+            }
+          } catch {}
+        }
+        if (!found || found.pin !== pin) {
+          showToast('Hmm, that name or PIN is wrong. Try again!');
+          return;
+        }
+        localAccounts[playerId] = { name, pin, room, createdAt: found.createdAt || Date.now() };
+        store.set('mpt_accounts', localAccounts);
+        saveAccount({
+          playerId, name, pin, room,
+          bestSession: state.bestSession || 0,
+          totalStars: state.totalStars || 0,
+          totalPetsFed: 0,
+          petEmoji: PETS[state.favPet || 0].emoji
+        });
+        showToast('Welcome back, ' + name + '!');
+      }
+
+      $('welcomePin').value = '';
+      updateAccountUI();
+      await uploadScore();
+      showScreen('startScreen');
+    }
+
+    async function uploadScore() {
+      if (!account?.playerId) return false;
+      const payload = {
+        name: account.name,
+        pin: account.pin,
+        bestSession: Math.max(account.bestSession || 0, state.bestSession || 0),
+        totalStars: Math.max(account.totalStars || 0, state.totalStars || 0),
+        totalPetsFed: account.totalPetsFed || 0,
+        petEmoji: account.petEmoji || PETS[state.favPet || 0].emoji,
+        level: state.level || 1,
+        updatedAt: Date.now()
+      };
+      account.bestSession = payload.bestSession;
+      account.totalStars = payload.totalStars;
+      saveAccount(account);
+
+      // Always keep a local room cache for offline/fallback
+      const localLb = store.get('mpt_local_lb', {});
+      const room = sanitizeRoom(account.room);
+      if (!localLb[room]) localLb[room] = {};
+      localLb[room][account.playerId] = payload;
+      store.set('mpt_local_lb', localLb);
+
+      if (!db && !initFirebase()) return false;
+      try {
+        const ref = db.collection('prayerChains').doc(roomDocId(room));
+        await ref.set({ players: { [account.playerId]: payload }, room, updatedAt: Date.now() }, { merge: true });
+        return true;
+      } catch (e) {
+        console.warn('Score upload failed', e);
+        return false;
+      }
+    }
+
+    async function fetchLeaderboard() {
+      const room = sanitizeRoom(account?.room || $('roomCode')?.value || DEFAULT_ROOM);
+      $('lbRoomLabel').textContent = room;
+      $('lbStatus').textContent = 'Loading scores…';
+      $('lbList').innerHTML = '';
+
+      let players = {};
+      const localLb = store.get('mpt_local_lb', {});
+      if (localLb[room]) players = { ...localLb[room] };
+
+      if (!db) initFirebase();
+      if (db) {
+        try {
+          const snap = await db.collection('prayerChains').doc(roomDocId(room)).get();
+          if (snap.exists) {
+            const remote = snap.data().players || {};
+            players = { ...players, ...remote };
+            localLb[room] = players;
+            store.set('mpt_local_lb', localLb);
+            $('lbStatus').textContent = 'Live scores · room ' + room;
+          } else {
+            $('lbStatus').textContent = 'No scores yet — be the first in room ' + room + '!';
+          }
+        } catch (e) {
+          $('lbStatus').textContent = 'Showing saved scores (offline).';
+        }
+      } else {
+        $('lbStatus').textContent = 'Showing scores saved on this device.';
+      }
+
+      const rows = Object.entries(players).map(([id, p]) => ({ id, ...p }));
+      rows.sort((a, b) => (b.bestSession || 0) - (a.bestSession || 0) || (b.totalStars || 0) - (a.totalStars || 0));
+
+      if (!rows.length) {
+        $('lbList').innerHTML = '<div class="rescue-empty">🍪 No scores yet. Play a session, then invite friends with your room code!</div>';
+        return;
+      }
+
+      rows.slice(0, 20).forEach((p, i) => {
+        const rank = i + 1;
+        const row = document.createElement('div');
+        row.className = 'lb-row' + (account && p.id === account.playerId ? ' me' : '');
+        const rankClass = rank === 1 ? ' gold' : rank === 2 ? ' silver' : rank === 3 ? ' bronze' : '';
+        const medal = rank === 1 ? '🥇' : rank === 2 ? '🥈' : rank === 3 ? '🥉' : String(rank);
+        row.innerHTML =
+          '<div class="lb-rank' + rankClass + '">' + medal + '</div>' +
+          '<div><div class="lb-name">' + (p.petEmoji || '🦄') + ' ' + (p.name || 'Player') +
+          (account && p.id === account.playerId ? ' (you)' : '') + '</div>' +
+          '<div class="lb-meta">' + (p.totalPetsFed || 0) + ' pets · Lv ' + (p.level || 1) +
+          ' · ' + (p.totalStars || 0) + '⭐ total</div></div>' +
+          '<div class="lb-score">' + (p.bestSession || 0) + '⭐</div>';
+        $('lbList').appendChild(row);
+      });
+    }
+
+    async function showLeaderboard(from) {
+      if (!account?.playerId) {
+        showToast('Create an account first so friends can find you!');
+        showScreen('welcomeScreen');
+        return;
+      }
+      leaderboardReturn = from || 'welcomeScreen';
+      showScreen('leaderboardScreen');
+      await fetchLeaderboard();
+    }
 
     function init() {
+      const params = new URLSearchParams(location.search);
+      const urlRoom = params.get('room');
+      if (urlRoom && $('roomCode')) $('roomCode').value = sanitizeRoom(urlRoom);
+
       buildTablePresets();
       buildTableGrid();
       buildPetPicker();
       buildCloset();
       loadSavedSettings();
+      loadAccount();
       updateMetaPills();
       updateStreak();
       bindEvents();
       applyTheme(state.theme || 'blossom');
       checkPendingReminder();
       initYouTube();
+      initFirebase();
       syncNameFields();
+      updateAccountUI();
+      setAccountTab('create');
+      if (urlRoom && !account) showToast('Join room ' + sanitizeRoom(urlRoom) + ' to compete!');
     }
 
     function syncNameFields() {
-      const name = state.name || store.get('mpt_name', '');
+      const name = (account && account.name) || state.name || store.get('mpt_name', '');
       if (name) {
         $('playerName').value = name;
         $('welcomeName').value = name;
@@ -1107,7 +1476,7 @@
     }
 
     function getPlayerName() {
-      return ($('welcomeName').value || $('playerName').value || state.name || '').trim() || 'Superstar';
+      return sanitizeName(($('welcomeName').value || $('playerName').value || account?.name || state.name || '')) || 'Superstar';
     }
 
     function buildTablePresets() {
@@ -1251,17 +1620,41 @@
     }
 
     function bindEvents() {
+      $('tabCreate').onclick = () => setAccountTab('create');
+      $('tabLogin').onclick = () => setAccountTab('login');
+      $('accountSubmitBtn').onclick = () => createOrLoginAccount();
+      $('welcomePin').onkeydown = e => { if (e.key === 'Enter') createOrLoginAccount(); };
+      $('welcomeName').onkeydown = e => { if (e.key === 'Enter') createOrLoginAccount(); };
+
       $('welcomeBtn').onclick = () => {
-        const name = getPlayerName();
-        if (name) store.set('mpt_name', name);
+        if (!account?.playerId) {
+          showToast('Create an account or log in first!');
+          return;
+        }
         showScreen('startScreen');
       };
+      $('logoutBtn').onclick = () => {
+        clearAccountLocal();
+        updateAccountUI();
+        setAccountTab('login');
+        showToast('Logged out. Log in again anytime!');
+      };
+
       $('viewRescueBtn').onclick = () => { rescueReturnScreen = 'welcomeScreen'; showRescueScreen(); };
       $('viewRescueBtn2').onclick = () => { rescueReturnScreen = 'startScreen'; showRescueScreen(); };
       $('viewRescueBtn3').onclick = () => { rescueReturnScreen = 'resultsScreen'; showRescueScreen(); };
       $('rescueBackBtn').onclick = () => showScreen(rescueReturnScreen);
-      $('rescuePlayBtn').onclick = () => showScreen('startScreen');
+      $('rescuePlayBtn').onclick = () => showScreen(account ? 'startScreen' : 'welcomeScreen');
       $('backBtn').onclick = () => showScreen('welcomeScreen');
+
+      $('viewLeaderboardBtn').onclick = () => showLeaderboard('welcomeScreen');
+      $('viewLeaderboardBtn2').onclick = () => showLeaderboard('startScreen');
+      $('viewLeaderboardBtn3').onclick = () => showLeaderboard('resultsScreen');
+      $('lbBackBtn').onclick = () => showScreen(leaderboardReturn);
+      $('lbRefreshBtn').onclick = () => fetchLeaderboard();
+      $('lbShareBtn').onclick = shareInvite;
+      $('shareInviteBtn').onclick = shareInvite;
+
       $('startBtn').onclick = startGame;
       $('playerName').onkeydown = e => { if (e.key === 'Enter') startGame(); };
       $('reminderBtn').onclick = openReminder;
@@ -1274,7 +1667,7 @@
       $('musicToggle').onclick = toggleMusic;
       $('muteAllBtn').onclick = toggleMasterMute;
       $('sfxToggle').onclick = toggleSound;
-      $('shareBtn').onclick = $('shareBtn2').onclick = shareGame;
+      $('shareBtn').onclick = $('shareBtn2').onclick = shareInvite;
       $('pauseBtn').onclick = () => { stopSessionTimer(); stopMusic(); renderCloset(); updatePetPreview(); showScreen('startScreen'); };
       $('playAgainBtn').onclick = startGame;
       $('homeBtn').onclick = () => { stopSessionTimer(); renderCloset(); updatePetPreview(); showScreen('startScreen'); };
@@ -1607,20 +2000,26 @@
       setTimeout(() => t.classList.remove('show'), 3200);
     }
 
-    async function shareGame() {
-      const text = 'Feed magical pets and practice times tables! 🍪✨';
+    async function shareInvite() {
+      const room = sanitizeRoom(account?.room || $('roomCode')?.value || DEFAULT_ROOM);
+      const url = GAME_URL + '?room=' + encodeURIComponent(room);
+      const text = 'Race me in Magical Pet Treats! 🍪✨ Join room ' + room + ' and see who gets the highest score.';
       try {
         if (navigator.share) {
-          await navigator.share({ title: 'Magical Pet Treats', text, url: GAME_URL });
+          await navigator.share({ title: 'Magical Pet Treats', text, url });
           return;
         }
       } catch {}
       try {
-        await navigator.clipboard.writeText(GAME_URL);
-        showToast('Link copied! Share it with a friend 💌');
+        await navigator.clipboard.writeText(url);
+        showToast('Invite link copied! Room: ' + room);
       } catch {
-        prompt('Copy this link:', GAME_URL);
+        prompt('Copy this invite link:', url);
       }
+    }
+
+    async function shareGame() {
+      return shareInvite();
     }
 
     function updateMetaPills() {
@@ -1747,13 +2146,21 @@
     }
 
     function startGame() {
+      if (!account?.playerId) {
+        showToast('Create an account on the home screen first!');
+        showScreen('welcomeScreen');
+        return;
+      }
+
       state.tables = getSelectedTables();
       if (!state.tables.length) {
         showToast('Pick at least one times table to practice!');
         return;
       }
 
-      state.name = getPlayerName();
+      state.name = account.name || getPlayerName();
+      $('playerName').value = state.name;
+      $('welcomeName').value = state.name;
       state.favPet = +($('petPicker').querySelector('.pick-btn.selected')?.dataset.pet || 0);
       state.theme = $('themePicker').querySelector('.theme-btn.selected')?.dataset.theme || 'blossom';
       state.studyMinutes = +($('studyPicker').querySelector('.study-btn.selected')?.dataset.minutes || 10);
@@ -1969,6 +2376,17 @@
         store.set('mpt_bestSession', state.bestSession);
       }
 
+      if (account) {
+        account.bestSession = Math.max(account.bestSession || 0, state.bestSession || 0);
+        account.totalStars = Math.max(account.totalStars || 0, state.totalStars || 0);
+        account.totalPetsFed = (account.totalPetsFed || 0) + state.round;
+        account.petEmoji = PETS[state.favPet || 0].emoji;
+        saveAccount(account);
+        uploadScore().then(ok => {
+          if (ok) showToast('Score posted to room ' + sanitizeRoom(account.room) + '! 🏆');
+        });
+      }
+
       unlockAch('perfect', state.wrongTries === 0 && state.round > 0);
 
       const newCosmetics = checkCosmeticUnlocks();
@@ -1985,7 +2403,7 @@
       $('resultsTitle').textContent = timedOut ? 'Time\'s up, ' + state.name + '!' : 'Great job, ' + state.name + '!';
       $('resultsMsg').textContent = state.round === 0
         ? 'Try again — your pets are waiting!'
-        : 'You fed ' + state.round + ' pets in ' + state.studyMinutes + ' minutes! Dress up your pet with your ⭐ stars!';
+        : 'You fed ' + state.round + ' pets! Check the Friend Leaderboard to see who is winning.';
       $('resultsScore').textContent = '⭐ ' + state.sessionStars;
       $('statCorrect').textContent = state.round;
       $('statCombo').textContent = state.bestCombo;
