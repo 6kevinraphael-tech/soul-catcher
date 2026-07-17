@@ -835,6 +835,7 @@
       display: grid;
       grid-template-columns: 1fr 1fr;
       gap: 10px;
+      padding-bottom: 88px;
     }
 
     .merch-card {
@@ -853,6 +854,15 @@
     }
 
     .merch-card:hover { transform: translateY(-2px); }
+
+    .merch-photo {
+      width: 100%;
+      aspect-ratio: 1;
+      object-fit: cover;
+      object-position: center;
+      display: block;
+      background: #E8E8E8;
+    }
 
     .merch-swatch {
       height: 110px;
@@ -1693,8 +1703,8 @@
 
         <div class="section-head"><h3>Campaign posters</h3></div>
         <div class="poster-stack">
-          <img src="assets/shelterlink/poster-1.png" alt="ShelterLink poster — A better tomorrow starts today">
-          <img src="assets/shelterlink/poster-2.png" alt="ShelterLink poster — A safe place. A stronger future.">
+          <img src="assets/shelterlink/poster-1.jpg" alt="ShelterLink poster — A better tomorrow starts today" loading="lazy" decoding="async" width="640" height="960">
+          <img src="assets/shelterlink/poster-2.jpg" alt="ShelterLink poster — A safe place. A stronger future." loading="lazy" decoding="async" width="640" height="960">
         </div>
       </section>
 
@@ -1705,7 +1715,7 @@
           Wear the mission. Proceeds help keep ShelterLink free for people who need it most.
         </p>
         <div class="merch-hero">
-          <img src="assets/shelterlink/merch.png" alt="ShelterLink merchandise collection">
+          <img src="assets/shelterlink/merch-hero.jpg" alt="ShelterLink merchandise collection" width="860" height="573" loading="lazy" decoding="async">
         </div>
         <div class="merch-grid" id="merchGrid"></div>
         <div class="cart-bar" id="cartBar">
@@ -2250,18 +2260,17 @@
     }
 
     const MERCH = [
-      { id: 'm1', name: 'Classic Logo Tee', price: 28, color: 'Cream', swatch: '#EDE6D8', text: '#2F363B', kind: 'apparel' },
-      { id: 'm2', name: 'Classic Logo Tee', price: 28, color: 'Slate Blue', swatch: '#5B7A8A', text: '#fff', kind: 'apparel' },
-      { id: 'm3', name: 'Classic Logo Tee', price: 28, color: 'Charcoal', swatch: '#2F363B', text: '#E3D9C6', kind: 'apparel' },
-      { id: 'm4', name: 'Classic Logo Tee', price: 28, color: 'White', swatch: '#FFFFFF', text: '#2F363B', kind: 'apparel' },
-      { id: 'm5', name: 'Mission Hoodie', price: 58, color: 'Black', swatch: '#1A1D1F', text: '#E3D9C6', kind: 'apparel' },
-      { id: 'm6', name: 'Slogan Hoodie', price: 62, color: 'Heather Grey', swatch: '#C5C8CA', text: '#2F363B', kind: 'apparel' },
-      { id: 'm7', name: 'Sleeve Logo Hoodie', price: 60, color: 'Slate Blue', swatch: '#5B7A8A', text: '#fff', kind: 'apparel' },
-      { id: 'm8', name: 'Dad Cap', price: 26, color: 'Cream', swatch: '#E8DFD0', text: '#2F363B', kind: 'hat' },
-      { id: 'm9', name: 'Dad Cap', price: 26, color: 'Black', swatch: '#1A1D1F', text: '#E3D9C6', kind: 'hat' },
-      { id: 'm10', name: 'Cuff Beanie', price: 24, color: 'Navy', swatch: '#3D5563', text: '#E3D9C6', kind: 'hat' },
-      { id: 'm11', name: 'Tag Beanie', price: 24, color: 'Black', swatch: '#1A1D1F', text: '#E3D9C6', kind: 'hat' },
-      { id: 'm12', name: 'Oversized Logo Tee', price: 32, color: 'Sand Wash', swatch: '#D9CDB8', text: '#5B7A8A', kind: 'apparel' },
+      { id: 'm1', name: 'Classic Logo Tee', price: 28, color: 'White', kind: 'apparel', img: 'assets/shelterlink/store/tee-white.jpg' },
+      { id: 'm2', name: 'Classic Logo Tee', price: 28, color: 'Slate Blue', kind: 'apparel', img: 'assets/shelterlink/store/tee-slate.jpg' },
+      { id: 'm3', name: 'Back Logo Tee', price: 30, color: 'Charcoal', kind: 'apparel', img: 'assets/shelterlink/store/tee-black-back.jpg' },
+      { id: 'm4', name: 'Slogan Tee', price: 28, color: 'Cream', kind: 'apparel', img: 'assets/shelterlink/store/tee-cream.jpg' },
+      { id: 'm5', name: 'Mission Hoodie', price: 58, color: 'Black', kind: 'apparel', img: 'assets/shelterlink/store/hoodie-black.jpg' },
+      { id: 'm6', name: 'Slogan Hoodie', price: 62, color: 'Heather Grey', kind: 'apparel', img: 'assets/shelterlink/store/hoodie-grey.jpg' },
+      { id: 'm7', name: 'Sleeve Logo Hoodie', price: 60, color: 'Slate Blue', kind: 'apparel', img: 'assets/shelterlink/store/hoodie-slate.jpg' },
+      { id: 'm8', name: 'Dad Cap', price: 26, color: 'Black', kind: 'hat', img: 'assets/shelterlink/store/cap-black.jpg' },
+      { id: 'm9', name: 'Dad Cap', price: 26, color: 'Cream', kind: 'hat', img: 'assets/shelterlink/store/cap-cream.jpg' },
+      { id: 'm10', name: 'Tag Beanie', price: 24, color: 'Black', kind: 'hat', img: 'assets/shelterlink/store/beanie-black.jpg' },
+      { id: 'm11', name: 'Wordmark Beanie', price: 24, color: 'Slate Blue', kind: 'hat', img: 'assets/shelterlink/store/beanie-slate.jpg' },
     ];
 
     const REDFIN_CITY = {
@@ -3129,21 +3138,23 @@
         </a>`).join('');
     }
 
-    function renderMerch() {
+    let merchRendered = false;
+
+    function renderMerch(force) {
       const grid = document.getElementById('merchGrid');
       if (!grid) return;
+      updateCartBar();
+      if (merchRendered && !force) return;
+      merchRendered = true;
       grid.innerHTML = MERCH.map(m => `
         <button class="merch-card" type="button" data-merch="${m.id}">
-          <div class="merch-swatch" style="background:${m.swatch};color:${m.text}">
-            <img class="logo-mark" src="assets/shelterlink/mark.svg" alt="" style="width:44px;height:auto;opacity:0.92;filter:${m.text === '#fff' || m.text === '#E3D9C6' ? 'brightness(10)' : 'none'}">
-          </div>
+          <img class="merch-photo" src="${m.img}" alt="${m.name} — ${m.color}" loading="lazy" decoding="async" width="380" height="380">
           <div class="merch-info">
             <h4>${m.name}</h4>
             <div class="color-label">${m.color}</div>
             <div class="price">${money(m.price)}</div>
           </div>
         </button>`).join('');
-      updateCartBar();
     }
 
     function openMerch(id) {
@@ -3156,9 +3167,7 @@
       let qty = 1;
       const sizeOptions = isHat ? ['One Size'] : ['XS','S','M','L','XL','2XL'];
       content.innerHTML = `
-        <div class="merch-swatch" style="background:${item.swatch};color:${item.text};border-radius:14px;height:140px;margin-bottom:14px">
-          <img src="assets/shelterlink/mark.svg" alt="" style="width:72px;height:auto;opacity:0.95;filter:${item.text === '#fff' || item.text === '#E3D9C6' ? 'brightness(10)' : 'none'}">
-        </div>
+        <img class="merch-photo" src="${item.img}" alt="${item.name}" style="border-radius:14px;margin-bottom:14px;aspect-ratio:1.05;width:100%" width="420" height="400" decoding="async">
         <h3>${item.name}</h3>
         <p class="sub">${item.color} · ${money(item.price)}</p>
         <div class="field">
@@ -3304,8 +3313,7 @@
       updateBudgetUI();
       renderLists();
       renderResources();
-      renderMerch();
-      renderCommunity();
+      updateCartBar();
       updateProfileUI();
     }
 
