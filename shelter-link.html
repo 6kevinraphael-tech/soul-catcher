@@ -1339,10 +1339,17 @@
         linear-gradient(165deg, #F5F3EF, #E8EEF1);
       display: flex;
       flex-direction: column;
-      align-items: stretch;
-      justify-content: stretch;
-      padding: 0;
+      align-items: center;
+      justify-content: space-between;
+      padding:
+        max(28px, env(safe-area-inset-top, 0px))
+        20px
+        max(24px, env(safe-area-inset-bottom, 0px));
       text-align: center;
+      overflow-x: hidden;
+      overflow-y: auto;
+      -webkit-overflow-scrolling: touch;
+      box-sizing: border-box;
       transition: opacity 0.35s ease;
     }
 
@@ -1354,36 +1361,47 @@
     }
 
     .splash-content {
-      position: absolute;
-      inset: 0;
+      position: relative;
       z-index: 1;
+      flex: 1;
+      width: 100%;
+      max-width: 360px;
       display: flex;
       flex-direction: column;
       align-items: center;
       justify-content: center;
-      padding: 32px;
+      gap: 14px;
+      padding: 12px 8px 24px;
       pointer-events: none;
+      min-height: 0;
+    }
+
+    .splash-logo {
+      display: none;
     }
 
     .splash-brand {
       display: flex;
       align-items: center;
-      gap: 14px;
-      margin-bottom: 18px;
+      justify-content: center;
+      gap: 12px;
+      margin: 0;
+      max-width: 100%;
       animation: rise 0.7s ease;
     }
 
     .splash-mark {
-      width: 56px;
-      height: 64px;
+      width: clamp(52px, 14vw, 72px);
+      height: auto;
+      flex-shrink: 0;
       filter: drop-shadow(0 8px 20px rgba(91, 122, 138, 0.25));
     }
 
     .splash-name {
-      font-size: clamp(1.8rem, 6vw, 2.4rem);
+      font-size: clamp(1.55rem, 7vw, 2.2rem);
       font-weight: 700;
       letter-spacing: -0.03em;
-      line-height: 1;
+      line-height: 1.05;
       text-align: left;
     }
 
@@ -1391,42 +1409,40 @@
 
     .splash-tag {
       font-family: 'Libre Baskerville', serif;
-      font-size: 0.58rem;
-      letter-spacing: 0.14em;
+      font-size: clamp(0.5rem, 2.4vw, 0.58rem);
+      letter-spacing: 0.08em;
       text-transform: uppercase;
       color: var(--muted);
-      margin-top: 8px;
+      margin-top: 6px;
       text-align: left;
+      max-width: 11.5rem;
+      line-height: 1.35;
+      white-space: normal;
     }
 
     .splash-copy {
       color: var(--muted);
-      font-size: 0.95rem;
+      font-size: clamp(0.88rem, 3.6vw, 0.98rem);
       line-height: 1.45;
       max-width: 280px;
+      margin: 0;
+      padding: 0 4px;
     }
 
-    .splash img {
-      width: min(280px, 85%);
-      margin-bottom: 18px;
-      filter: drop-shadow(0 8px 24px rgba(91, 122, 138, 0.2));
-      animation: rise 0.7s ease;
-    }
-
-    /* Full-viewport enter button — covers the whole screen */
+    /* Full-area enter hit target, with a fully visible CTA */
     .fullscreen-enter-btn {
-      position: absolute;
-      inset: 0;
+      position: relative;
       z-index: 2;
       width: 100%;
-      height: 100%;
+      max-width: 360px;
+      flex-shrink: 0;
       border: none;
       border-radius: 0;
       margin: 0;
-      padding: 0;
+      padding: 8px 0 4px;
       cursor: pointer;
       font: inherit;
-      color: transparent;
+      color: inherit;
       background: transparent;
       appearance: none;
       -webkit-tap-highlight-color: transparent;
@@ -1434,37 +1450,54 @@
 
     .fullscreen-enter-btn:focus-visible {
       outline: 3px solid var(--slate);
-      outline-offset: -6px;
+      outline-offset: 2px;
     }
 
     .fullscreen-enter-btn .enter-label {
-      position: absolute;
-      left: 50%;
-      bottom: max(40px, calc(24px + env(safe-area-inset-bottom, 0px)));
-      transform: translateX(-50%);
+      position: relative;
+      left: auto;
+      bottom: auto;
+      transform: none;
       display: inline-flex;
       align-items: center;
-      gap: 10px;
-      padding: 16px 28px;
+      justify-content: center;
+      gap: 8px;
+      width: 100%;
+      max-width: 100%;
+      box-sizing: border-box;
+      padding: 14px 18px;
       border-radius: 16px;
       background: linear-gradient(135deg, var(--slate), var(--slate-deep));
       color: white;
       font-weight: 700;
-      font-size: 1.05rem;
+      font-size: clamp(0.92rem, 3.8vw, 1.05rem);
       box-shadow: 0 12px 32px rgba(61, 85, 99, 0.4);
       pointer-events: none;
-      white-space: nowrap;
+      white-space: normal;
+      text-align: center;
+      line-height: 1.25;
       animation: rise 0.7s ease 0.15s both;
     }
 
     .fullscreen-enter-btn:active .enter-label {
-      transform: translateX(-50%) scale(0.97);
+      transform: scale(0.98);
     }
 
     .fullscreen-enter-btn .enter-label svg {
       width: 20px;
       height: 20px;
       flex-shrink: 0;
+    }
+
+    /* Invisible full-screen tap layer above content, below doesn't steal layout */
+    .splash-tap-catcher {
+      position: absolute;
+      inset: 0;
+      z-index: 1;
+      border: none;
+      background: transparent;
+      cursor: pointer;
+      appearance: none;
     }
 
     .loc-pill {
@@ -1485,6 +1518,7 @@
 <body>
   <div class="phone" id="app">
     <div class="splash" id="splash">
+      <button type="button" class="splash-tap-catcher" id="splashTap" aria-hidden="true" tabindex="-1"></button>
       <div class="splash-content">
         <div class="splash-brand">
           <img src="assets/shelterlink/mark.svg" alt="" class="splash-mark">
@@ -1500,7 +1534,7 @@
       <button class="fullscreen-enter-btn" id="startBtn" type="button" aria-label="Get started">
         <span class="enter-label">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M5 12h14M13 5l7 7-7 7"/></svg>
-          Tap anywhere · Get started
+          Get started
         </span>
       </button>
     </div>
@@ -3468,12 +3502,15 @@
       });
     });
 
-    document.getElementById('startBtn').onclick = async () => {
+    function enterFromSplash() {
       state.seenSplash = true;
       saveState();
       hideSplash();
       openBudget();
-    };
+    }
+
+    document.getElementById('startBtn').onclick = enterFromSplash;
+    document.getElementById('splashTap').onclick = enterFromSplash;
 
     document.getElementById('fullscreenBtn').onclick = () => toggleFullscreen();
     document.getElementById('profileBtn').onclick = openProfile;
