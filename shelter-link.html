@@ -1,0 +1,3486 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta name="description" content="ShelterLink — find nearby shelters and affordable housing that fits your budget. Guiding you toward a safer tomorrow.">
+  <meta name="theme-color" content="#5B7A8A">
+  <title>ShelterLink</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cabin:wght@400;500;600;700&family=Libre+Baskerville:ital@0;1&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --slate: #5B7A8A;
+      --slate-deep: #3D5563;
+      --slate-soft: #7A9AAA;
+      --sand: #E3D9C6;
+      --sand-light: #F3EEE5;
+      --cream: #FAF8F4;
+      --charcoal: #2F363B;
+      --muted: #6B757C;
+      --line: #D8D2C6;
+      --ok: #3D7A5A;
+      --ok-bg: #E8F3EC;
+      --warn: #A36B2F;
+      --warn-bg: #F8F0E4;
+      --surface: #FFFFFF;
+      --shadow: 0 8px 28px rgba(47, 54, 59, 0.08);
+      --radius: 16px;
+      --nav-h: 68px;
+      --safe-b: env(safe-area-inset-bottom, 0px);
+    }
+
+    html, body {
+      height: 100%;
+      min-height: 100%;
+      min-height: 100dvh;
+      font-family: 'Cabin', sans-serif;
+      color: var(--charcoal);
+      background:
+        radial-gradient(ellipse 70% 45% at 10% 0%, rgba(91, 122, 138, 0.16), transparent 55%),
+        radial-gradient(ellipse 60% 40% at 100% 10%, rgba(227, 217, 198, 0.45), transparent 50%),
+        linear-gradient(165deg, #E8EEF1 0%, var(--cream) 45%, #EDE6D8 100%);
+      -webkit-font-smoothing: antialiased;
+      overflow: hidden;
+    }
+
+    body {
+      display: flex;
+      justify-content: center;
+      align-items: stretch;
+      padding: 0;
+      margin: 0;
+    }
+
+    .phone {
+      width: 100%;
+      max-width: 480px;
+      height: 100vh;
+      height: 100dvh;
+      min-height: 100%;
+      background: var(--surface);
+      border-radius: 0;
+      box-shadow: none;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      position: relative;
+    }
+
+    .phone.is-fullscreen {
+      max-width: none;
+      width: 100vw;
+      height: 100vh;
+      height: 100dvh;
+    }
+
+    @media (min-width: 520px) {
+      body { padding: 16px; align-items: center; }
+      .phone {
+        height: min(900px, calc(100vh - 32px));
+        border-radius: 28px;
+        box-shadow:
+          0 0 0 1px rgba(47, 54, 59, 0.06),
+          0 24px 64px rgba(61, 85, 99, 0.2);
+      }
+      .phone.is-fullscreen {
+        height: 100vh;
+        height: 100dvh;
+        border-radius: 0;
+        box-shadow: none;
+      }
+      .modal-backdrop {
+        align-items: center;
+        padding: 24px;
+      }
+      .modal {
+        border-radius: 20px;
+        max-width: 420px;
+        max-height: min(85dvh, calc(100% - 48px));
+        margin: auto;
+      }
+    }
+
+    @media (max-width: 380px) {
+      .brand-text p { display: none; }
+      .header-actions { gap: 6px; }
+      .icon-btn { width: 34px; height: 34px; border-radius: 10px; }
+      .budget-banner {
+        flex-direction: column;
+        align-items: stretch;
+      }
+      .budget-banner button { width: 100%; }
+      .nav-btn { font-size: 0.58rem; }
+    }
+
+    .phone::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background:
+        url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
+      pointer-events: none;
+      opacity: 0.35;
+      z-index: 0;
+    }
+
+    .app-header {
+      position: relative;
+      z-index: 30;
+      padding: calc(12px + env(safe-area-inset-top, 0px)) 18px 12px;
+      background: linear-gradient(180deg, rgba(250, 248, 244, 0.98), rgba(255, 255, 255, 0.92));
+      border-bottom: 1px solid rgba(216, 210, 198, 0.7);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-shrink: 0;
+    }
+
+    .brand-logo {
+      width: 36px;
+      height: 36px;
+      object-fit: contain;
+      flex-shrink: 0;
+      filter: drop-shadow(0 2px 6px rgba(91, 122, 138, 0.25));
+    }
+
+    .brand-mark {
+      width: 32px;
+      height: auto;
+      flex-shrink: 0;
+    }
+
+    .brand-text h1 {
+      font-size: 1.15rem;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      line-height: 1.1;
+    }
+
+    .brand-text h1 span { color: var(--slate); }
+
+    .brand-text p {
+      font-family: 'Libre Baskerville', serif;
+      font-size: 0.58rem;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-top: 3px;
+      max-width: 15rem;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .header-actions {
+      margin-left: auto;
+      display: flex;
+      gap: 8px;
+      flex-shrink: 0;
+    }
+
+    .icon-btn {
+      width: 38px;
+      height: 38px;
+      border-radius: 12px;
+      border: 1px solid var(--line);
+      background: var(--cream);
+      color: var(--slate-deep);
+      display: grid;
+      place-items: center;
+      cursor: pointer;
+      transition: transform 0.15s, background 0.15s;
+    }
+
+    .icon-btn:hover { background: var(--sand-light); }
+    .icon-btn:active { transform: scale(0.96); }
+
+    .screens {
+      position: relative;
+      z-index: 1;
+      flex: 1;
+      overflow-y: auto;
+      overflow-x: hidden;
+      -webkit-overflow-scrolling: touch;
+      padding-bottom: calc(var(--nav-h) + var(--safe-b) + 12px);
+      overscroll-behavior: contain;
+      /* smooth scroll fights touch scrolling / programmatic jumps */
+      scroll-behavior: auto;
+    }
+
+    .screen {
+      display: none;
+      padding: 14px 16px 24px;
+      max-width: 560px;
+      margin: 0 auto;
+    }
+    .screen.active { display: block; }
+
+    @keyframes rise {
+      from { opacity: 0; transform: translateY(8px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+      }
+    }
+
+    .welcome {
+      background:
+        linear-gradient(135deg, rgba(91, 122, 138, 0.12), rgba(227, 217, 198, 0.35)),
+        var(--cream);
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      padding: 16px;
+      margin-bottom: 14px;
+    }
+
+    .welcome h2 {
+      font-size: 1.2rem;
+      font-weight: 700;
+      line-height: 1.25;
+      margin-bottom: 6px;
+    }
+
+    .welcome p {
+      color: var(--muted);
+      font-size: 0.92rem;
+      line-height: 1.45;
+    }
+
+    .search-row {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 14px;
+    }
+
+    .search-box {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      background: var(--surface);
+      border: 1.5px solid var(--line);
+      border-radius: 14px;
+      padding: 0 12px;
+      box-shadow: var(--shadow);
+    }
+
+    .search-box input {
+      flex: 1;
+      border: none;
+      outline: none;
+      font: inherit;
+      font-size: 0.95rem;
+      padding: 13px 0;
+      background: transparent;
+      color: var(--charcoal);
+    }
+
+    .search-box input::placeholder { color: #9AA3A9; }
+
+    .filter-chip {
+      border: 1.5px solid var(--line);
+      background: var(--slate);
+      color: white;
+      border-radius: 14px;
+      padding: 0 14px;
+      min-height: 46px;
+      font: inherit;
+      font-weight: 600;
+      font-size: 0.85rem;
+      cursor: pointer;
+      white-space: nowrap;
+      box-shadow: 0 6px 16px rgba(91, 122, 138, 0.28);
+      flex-shrink: 0;
+    }
+
+    .section-head {
+      display: flex;
+      align-items: baseline;
+      justify-content: space-between;
+      margin: 18px 0 10px;
+    }
+
+    .section-head h3 {
+      font-size: 1.05rem;
+      font-weight: 700;
+    }
+
+    .section-head button {
+      border: none;
+      background: none;
+      color: var(--slate);
+      font: inherit;
+      font-weight: 600;
+      font-size: 0.85rem;
+      cursor: pointer;
+    }
+
+    .budget-banner {
+      background: linear-gradient(120deg, var(--slate-deep), var(--slate));
+      color: white;
+      border-radius: var(--radius);
+      padding: 14px 16px;
+      margin-bottom: 6px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 10px;
+      box-shadow: 0 10px 24px rgba(61, 85, 99, 0.28);
+    }
+
+    .budget-banner strong { display: block; font-size: 0.95rem; }
+    .budget-banner span { font-size: 0.78rem; opacity: 0.85; }
+    .budget-banner button {
+      border: 1px solid rgba(255,255,255,0.35);
+      background: rgba(255,255,255,0.12);
+      color: white;
+      border-radius: 10px;
+      padding: 8px 12px;
+      font: inherit;
+      font-weight: 600;
+      font-size: 0.8rem;
+      cursor: pointer;
+      white-space: nowrap;
+    }
+
+    .list { display: flex; flex-direction: column; gap: 10px; }
+
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      padding: 14px;
+      box-shadow: var(--shadow);
+      display: grid;
+      grid-template-columns: 48px 1fr auto;
+      gap: 12px;
+      align-items: start;
+      cursor: pointer;
+      transition: transform 0.15s, border-color 0.15s;
+      text-align: left;
+      width: 100%;
+      font: inherit;
+      color: inherit;
+      position: relative;
+    }
+
+    .card:hover { border-color: var(--slate-soft); transform: translateY(-1px); }
+    .card:active { transform: scale(0.99); }
+    .card:focus-visible {
+      outline: 2px solid var(--slate);
+      outline-offset: 2px;
+    }
+
+    .card-icon {
+      width: 48px;
+      height: 48px;
+      border-radius: 14px;
+      display: grid;
+      place-items: center;
+      background: linear-gradient(145deg, var(--sand-light), var(--sand));
+      color: var(--slate-deep);
+      flex-shrink: 0;
+    }
+
+    .card-icon svg { width: 24px; height: 24px; }
+
+    .card-body h4 {
+      font-size: 0.98rem;
+      font-weight: 700;
+      margin-bottom: 3px;
+    }
+
+    .card-meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px 10px;
+      font-size: 0.78rem;
+      color: var(--muted);
+    }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      padding: 4px 8px;
+      border-radius: 999px;
+      font-size: 0.72rem;
+      font-weight: 700;
+      white-space: nowrap;
+    }
+
+    .badge-ok { background: var(--ok-bg); color: var(--ok); }
+    .badge-warn { background: var(--warn-bg); color: var(--warn); }
+    .badge-slate { background: rgba(91, 122, 138, 0.12); color: var(--slate-deep); }
+
+    .heart-btn {
+      border: none;
+      background: transparent;
+      color: var(--muted);
+      cursor: pointer;
+      padding: 4px;
+      border-radius: 8px;
+      width: 36px;
+      height: 36px;
+      display: grid;
+      place-items: center;
+      flex-shrink: 0;
+      z-index: 1;
+    }
+
+    .heart-btn:hover { background: var(--sand-light); }
+    .heart-btn.saved { color: #B85C5C; }
+
+    .bottom-nav {
+      position: absolute;
+      left: 0; right: 0; bottom: 0;
+      z-index: 30;
+      height: calc(var(--nav-h) + var(--safe-b));
+      padding: 8px 8px calc(8px + var(--safe-b));
+      background: rgba(255, 255, 255, 0.96);
+      backdrop-filter: blur(12px);
+      border-top: 1px solid var(--line);
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 2px;
+    }
+
+    .nav-btn {
+      border: none;
+      background: transparent;
+      font: inherit;
+      font-size: 0.65rem;
+      font-weight: 600;
+      color: var(--muted);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 3px;
+      cursor: pointer;
+      border-radius: 12px;
+      transition: color 0.15s, background 0.15s;
+      position: relative;
+      min-width: 0;
+    }
+
+    .nav-btn svg { width: 22px; height: 22px; flex-shrink: 0; }
+    .nav-btn.active {
+      color: var(--slate-deep);
+      background: rgba(91, 122, 138, 0.1);
+    }
+
+    .nav-badge {
+      position: absolute;
+      top: 2px;
+      right: calc(50% - 18px);
+      min-width: 16px;
+      height: 16px;
+      padding: 0 4px;
+      border-radius: 999px;
+      background: var(--slate-deep);
+      color: white;
+      font-size: 0.58rem;
+      font-weight: 700;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      line-height: 1;
+    }
+
+    .nav-badge.show { display: inline-flex; }
+
+    .section-count {
+      font-weight: 600;
+      color: var(--muted);
+      font-size: 0.8rem;
+      margin-left: 6px;
+    }
+
+    .search-clear {
+      border: none;
+      background: transparent;
+      color: var(--muted);
+      cursor: pointer;
+      font: inherit;
+      font-size: 1rem;
+      font-weight: 700;
+      padding: 4px 2px;
+      line-height: 1;
+      display: none;
+    }
+    .search-clear.show { display: block; }
+
+    .modal-backdrop {
+      position: absolute;
+      inset: 0;
+      z-index: 50;
+      background: rgba(47, 54, 59, 0.45);
+      display: flex;
+      align-items: flex-end;
+      justify-content: center;
+      padding: 12px;
+      padding-bottom: max(12px, env(safe-area-inset-bottom, 0px));
+      overflow-x: hidden;
+      overflow-y: auto;
+      -webkit-overflow-scrolling: touch;
+      overscroll-behavior: contain;
+      opacity: 0;
+      visibility: hidden;
+      pointer-events: none;
+      transition: opacity 0.2s ease, visibility 0.2s ease;
+    }
+
+    .modal-backdrop.open {
+      opacity: 1;
+      visibility: visible;
+      pointer-events: auto;
+    }
+
+    body.modal-open .screens,
+    .phone.modal-open .screens {
+      overflow: hidden;
+      touch-action: none;
+    }
+
+    body.modal-open .bottom-nav,
+    body.modal-open .app-header,
+    .phone.modal-open .bottom-nav,
+    .phone.modal-open .app-header {
+      pointer-events: none;
+    }
+
+    @keyframes fade {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+
+    .modal {
+      width: 100%;
+      max-height: min(88dvh, calc(100% - 24px));
+      overflow-y: auto;
+      overflow-x: hidden;
+      -webkit-overflow-scrolling: touch;
+      overscroll-behavior: contain;
+      touch-action: pan-y;
+      background: var(--surface);
+      border-radius: 22px 22px 18px 18px;
+      padding: 18px;
+      padding-bottom: max(18px, env(safe-area-inset-bottom, 0px));
+      box-shadow: 0 -12px 40px rgba(0,0,0,0.18);
+      margin: auto 0 0;
+      flex-shrink: 0;
+    }
+
+    .modal h3 {
+      font-size: 1.15rem;
+      margin-bottom: 4px;
+    }
+
+    .modal .sub {
+      color: var(--muted);
+      font-size: 0.88rem;
+      margin-bottom: 16px;
+      line-height: 1.4;
+    }
+
+    .field { margin-bottom: 14px; }
+
+    .field label {
+      display: block;
+      font-size: 0.8rem;
+      font-weight: 700;
+      color: var(--slate-deep);
+      margin-bottom: 6px;
+    }
+
+    .field input, .field select, .field textarea {
+      width: 100%;
+      border: 1.5px solid var(--line);
+      border-radius: 12px;
+      padding: 12px 14px;
+      font: inherit;
+      font-size: 0.95rem;
+      background: var(--cream);
+      color: var(--charcoal);
+      outline: none;
+    }
+
+    .field input:focus, .field select:focus {
+      border-color: var(--slate);
+      background: white;
+    }
+
+    .range-row {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.85rem;
+      margin-bottom: 6px;
+    }
+
+    input[type="range"] {
+      width: 100%;
+      accent-color: var(--slate);
+      touch-action: none;
+    }
+
+    .hint {
+      font-size: 0.78rem;
+      color: var(--muted);
+      margin-top: 6px;
+      line-height: 1.35;
+    }
+
+    .btn-row {
+      display: flex;
+      gap: 8px;
+      margin-top: 8px;
+    }
+
+    .btn {
+      flex: 1;
+      border: none;
+      border-radius: 14px;
+      padding: 13px 16px;
+      font: inherit;
+      font-weight: 700;
+      font-size: 0.95rem;
+      cursor: pointer;
+      transition: transform 0.12s, opacity 0.12s;
+    }
+
+    .btn:active { transform: scale(0.98); }
+    .btn-primary {
+      background: linear-gradient(135deg, var(--slate), var(--slate-deep));
+      color: white;
+      box-shadow: 0 8px 20px rgba(91, 122, 138, 0.3);
+    }
+    .btn-ghost {
+      background: var(--sand-light);
+      color: var(--slate-deep);
+      border: 1px solid var(--line);
+    }
+
+    .map-wrap {
+      height: 220px;
+      border-radius: var(--radius);
+      overflow: hidden;
+      border: 1px solid var(--line);
+      background:
+        linear-gradient(180deg, rgba(91,122,138,0.08), transparent),
+        repeating-linear-gradient(0deg, transparent, transparent 24px, rgba(91,122,138,0.06) 24px, rgba(91,122,138,0.06) 25px),
+        repeating-linear-gradient(90deg, transparent, transparent 24px, rgba(91,122,138,0.06) 24px, rgba(91,122,138,0.06) 25px),
+        #EEF2F4;
+      position: relative;
+      margin-bottom: 14px;
+    }
+
+    .map-pin {
+      position: absolute;
+      transform: translate(-50%, -100%);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      cursor: pointer;
+    }
+
+    .map-pin .pin-dot {
+      width: 28px;
+      height: 28px;
+      border-radius: 50% 50% 50% 0;
+      transform: rotate(-45deg);
+      background: var(--slate);
+      box-shadow: 0 4px 10px rgba(61, 85, 99, 0.35);
+      display: grid;
+      place-items: center;
+    }
+
+    .map-pin .pin-dot span {
+      transform: rotate(45deg);
+      color: white;
+      font-size: 0.7rem;
+      font-weight: 700;
+    }
+
+    .map-pin.housing .pin-dot { background: #8B7355; }
+
+    @keyframes bob {
+      0%, 100% { translate: 0 0; }
+      50% { translate: 0 -4px; }
+    }
+
+    .map-legend {
+      position: absolute;
+      left: 10px;
+      bottom: 10px;
+      background: rgba(255,255,255,0.92);
+      border-radius: 10px;
+      padding: 8px 10px;
+      font-size: 0.72rem;
+      display: flex;
+      gap: 10px;
+      border: 1px solid var(--line);
+    }
+
+    .map-legend i {
+      display: inline-block;
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      margin-right: 4px;
+    }
+
+    .resource-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+
+    .resource-card {
+      background: var(--cream);
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      padding: 14px;
+      text-align: left;
+      cursor: pointer;
+      font: inherit;
+      color: inherit;
+      text-decoration: none;
+      display: block;
+      transition: border-color 0.15s, transform 0.15s;
+    }
+
+    .resource-card:hover { border-color: var(--slate-soft); transform: translateY(-1px); }
+    .resource-card .ico { font-size: 1.4rem; margin-bottom: 8px; }
+    .resource-card h4 { font-size: 0.92rem; margin-bottom: 4px; }
+    .resource-card p { font-size: 0.75rem; color: var(--muted); line-height: 1.35; }
+
+    .poster-stack {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      margin-top: 8px;
+    }
+
+    .poster-stack img {
+      width: 100%;
+      border-radius: 14px;
+      border: 1px solid var(--line);
+      box-shadow: var(--shadow);
+      display: block;
+    }
+
+    .values {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 8px;
+      margin: 14px 0;
+    }
+
+    .value {
+      text-align: center;
+      background: var(--cream);
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      padding: 12px 6px;
+    }
+
+    .value svg {
+      width: 22px;
+      height: 22px;
+      color: var(--slate);
+      margin-bottom: 6px;
+    }
+
+    .value strong {
+      display: block;
+      font-size: 0.72rem;
+      letter-spacing: 0.06em;
+      margin-bottom: 2px;
+    }
+
+    .value span {
+      font-size: 0.65rem;
+      color: var(--muted);
+      line-height: 1.25;
+    }
+
+    .merch-hero {
+      border-radius: var(--radius);
+      overflow: hidden;
+      border: 1px solid var(--line);
+      margin-bottom: 14px;
+      box-shadow: var(--shadow);
+    }
+
+    .merch-hero img {
+      width: 100%;
+      display: block;
+      max-height: 200px;
+      object-fit: cover;
+      object-position: center top;
+    }
+
+    .merch-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+
+    .merch-card {
+      background: var(--surface);
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      overflow: hidden;
+      box-shadow: var(--shadow);
+      display: flex;
+      flex-direction: column;
+      text-align: left;
+      font: inherit;
+      color: inherit;
+      cursor: pointer;
+      transition: transform 0.15s;
+    }
+
+    .merch-card:hover { transform: translateY(-2px); }
+
+    .merch-swatch {
+      height: 110px;
+      display: grid;
+      place-items: center;
+      position: relative;
+    }
+
+    .merch-swatch .logo-mark {
+      width: 48px;
+      height: 48px;
+      opacity: 0.9;
+    }
+
+    .merch-info { padding: 10px 12px 12px; }
+    .merch-info h4 { font-size: 0.88rem; margin-bottom: 2px; }
+    .merch-info .price {
+      font-weight: 700;
+      color: var(--slate-deep);
+      font-size: 0.92rem;
+    }
+    .merch-info .color-label {
+      font-size: 0.72rem;
+      color: var(--muted);
+      margin-bottom: 6px;
+    }
+
+    .cart-bar {
+      position: sticky;
+      bottom: calc(var(--nav-h) + var(--safe-b) + 8px);
+      margin-top: 14px;
+      background: var(--slate-deep);
+      color: white;
+      border-radius: 14px;
+      padding: 12px 14px;
+      display: none;
+      align-items: center;
+      justify-content: space-between;
+      box-shadow: 0 10px 28px rgba(47, 54, 59, 0.3);
+      z-index: 4;
+    }
+
+    .cart-bar.show { display: flex; }
+    .cart-bar button {
+      border: none;
+      background: white;
+      color: var(--slate-deep);
+      font: inherit;
+      font-weight: 700;
+      border-radius: 10px;
+      padding: 8px 12px;
+      cursor: pointer;
+    }
+
+    .profile-card {
+      background: linear-gradient(145deg, var(--slate-deep), var(--slate));
+      color: white;
+      border-radius: var(--radius);
+      padding: 18px;
+      margin-bottom: 14px;
+      display: flex;
+      gap: 14px;
+      align-items: center;
+    }
+
+    .avatar {
+      width: 56px;
+      height: 56px;
+      border-radius: 50%;
+      background: rgba(255,255,255,0.18);
+      display: grid;
+      place-items: center;
+      font-weight: 700;
+      font-size: 1.2rem;
+    }
+
+    .profile-card h3 { font-size: 1.1rem; }
+    .profile-card p { font-size: 0.82rem; opacity: 0.85; margin-top: 2px; }
+
+    .settings-list {
+      background: var(--surface);
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      overflow: hidden;
+    }
+
+    .settings-row {
+      width: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 14px 16px;
+      border: none;
+      border-bottom: 1px solid var(--line);
+      background: white;
+      font: inherit;
+      font-size: 0.92rem;
+      cursor: pointer;
+      color: inherit;
+      text-align: left;
+    }
+
+    .settings-row:last-child { border-bottom: none; }
+    .settings-row span { color: var(--muted); font-size: 0.85rem; }
+
+    .comm-tabs {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 6px;
+      margin-bottom: 14px;
+      background: var(--sand-light);
+      padding: 5px;
+      border-radius: 14px;
+    }
+
+    .comm-tab {
+      border: none;
+      background: transparent;
+      font: inherit;
+      font-size: 0.8rem;
+      font-weight: 700;
+      color: var(--muted);
+      padding: 9px 6px;
+      border-radius: 10px;
+      cursor: pointer;
+    }
+
+    .comm-tab.active {
+      background: white;
+      color: var(--slate-deep);
+      box-shadow: 0 1px 4px rgba(47, 54, 59, 0.08);
+    }
+
+    .comm-panel { display: none; }
+    .comm-panel.active { display: block; }
+
+    .account-banner {
+      background: linear-gradient(135deg, rgba(91, 122, 138, 0.12), rgba(227, 217, 198, 0.55));
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      padding: 14px;
+      margin-bottom: 14px;
+    }
+
+    .account-banner strong {
+      display: block;
+      font-size: 0.95rem;
+      margin-bottom: 4px;
+      color: var(--slate-deep);
+    }
+
+    .account-banner p {
+      font-size: 0.82rem;
+      color: var(--muted);
+      line-height: 1.4;
+      margin-bottom: 10px;
+    }
+
+    .account-banner .btn-row { margin-bottom: 0; }
+
+    .friend-card, .msg-row, .housed-card, .meetup-card {
+      background: var(--surface);
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      padding: 12px 14px;
+      margin-bottom: 10px;
+      display: flex;
+      gap: 12px;
+      align-items: flex-start;
+    }
+
+    .friend-avatar, .housed-avatar {
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      background: linear-gradient(145deg, var(--slate), var(--slate-deep));
+      color: white;
+      display: grid;
+      place-items: center;
+      font-weight: 700;
+      font-size: 0.85rem;
+      flex-shrink: 0;
+    }
+
+    .housed-avatar {
+      background: linear-gradient(145deg, #4A8B68, #2F6B4A);
+    }
+
+    .friend-body, .msg-body, .housed-body { flex: 1; min-width: 0; }
+
+    .friend-body strong, .msg-body strong, .housed-body strong {
+      display: block;
+      font-size: 0.95rem;
+      margin-bottom: 2px;
+    }
+
+    .friend-meta, .msg-preview, .housed-meta {
+      font-size: 0.8rem;
+      color: var(--muted);
+      line-height: 1.35;
+    }
+
+    .friend-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-top: 10px;
+    }
+
+    .mini-btn {
+      border: 1.5px solid var(--line);
+      background: var(--cream);
+      color: var(--slate-deep);
+      font: inherit;
+      font-size: 0.75rem;
+      font-weight: 700;
+      padding: 6px 10px;
+      border-radius: 999px;
+      cursor: pointer;
+    }
+
+    .mini-btn.primary {
+      background: var(--slate);
+      border-color: var(--slate);
+      color: white;
+    }
+
+    .msg-row {
+      cursor: pointer;
+      transition: background 0.15s;
+    }
+
+    .msg-row:hover { background: var(--sand-light); }
+
+    .msg-row.unread strong::after {
+      content: "";
+      display: inline-block;
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: var(--slate);
+      margin-left: 6px;
+      vertical-align: middle;
+    }
+
+    .chat-thread {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      max-height: 280px;
+      overflow-y: auto;
+      padding: 8px 2px 12px;
+      margin-bottom: 10px;
+    }
+
+    .bubble {
+      max-width: 82%;
+      padding: 10px 12px;
+      border-radius: 16px;
+      font-size: 0.88rem;
+      line-height: 1.4;
+    }
+
+    .bubble.them {
+      align-self: flex-start;
+      background: var(--sand-light);
+      color: var(--charcoal);
+      border-bottom-left-radius: 4px;
+    }
+
+    .bubble.me {
+      align-self: flex-end;
+      background: var(--slate);
+      color: white;
+      border-bottom-right-radius: 4px;
+    }
+
+    .bubble .when {
+      display: block;
+      font-size: 0.68rem;
+      opacity: 0.7;
+      margin-top: 4px;
+    }
+
+    .chat-compose {
+      display: flex;
+      gap: 8px;
+      align-items: flex-end;
+    }
+
+    .chat-compose textarea {
+      flex: 1;
+      min-height: 44px;
+      max-height: 90px;
+      resize: none;
+    }
+
+    .housed-card {
+      flex-direction: column;
+      background:
+        linear-gradient(180deg, rgba(61, 122, 90, 0.06), transparent 40%),
+        var(--surface);
+    }
+
+    .housed-top {
+      display: flex;
+      gap: 12px;
+      align-items: flex-start;
+      width: 100%;
+    }
+
+    .housed-quote {
+      font-family: 'Libre Baskerville', serif;
+      font-style: italic;
+      font-size: 0.88rem;
+      color: var(--charcoal);
+      line-height: 1.45;
+      margin-top: 10px;
+      padding-top: 10px;
+      border-top: 1px solid var(--line);
+    }
+
+    .housed-stats {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+      margin-bottom: 14px;
+    }
+
+    .housed-stat {
+      background: var(--ok-bg);
+      border-radius: 12px;
+      padding: 12px;
+      text-align: center;
+    }
+
+    .housed-stat strong {
+      display: block;
+      font-size: 1.25rem;
+      color: var(--ok);
+    }
+
+    .housed-stat span {
+      font-size: 0.72rem;
+      color: var(--muted);
+      font-weight: 600;
+    }
+
+    .auth-toggle {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 14px;
+    }
+
+    .auth-toggle button {
+      flex: 1;
+      border: 1.5px solid var(--line);
+      background: var(--cream);
+      font: inherit;
+      font-weight: 700;
+      font-size: 0.85rem;
+      padding: 10px;
+      border-radius: 12px;
+      cursor: pointer;
+      color: var(--muted);
+    }
+
+    .auth-toggle button.active {
+      border-color: var(--slate);
+      background: rgba(91, 122, 138, 0.1);
+      color: var(--slate-deep);
+    }
+
+    .empty {
+      text-align: center;
+      padding: 36px 16px;
+      color: var(--muted);
+    }
+
+    .empty strong {
+      display: block;
+      color: var(--charcoal);
+      margin-bottom: 6px;
+      font-size: 1rem;
+    }
+
+    .detail-hero {
+      display: flex;
+      gap: 12px;
+      align-items: flex-start;
+      margin-bottom: 14px;
+    }
+
+    .chips { display: flex; flex-wrap: wrap; gap: 6px; margin: 10px 0 14px; }
+
+    .toast {
+      position: absolute;
+      left: 50%;
+      bottom: calc(var(--nav-h) + var(--safe-b) + 18px);
+      transform: translateX(-50%) translateY(20px);
+      background: var(--charcoal);
+      color: white;
+      padding: 10px 16px;
+      border-radius: 999px;
+      font-size: 0.85rem;
+      font-weight: 600;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.25s, transform 0.25s;
+      z-index: 60;
+      white-space: nowrap;
+      max-width: calc(100% - 32px);
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .toast.show {
+      opacity: 1;
+      transform: translateX(-50%) translateY(0);
+    }
+
+    .redfin-note {
+      display: flex;
+      gap: 10px;
+      align-items: flex-start;
+      background: #FFF8F0;
+      border: 1px solid #E8D5BC;
+      border-radius: 12px;
+      padding: 12px;
+      margin-bottom: 12px;
+      font-size: 0.8rem;
+      line-height: 1.4;
+      color: #6B5338;
+    }
+
+    .redfin-note strong { color: #8B4513; }
+
+    .qty-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin: 10px 0;
+    }
+
+    .qty-row button {
+      width: 36px;
+      height: 36px;
+      border-radius: 10px;
+      border: 1px solid var(--line);
+      background: var(--cream);
+      font: inherit;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    .size-pills {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-top: 6px;
+    }
+
+    .size-pills button {
+      border: 1.5px solid var(--line);
+      background: white;
+      border-radius: 10px;
+      padding: 8px 12px;
+      font: inherit;
+      font-weight: 600;
+      cursor: pointer;
+    }
+
+    .size-pills button.active {
+      border-color: var(--slate);
+      background: rgba(91, 122, 138, 0.12);
+      color: var(--slate-deep);
+    }
+
+    .splash {
+      position: absolute;
+      inset: 0;
+      z-index: 40;
+      background:
+        radial-gradient(ellipse at 30% 20%, rgba(227, 217, 198, 0.5), transparent 50%),
+        linear-gradient(165deg, #F5F3EF, #E8EEF1);
+      display: flex;
+      flex-direction: column;
+      align-items: stretch;
+      justify-content: stretch;
+      padding: 0;
+      text-align: center;
+      transition: opacity 0.35s ease;
+    }
+
+    .splash.hide {
+      opacity: 0;
+      pointer-events: none;
+      visibility: hidden;
+      display: none;
+    }
+
+    .splash-content {
+      position: absolute;
+      inset: 0;
+      z-index: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 32px;
+      pointer-events: none;
+    }
+
+    .splash-brand {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      margin-bottom: 18px;
+      animation: rise 0.7s ease;
+    }
+
+    .splash-mark {
+      width: 56px;
+      height: 64px;
+      filter: drop-shadow(0 8px 20px rgba(91, 122, 138, 0.25));
+    }
+
+    .splash-name {
+      font-size: clamp(1.8rem, 6vw, 2.4rem);
+      font-weight: 700;
+      letter-spacing: -0.03em;
+      line-height: 1;
+      text-align: left;
+    }
+
+    .splash-name span { color: var(--slate); }
+
+    .splash-tag {
+      font-family: 'Libre Baskerville', serif;
+      font-size: 0.58rem;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-top: 8px;
+      text-align: left;
+    }
+
+    .splash-copy {
+      color: var(--muted);
+      font-size: 0.95rem;
+      line-height: 1.45;
+      max-width: 280px;
+    }
+
+    .splash img {
+      width: min(280px, 85%);
+      margin-bottom: 18px;
+      filter: drop-shadow(0 8px 24px rgba(91, 122, 138, 0.2));
+      animation: rise 0.7s ease;
+    }
+
+    /* Full-viewport enter button — covers the whole screen */
+    .fullscreen-enter-btn {
+      position: absolute;
+      inset: 0;
+      z-index: 2;
+      width: 100%;
+      height: 100%;
+      border: none;
+      border-radius: 0;
+      margin: 0;
+      padding: 0;
+      cursor: pointer;
+      font: inherit;
+      color: transparent;
+      background: transparent;
+      appearance: none;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    .fullscreen-enter-btn:focus-visible {
+      outline: 3px solid var(--slate);
+      outline-offset: -6px;
+    }
+
+    .fullscreen-enter-btn .enter-label {
+      position: absolute;
+      left: 50%;
+      bottom: max(40px, calc(24px + env(safe-area-inset-bottom, 0px)));
+      transform: translateX(-50%);
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      padding: 16px 28px;
+      border-radius: 16px;
+      background: linear-gradient(135deg, var(--slate), var(--slate-deep));
+      color: white;
+      font-weight: 700;
+      font-size: 1.05rem;
+      box-shadow: 0 12px 32px rgba(61, 85, 99, 0.4);
+      pointer-events: none;
+      white-space: nowrap;
+      animation: rise 0.7s ease 0.15s both;
+    }
+
+    .fullscreen-enter-btn:active .enter-label {
+      transform: translateX(-50%) scale(0.97);
+    }
+
+    .fullscreen-enter-btn .enter-label svg {
+      width: 20px;
+      height: 20px;
+      flex-shrink: 0;
+    }
+
+    .loc-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: var(--sand-light);
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      padding: 6px 12px;
+      font-size: 0.78rem;
+      font-weight: 600;
+      color: var(--slate-deep);
+      margin-bottom: 12px;
+    }
+  </style>
+</head>
+<body>
+  <div class="phone" id="app">
+    <div class="splash" id="splash">
+      <div class="splash-content">
+        <div class="splash-brand">
+          <img src="assets/shelterlink/mark.svg" alt="" class="splash-mark">
+          <div>
+            <div class="splash-name">Shelter<span>Link</span></div>
+            <div class="splash-tag">Guiding you toward a safer tomorrow</div>
+          </div>
+        </div>
+        <p class="splash-copy">
+          Find nearby shelters and affordable housing that fits your budget.
+        </p>
+      </div>
+      <button class="fullscreen-enter-btn" id="startBtn" type="button" aria-label="Get started">
+        <span class="enter-label">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M5 12h14M13 5l7 7-7 7"/></svg>
+          Tap anywhere · Get started
+        </span>
+      </button>
+    </div>
+
+    <header class="app-header">
+      <img class="brand-mark" src="assets/shelterlink/mark.svg" alt="">
+      <div class="brand-text">
+        <h1>Shelter<span>Link</span></h1>
+        <p>Guiding you toward a safer tomorrow</p>
+      </div>
+      <div class="header-actions">
+        <button class="icon-btn" id="fullscreenBtn" title="Full screen" aria-label="Toggle full screen">
+          <svg id="fullscreenIcon" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"><path d="M8 3H3v5M16 3h5v5M8 21H3v-5M16 21h5v-5"/></svg>
+        </button>
+        <button class="icon-btn" id="budgetQuickBtn" title="Budget" aria-label="Set budget">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 1v22M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6"/></svg>
+        </button>
+        <button class="icon-btn" id="profileBtn" title="Profile" aria-label="Profile">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+        </button>
+      </div>
+    </header>
+
+    <main class="screens">
+      <!-- HOME -->
+      <section class="screen active" id="screen-home" data-screen="home">
+        <div class="welcome">
+          <h2>Find help. Find hope.</h2>
+          <p>You're not alone. Let's find a safe place for you.</p>
+        </div>
+
+        <div class="loc-pill" id="locPill">
+          <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 21s-7-5.5-7-11a7 7 0 1114 0c0 5.5-7 11-7 11z"/><circle cx="12" cy="10" r="2.5"/></svg>
+          <span id="locLabel">Near you · San Francisco, CA</span>
+        </div>
+
+        <div class="search-row">
+          <div class="search-box">
+            <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="#6B757C" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg>
+            <input type="search" id="searchInput" placeholder="Search for shelters or housing..." autocomplete="off">
+            <button type="button" class="search-clear" id="searchClear" aria-label="Clear search">×</button>
+          </div>
+          <button class="filter-chip" id="openBudgetBtn">Budget</button>
+        </div>
+
+        <div class="budget-banner" id="budgetBanner">
+          <div>
+            <strong id="budgetSummary">Set your income & rent budget</strong>
+            <span id="budgetHint">We'll match affordable options for you</span>
+          </div>
+          <button type="button" id="editBudgetBtn">Adjust</button>
+        </div>
+
+        <div class="section-head">
+          <h3>Nearby shelters<span class="section-count" id="shelterCount"></span></h3>
+          <button type="button" data-go="map">See all</button>
+        </div>
+        <div class="list" id="shelterList"></div>
+
+        <div class="section-head">
+          <h3>Homes & apartments<span class="section-count" id="housingCount"></span></h3>
+          <button type="button" id="openRedfinBtn">View on Redfin</button>
+        </div>
+        <div class="redfin-note">
+          <div>
+            Housing listings are matched to your budget and open on <strong>Redfin</strong> for full details, photos, and applications.
+          </div>
+        </div>
+        <div class="list" id="housingList"></div>
+
+        <div class="section-head" style="margin-top:8px">
+          <h3>Community</h3>
+          <button type="button" data-go="community">Open</button>
+        </div>
+        <div class="account-banner" style="margin-bottom:8px">
+          <strong>Friends, meetups & housed wins</strong>
+          <p>Optional account lets you message friends and plan meetups. Anyone can celebrate people who've found homes.</p>
+          <div class="btn-row">
+            <button class="btn btn-ghost" type="button" data-go="community" data-comm-tab="housed">See housed</button>
+            <button class="btn btn-primary" type="button" data-go="community" data-comm-tab="friends">Community</button>
+          </div>
+        </div>
+      </section>
+
+      <!-- MAP -->
+      <section class="screen" id="screen-map" data-screen="map">
+        <h2 style="font-size:1.2rem;margin-bottom:10px;">Map</h2>
+        <p style="color:var(--muted);font-size:0.9rem;margin-bottom:12px;">Shelters and affordable homes near you.</p>
+        <div class="map-wrap" id="mapCanvas">
+          <div class="map-legend">
+            <span><i style="background:var(--slate)"></i>Shelter</span>
+            <span><i style="background:#8B7355"></i>Housing</span>
+          </div>
+        </div>
+        <div class="list" id="mapList"></div>
+      </section>
+
+      <!-- COMMUNITY -->
+      <section class="screen" id="screen-community" data-screen="community">
+        <h2 style="font-size:1.2rem;margin-bottom:6px;">Community</h2>
+        <p style="color:var(--muted);font-size:0.9rem;margin-bottom:12px;line-height:1.4;">
+          Optional friends, messages, and meetups — plus real wins from people who found housing.
+        </p>
+
+        <div id="accountGate"></div>
+
+        <div class="comm-tabs" role="tablist" aria-label="Community sections">
+          <button type="button" class="comm-tab active" data-comm-tab="friends" role="tab" aria-selected="true">Friends</button>
+          <button type="button" class="comm-tab" data-comm-tab="messages" role="tab" aria-selected="false">Messages</button>
+          <button type="button" class="comm-tab" data-comm-tab="housed" role="tab" aria-selected="false">Housed</button>
+        </div>
+
+        <div class="comm-panel active" id="panel-friends" data-panel="friends">
+          <div id="friendsList"></div>
+        </div>
+        <div class="comm-panel" id="panel-messages" data-panel="messages">
+          <div id="messagesList"></div>
+        </div>
+        <div class="comm-panel" id="panel-housed" data-panel="housed">
+          <div class="housed-stats" id="housedStats"></div>
+          <div id="housedList"></div>
+        </div>
+      </section>
+
+      <!-- SAVED -->
+      <section class="screen" id="screen-saved" data-screen="saved">
+        <h2 style="font-size:1.2rem;margin-bottom:10px;">Saved</h2>
+        <p style="color:var(--muted);font-size:0.9rem;margin-bottom:12px;">Places you've bookmarked for later.</p>
+        <div class="list" id="savedList"></div>
+      </section>
+
+      <!-- RESOURCES -->
+      <section class="screen" id="screen-resources" data-screen="resources">
+        <h2 style="font-size:1.2rem;margin-bottom:6px;">Support & resources</h2>
+        <p style="color:var(--muted);font-size:0.9rem;margin-bottom:14px;line-height:1.4;">Access food, healthcare, jobs, and more.</p>
+        <div class="resource-grid" id="resourceGrid"></div>
+
+        <div class="section-head">
+          <h3>Our mission</h3>
+        </div>
+        <div class="values">
+          <div class="value">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+            <strong>SAFE</strong>
+            <span>Verified shelters & listings</span>
+          </div>
+          <div class="value">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75"/></svg>
+            <strong>DIGNITY</strong>
+            <span>Everyone deserves respect</span>
+          </div>
+          <div class="value">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78L12 21.23l8.84-8.84a5.5 5.5 0 000-7.78z"/></svg>
+            <strong>HOPE</strong>
+            <span>Stronger communities</span>
+          </div>
+        </div>
+
+        <div class="section-head"><h3>Campaign posters</h3></div>
+        <div class="poster-stack">
+          <img src="assets/shelterlink/poster-1.png" alt="ShelterLink poster — A better tomorrow starts today">
+          <img src="assets/shelterlink/poster-2.png" alt="ShelterLink poster — A safe place. A stronger future.">
+        </div>
+      </section>
+
+      <!-- STORE / PROFILE combo via nav store + profile -->
+      <section class="screen" id="screen-store" data-screen="store">
+        <h2 style="font-size:1.2rem;margin-bottom:6px;">Merch store</h2>
+        <p style="color:var(--muted);font-size:0.9rem;margin-bottom:12px;line-height:1.4;">
+          Wear the mission. Proceeds help keep ShelterLink free for people who need it most.
+        </p>
+        <div class="merch-hero">
+          <img src="assets/shelterlink/merch.png" alt="ShelterLink merchandise collection">
+        </div>
+        <div class="merch-grid" id="merchGrid"></div>
+        <div class="cart-bar" id="cartBar">
+          <div>
+            <strong id="cartCount">0 items</strong>
+            <div style="font-size:0.8rem;opacity:0.85" id="cartTotal">$0</div>
+          </div>
+          <button type="button" id="checkoutBtn">Checkout</button>
+        </div>
+      </section>
+
+      <section class="screen" id="screen-profile" data-screen="profile">
+        <div class="profile-card">
+          <div class="avatar" id="avatarInitials">SL</div>
+          <div>
+            <h3 id="profileName">Guest</h3>
+            <p id="profileSub">Browsing as guest · account optional</p>
+          </div>
+        </div>
+        <div class="settings-list">
+          <button class="settings-row" data-go="home">
+            Back to home
+            <span>→</span>
+          </button>
+          <button class="settings-row" id="accountRow">
+            Account
+            <span id="accountRowSpan">Optional</span>
+          </button>
+          <button class="settings-row" data-go="community">
+            Community
+            <span>Friends · Housed</span>
+          </button>
+          <button class="settings-row" id="profileBudgetRow">
+            Income & rent budget
+            <span id="profileBudgetSpan">Not set</span>
+          </button>
+          <button class="settings-row" data-go="store">
+            Merch store
+            <span>Shop →</span>
+          </button>
+          <button class="settings-row" id="shareAppBtn">
+            Share ShelterLink
+            <span>→</span>
+          </button>
+          <button class="settings-row" id="crisisBtn">
+            Crisis hotline
+            <span>988</span>
+          </button>
+        </div>
+        <p style="text-align:center;margin-top:20px;font-size:0.8rem;color:var(--muted);line-height:1.5;">
+          Real help. Real hope. Real change.<br>
+          No one should have to face tomorrow alone.
+        </p>
+      </section>
+    </main>
+
+    <nav class="bottom-nav" aria-label="Main">
+      <button class="nav-btn active" data-nav="home">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 11l9-8 9 8"/><path d="M5 10v10h14V10"/></svg>
+        Home
+      </button>
+      <button class="nav-btn" data-nav="map">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 21s-7-5.5-7-11a7 7 0 1114 0c0 5.5-7 11-7 11z"/><circle cx="12" cy="10" r="2.5"/></svg>
+        Map
+      </button>
+      <button class="nav-btn" data-nav="community">
+        <span class="nav-badge" id="msgBadge" aria-hidden="true">0</span>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75"/></svg>
+        Community
+      </button>
+      <button class="nav-btn" data-nav="saved">
+        <span class="nav-badge" id="savedBadge" aria-hidden="true">0</span>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78L12 21.23l8.84-8.84a5.5 5.5 0 000-7.78z"/></svg>
+        Saved
+      </button>
+      <button class="nav-btn" data-nav="resources">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 016.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 014 19.5v-15A2.5 2.5 0 016.5 2z"/></svg>
+        Resources
+      </button>
+    </nav>
+
+    <!-- Budget modal -->
+    <div class="modal-backdrop" id="budgetModal" role="dialog" aria-modal="true" aria-labelledby="budgetTitle">
+      <div class="modal">
+        <h3 id="budgetTitle">Your budget</h3>
+        <p class="sub">We'll show shelters for free and apartments that fit what you can afford — including Redfin rentals.</p>
+        <div class="field">
+          <label for="yearlyIncome">Yearly income ($)</label>
+          <input type="number" id="yearlyIncome" min="0" step="500" placeholder="e.g. 24000">
+        </div>
+        <div class="field">
+          <div class="range-row">
+            <label for="rentBudget">Max monthly rent</label>
+            <strong id="rentBudgetLabel">$1,500</strong>
+          </div>
+          <input type="range" id="rentBudget" min="400" max="5500" step="50" value="1500">
+          <p class="hint" id="affordHint">Tip: many advisors suggest keeping rent near 30% of monthly income.</p>
+          <p class="hint" id="matchPreview" style="margin-top:8px;font-weight:600;color:var(--slate-deep)"></p>
+        </div>
+        <div class="field">
+          <label for="citySelect">City</label>
+          <select id="citySelect">
+            <option value="San Francisco, CA">San Francisco, CA</option>
+            <option value="Oakland, CA">Oakland, CA</option>
+            <option value="Los Angeles, CA">Los Angeles, CA</option>
+            <option value="San Diego, CA">San Diego, CA</option>
+            <option value="Sacramento, CA">Sacramento, CA</option>
+            <option value="Seattle, WA">Seattle, WA</option>
+            <option value="Portland, OR">Portland, OR</option>
+            <option value="Phoenix, AZ">Phoenix, AZ</option>
+            <option value="Denver, CO">Denver, CO</option>
+            <option value="Chicago, IL">Chicago, IL</option>
+            <option value="New York, NY">New York, NY</option>
+            <option value="Austin, TX">Austin, TX</option>
+          </select>
+        </div>
+        <div class="btn-row">
+          <button class="btn btn-ghost" type="button" id="closeBudgetBtn">Cancel</button>
+          <button class="btn btn-primary" type="button" id="saveBudgetBtn">Save & match</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Detail modal -->
+    <div class="modal-backdrop" id="detailModal" role="dialog" aria-modal="true">
+      <div class="modal" id="detailContent"></div>
+    </div>
+
+    <!-- Merch modal -->
+    <div class="modal-backdrop" id="merchModal" role="dialog" aria-modal="true">
+      <div class="modal" id="merchContent"></div>
+    </div>
+
+    <!-- Account modal (optional) -->
+    <div class="modal-backdrop" id="accountModal" role="dialog" aria-modal="true" aria-labelledby="accountTitle">
+      <div class="modal">
+        <h3 id="accountTitle">Optional account</h3>
+        <p class="sub">Create an account only if you want friends, messages, and meetups. Shelter search works either way.</p>
+        <div class="auth-toggle" id="authToggle">
+          <button type="button" class="active" data-auth-mode="create">Create</button>
+          <button type="button" data-auth-mode="signin">Sign in</button>
+        </div>
+        <div id="authFormCreate">
+          <div class="field">
+            <label for="acctName">Display name</label>
+            <input type="text" id="acctName" maxlength="40" placeholder="e.g. Alex" autocomplete="nickname">
+          </div>
+          <div class="field">
+            <label for="acctUser">Username</label>
+            <input type="text" id="acctUser" maxlength="24" placeholder="e.g. alex_sf" autocomplete="username">
+          </div>
+          <div class="field">
+            <label for="acctPass">Password</label>
+            <input type="password" id="acctPass" maxlength="64" placeholder="Demo only — stays on this device" autocomplete="new-password">
+          </div>
+          <div class="field">
+            <label for="acctCity">City</label>
+            <select id="acctCity">
+              <option value="San Francisco, CA">San Francisco, CA</option>
+              <option value="Oakland, CA">Oakland, CA</option>
+              <option value="Los Angeles, CA">Los Angeles, CA</option>
+              <option value="San Diego, CA">San Diego, CA</option>
+              <option value="Sacramento, CA">Sacramento, CA</option>
+              <option value="Seattle, WA">Seattle, WA</option>
+              <option value="Portland, OR">Portland, OR</option>
+              <option value="Phoenix, AZ">Phoenix, AZ</option>
+              <option value="Denver, CO">Denver, CO</option>
+              <option value="Chicago, IL">Chicago, IL</option>
+              <option value="New York, NY">New York, NY</option>
+              <option value="Austin, TX">Austin, TX</option>
+            </select>
+          </div>
+        </div>
+        <div id="authFormSignin" hidden>
+          <div class="field">
+            <label for="signinUser">Username</label>
+            <input type="text" id="signinUser" maxlength="24" autocomplete="username">
+          </div>
+          <div class="field">
+            <label for="signinPass">Password</label>
+            <input type="password" id="signinPass" maxlength="64" autocomplete="current-password">
+          </div>
+        </div>
+        <p class="hint" id="authHint">Demo accounts are stored only in this browser. No real server.</p>
+        <div class="btn-row">
+          <button class="btn btn-ghost" type="button" id="closeAccountBtn">Cancel</button>
+          <button class="btn btn-primary" type="button" id="submitAccountBtn">Create account</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Chat modal -->
+    <div class="modal-backdrop" id="chatModal" role="dialog" aria-modal="true">
+      <div class="modal" id="chatContent"></div>
+    </div>
+
+    <!-- Meetup modal -->
+    <div class="modal-backdrop" id="meetupModal" role="dialog" aria-modal="true" aria-labelledby="meetupTitle">
+      <div class="modal">
+        <h3 id="meetupTitle">Plan a meetup</h3>
+        <p class="sub" id="meetupSub">Pick a place and time to meet a friend.</p>
+        <input type="hidden" id="meetupFriendId">
+        <div class="field">
+          <label for="meetupPlace">Place</label>
+          <input type="text" id="meetupPlace" maxlength="80" placeholder="e.g. Hope Haven shelter lobby">
+        </div>
+        <div class="field">
+          <label for="meetupWhen">When</label>
+          <input type="datetime-local" id="meetupWhen">
+        </div>
+        <div class="field">
+          <label for="meetupNote">Note (optional)</label>
+          <textarea id="meetupNote" rows="2" maxlength="160" placeholder="Bring snacks, or meet after case worker appointment…"></textarea>
+        </div>
+        <div class="btn-row">
+          <button class="btn btn-ghost" type="button" id="closeMeetupBtn">Cancel</button>
+          <button class="btn btn-primary" type="button" id="saveMeetupBtn">Send invite</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="toast" id="toast"></div>
+  </div>
+
+  <script>
+    const STORAGE_KEY = 'shelterlink-v3';
+    const ACCOUNTS_KEY = 'shelterlink-accounts-v1';
+
+    const COMMUNITY_PEOPLE = [
+      { id: 'u_maya', name: 'Maya Chen', username: 'maya_c', city: 'Oakland, CA', status: 'Looking for a studio', initials: 'MC' },
+      { id: 'u_jordan', name: 'Jordan Lee', username: 'jordan_l', city: 'San Francisco, CA', status: 'At Hope Haven this week', initials: 'JL' },
+      { id: 'u_sam', name: 'Sam Ortiz', username: 'sam_o', city: 'Los Angeles, CA', status: 'Job search + housing apps', initials: 'SO' },
+      { id: 'u_riley', name: 'Riley Park', username: 'riley_p', city: 'Seattle, WA', status: 'Open to coffee meetups', initials: 'RP' },
+      { id: 'u_alex', name: 'Alex Rivera', username: 'alex_r', city: 'Denver, CO', status: 'Just started applications', initials: 'AR' },
+      { id: 'u_casey', name: 'Casey Kim', username: 'casey_k', city: 'Chicago, IL', status: 'Family shelter stay', initials: 'CK' },
+      { id: 'u_drew', name: 'Drew Nguyen', username: 'drew_n', city: 'Portland, OR', status: 'Waiting on waitlist news', initials: 'DN' },
+      { id: 'u_taylor', name: 'Taylor Brooks', username: 'taylor_b', city: 'Phoenix, AZ', status: 'Cooling center volunteer', initials: 'TB' },
+    ];
+
+    const HOUSED_STORIES = [
+      { id: 'h1', name: 'Elena M.', city: 'San Francisco, CA', home: 'Mission Studio Apartments', rent: 1450, when: 'Mar 2026', quote: 'ShelterLink showed me places I could actually afford. Keys in hand after 7 weeks.', initials: 'EM' },
+      { id: 'h2', name: 'Marcus T.', city: 'Oakland, CA', home: 'Fruitvale Family Flat', rent: 1650, when: 'Feb 2026', quote: 'My kids have their own beds again. The Redfin links made applying less scary.', initials: 'MT' },
+      { id: 'h3', name: 'Priya S.', city: 'Seattle, WA', home: 'Beacon Hill Shared Apt', rent: 1195, when: 'Jan 2026', quote: 'I filtered by my budget and found a roommate match through a friend meetup.', initials: 'PS' },
+      { id: 'h4', name: 'Devon R.', city: 'Los Angeles, CA', home: 'South LA Workforce Housing', rent: 1320, when: 'Dec 2025', quote: 'Case worker + ShelterLink listings. Finally a door with my name on it.', initials: 'DR' },
+      { id: 'h5', name: 'Nina K.', city: 'Chicago, IL', home: 'Near West Side 1BR', rent: 1100, when: 'Nov 2025', quote: 'Friends in Community kept me going while I waited on the waitlist.', initials: 'NK' },
+      { id: 'h6', name: 'Omar H.', city: 'Phoenix, AZ', home: 'Central Phoenix Cottage', rent: 995, when: 'Oct 2025', quote: 'From Valley Safe Bed to my own place. Still pinching myself.', initials: 'OH' },
+      { id: 'h7', name: 'Jamie L.', city: 'Denver, CO', home: 'Capitol Hill Micro Unit', rent: 1280, when: 'Sep 2025', quote: 'I planned meetups at the library with Jordan — we applied to the same buildings.', initials: 'JL' },
+      { id: 'h8', name: 'Chris A.', city: 'New York, NY', home: 'Bronx Supportive Housing', rent: 975, when: 'Aug 2025', quote: 'Seeing other housed stories made me believe it was possible for me too.', initials: 'CA' },
+      { id: 'h9', name: 'Sofia V.', city: 'Austin, TX', home: 'East Austin Duplex Share', rent: 1050, when: 'Jul 2025', quote: 'Budget slider kept me honest. Found a house share under my max rent.', initials: 'SV' },
+      { id: 'h10', name: 'Ben W.', city: 'Portland, OR', home: 'Alberta St. Apartment', rent: 1180, when: 'Jun 2025', quote: 'Saved three listings, messaged a friend for a second look, signed a lease.', initials: 'BW' },
+      { id: 'h11', name: 'Aisha B.', city: 'San Diego, CA', home: 'City Heights Studio', rent: 1395, when: 'May 2025', quote: 'ShelterLink + Redfin photos helped me know what I was walking into.', initials: 'AB' },
+      { id: 'h12', name: 'Luis G.', city: 'Sacramento, CA', home: 'Midtown Efficiency', rent: 925, when: 'Apr 2025', quote: 'Optional account meant I could keep chatting with my support circle.', initials: 'LG' },
+    ];
+
+    function seedMessagesFor(friendIds) {
+      const now = Date.now();
+      const msgs = {};
+      const samples = {
+        u_maya: [
+          { from: 'them', text: 'Hey! Did you check the Fruitvale listings under $1,600?', at: now - 86400000 * 2 },
+          { from: 'me', text: 'Yes — saved two. Want to look at them together?', at: now - 86400000 * 2 + 3600000 },
+          { from: 'them', text: 'Coffee at the library tomorrow?', at: now - 3600000 * 5 },
+        ],
+        u_jordan: [
+          { from: 'them', text: 'Hope Haven has beds tonight if you need one.', at: now - 86400000 },
+          { from: 'me', text: 'Thank you. I might stop by after 6.', at: now - 86400000 + 7200000 },
+        ],
+        u_riley: [
+          { from: 'them', text: 'Congrats on submitting those apps 🙌', at: now - 3600000 * 20 },
+        ],
+        u_sam: [
+          { from: 'them', text: 'LA waitlists are slow — hang in there.', at: now - 86400000 * 3 },
+          { from: 'me', text: 'Appreciate you. Meetup Sunday?', at: now - 86400000 * 3 + 5000000 },
+        ],
+      };
+      friendIds.forEach(id => {
+        msgs[id] = (samples[id] || [
+          { from: 'them', text: 'Glad we connected on ShelterLink.', at: now - 86400000 * 4 },
+        ]).map(m => ({ ...m }));
+      });
+      return msgs;
+    }
+
+    function initialsFrom(name) {
+      return (name || 'SL').split(/\s+/).map(p => p[0]).join('').slice(0, 2).toUpperCase();
+    }
+
+    function formatWhen(ts) {
+      const d = new Date(ts);
+      const diff = Date.now() - ts;
+      if (diff < 3600000) return Math.max(1, Math.round(diff / 60000)) + 'm ago';
+      if (diff < 86400000) return Math.round(diff / 3600000) + 'h ago';
+      return d.toLocaleDateString(undefined, { month: 'short', day: 'numeric' });
+    }
+
+    function formatMeetupWhen(iso) {
+      if (!iso) return '';
+      try {
+        return new Date(iso).toLocaleString(undefined, { weekday: 'short', month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit' });
+      } catch (_) { return iso; }
+    }
+
+    const ICONS = {
+      house: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 11l9-8 9 8"/><path d="M5 10v10h14V10"/></svg>`,
+      building: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 21V5a1 1 0 011-1h8a1 1 0 011 1v16M14 9h5a1 1 0 011 1v11M8 9h.01M8 13h.01M8 17h.01"/></svg>`,
+      heart: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78L12 21.23l8.84-8.84a5.5 5.5 0 000-7.78z"/></svg>`,
+      heartFill: `<svg viewBox="0 0 24 24" fill="currentColor"><path d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78L12 21.23l8.84-8.84a5.5 5.5 0 000-7.78z"/></svg>`,
+    };
+
+    const SHELTERS = [
+      // San Francisco
+      { id: 's1', type: 'shelter', name: 'Hope Haven Shelter', city: 'San Francisco, CA', distance: 0.4, hours: '24/7 Open', beds: 'Beds available', phone: '415-555-0142', address: '120 Mission St', services: ['Meals', 'Showers', 'Case management'], x: 28, y: 42 },
+      { id: 's2', type: 'shelter', name: 'New Start Shelter', city: 'San Francisco, CA', distance: 0.7, hours: 'Closes 9 PM', beds: 'Beds available', phone: '415-555-0198', address: '88 Folsom St', services: ['Overnight beds', 'Hot meals'], x: 62, y: 35 },
+      { id: 's3', type: 'shelter', name: 'Harbor Light Center', city: 'San Francisco, CA', distance: 1.1, hours: 'Opens 5 PM', beds: 'Limited beds', phone: '415-555-0110', address: '240 Turk St', services: ['Recovery support', 'Meals'], x: 45, y: 68 },
+      { id: 's15', type: 'shelter', name: 'Mission Bay Family Shelter', city: 'San Francisco, CA', distance: 1.6, hours: '24/7 Open', beds: 'Family rooms', phone: '415-555-0160', address: '500 China Basin St', services: ['Families', 'Childcare', 'Meals'], x: 55, y: 55 },
+      // Oakland
+      { id: 's4', type: 'shelter', name: 'Unity Family Shelter', city: 'Oakland, CA', distance: 0.8, hours: '24/7 Open', beds: 'Family rooms', phone: '510-555-0166', address: '410 Broadway', services: ['Families', 'Childcare'], x: 42, y: 48 },
+      { id: 's16', type: 'shelter', name: 'East Bay Emergency Beds', city: 'Oakland, CA', distance: 1.2, hours: 'Opens 6 PM', beds: 'Beds available', phone: '510-555-0172', address: '1200 San Pablo Ave', services: ['Overnight', 'Meals'], x: 58, y: 36 },
+      { id: 's17', type: 'shelter', name: 'Fruitvale Welcome House', city: 'Oakland, CA', distance: 1.9, hours: 'Closes 10 PM', beds: 'Limited beds', phone: '510-555-0181', address: '3300 International Blvd', services: ['Showers', 'Case management'], x: 70, y: 62 },
+      // Los Angeles
+      { id: 's5', type: 'shelter', name: 'Sunrise Emergency Beds', city: 'Los Angeles, CA', distance: 0.5, hours: '24/7 Open', beds: 'Beds available', phone: '213-555-0177', address: '515 San Pedro St', services: ['Emergency', 'Medical triage'], x: 35, y: 50 },
+      { id: 's18', type: 'shelter', name: 'Downtown LA Safe Haven', city: 'Los Angeles, CA', distance: 0.9, hours: '24/7 Open', beds: 'Beds available', phone: '213-555-0183', address: '200 E 6th St', services: ['Meals', 'Storage'], x: 48, y: 40 },
+      { id: 's19', type: 'shelter', name: 'Hollywood Community Shelter', city: 'Los Angeles, CA', distance: 2.4, hours: 'Closes 9 PM', beds: 'Limited beds', phone: '323-555-0144', address: '1600 N Gower St', services: ['Overnight', 'Job help'], x: 62, y: 28 },
+      { id: 's20', type: 'shelter', name: 'South LA Family Center', city: 'Los Angeles, CA', distance: 3.1, hours: '24/7 Open', beds: 'Family rooms', phone: '323-555-0190', address: '4000 S Figueroa St', services: ['Families', 'Meals'], x: 40, y: 72 },
+      // San Diego
+      { id: 's9', type: 'shelter', name: 'Pacific Beach Shelter', city: 'San Diego, CA', distance: 0.8, hours: '24/7 Open', beds: 'Beds available', phone: '619-555-0133', address: '1400 Market St', services: ['Meals', 'Showers'], x: 42, y: 48 },
+      { id: 's21', type: 'shelter', name: 'East Village Refuge', city: 'San Diego, CA', distance: 0.5, hours: 'Opens 5 PM', beds: 'Beds available', phone: '619-555-0148', address: '800 Island Ave', services: ['Overnight', 'Meals'], x: 55, y: 38 },
+      { id: 's22', type: 'shelter', name: 'City Heights Family Beds', city: 'San Diego, CA', distance: 2.2, hours: '24/7 Open', beds: 'Family rooms', phone: '619-555-0155', address: '4200 El Cajon Blvd', services: ['Families', 'Case management'], x: 68, y: 60 },
+      // Sacramento
+      { id: 's10', type: 'shelter', name: 'River City Refuge', city: 'Sacramento, CA', distance: 0.5, hours: 'Closes 9 PM', beds: 'Beds available', phone: '916-555-0155', address: '500 12th St', services: ['Overnight', 'Case management'], x: 50, y: 40 },
+      { id: 's23', type: 'shelter', name: 'Loaves & Shelter Sacramento', city: 'Sacramento, CA', distance: 1.0, hours: '24/7 Open', beds: 'Beds available', phone: '916-555-0162', address: '1500 North C St', services: ['Meals', 'Showers'], x: 38, y: 55 },
+      { id: 's24', type: 'shelter', name: 'North Sac Safe Night', city: 'Sacramento, CA', distance: 2.8, hours: 'Opens 6 PM', beds: 'Limited beds', phone: '916-555-0170', address: '2200 Del Paso Blvd', services: ['Overnight', 'Storage'], x: 65, y: 30 },
+      // Seattle
+      { id: 's6', type: 'shelter', name: 'Bridge Home Seattle', city: 'Seattle, WA', distance: 0.9, hours: 'Closes 10 PM', beds: 'Beds available', phone: '206-555-0122', address: '900 3rd Ave', services: ['Storage', 'Meals'], x: 55, y: 40 },
+      { id: 's25', type: 'shelter', name: 'Pioneer Square Shelter', city: 'Seattle, WA', distance: 0.4, hours: '24/7 Open', beds: 'Beds available', phone: '206-555-0135', address: '100 Yesler Way', services: ['Meals', 'Medical triage'], x: 40, y: 52 },
+      { id: 's26', type: 'shelter', name: 'Ballard Family Shelter', city: 'Seattle, WA', distance: 3.4, hours: '24/7 Open', beds: 'Family rooms', phone: '206-555-0141', address: '5400 15th Ave NW', services: ['Families', 'Childcare'], x: 72, y: 28 },
+      // Portland
+      { id: 's11', type: 'shelter', name: 'Rose City Shelter', city: 'Portland, OR', distance: 0.7, hours: '24/7 Open', beds: 'Beds available', phone: '503-555-0190', address: '220 NW Glisan', services: ['Meals', 'Storage'], x: 38, y: 55 },
+      { id: 's27', type: 'shelter', name: 'Old Town Emergency Beds', city: 'Portland, OR', distance: 0.5, hours: 'Opens 5 PM', beds: 'Beds available', phone: '503-555-0195', address: '30 NW 3rd Ave', services: ['Overnight', 'Meals'], x: 50, y: 42 },
+      { id: 's28', type: 'shelter', name: 'East Portland Refuge', city: 'Portland, OR', distance: 2.6, hours: 'Closes 9 PM', beds: 'Limited beds', phone: '503-555-0201', address: '11200 SE Division St', services: ['Showers', 'Case management'], x: 74, y: 58 },
+      // Phoenix
+      { id: 's12', type: 'shelter', name: 'Valley Safe Bed', city: 'Phoenix, AZ', distance: 1.0, hours: 'Opens 5 PM', beds: 'Beds available', phone: '602-555-0128', address: '901 S 7th Ave', services: ['Cooling center', 'Meals'], x: 55, y: 42 },
+      { id: 's29', type: 'shelter', name: 'Central Phoenix Shelter', city: 'Phoenix, AZ', distance: 0.6, hours: '24/7 Open', beds: 'Beds available', phone: '602-555-0133', address: '1209 W Madison St', services: ['Meals', 'Showers'], x: 42, y: 50 },
+      { id: 's30', type: 'shelter', name: 'South Mountain Family House', city: 'Phoenix, AZ', distance: 2.9, hours: '24/7 Open', beds: 'Family rooms', phone: '602-555-0140', address: '4800 S Central Ave', services: ['Families', 'Cooling center'], x: 60, y: 70 },
+      // Denver
+      { id: 's7', type: 'shelter', name: 'Safe Haven Denver', city: 'Denver, CO', distance: 0.6, hours: '24/7 Open', beds: 'Beds available', phone: '303-555-0188', address: '210 Larimer St', services: ['Pets welcome', 'Showers'], x: 40, y: 55 },
+      { id: 's31', type: 'shelter', name: 'Stout Street Refuge', city: 'Denver, CO', distance: 0.4, hours: 'Closes 10 PM', beds: 'Beds available', phone: '303-555-0192', address: '2100 Stout St', services: ['Meals', 'Case management'], x: 52, y: 40 },
+      { id: 's32', type: 'shelter', name: 'Aurora Overflow Beds', city: 'Denver, CO', distance: 4.2, hours: 'Opens 6 PM', beds: 'Limited beds', phone: '303-555-0198', address: '9800 E Colfax Ave', services: ['Overnight', 'Storage'], x: 78, y: 48 },
+      // Chicago
+      { id: 's8', type: 'shelter', name: 'Mercy House Chicago', city: 'Chicago, IL', distance: 1.0, hours: 'Opens 6 PM', beds: 'Limited beds', phone: '312-555-0144', address: '1200 S State', services: ['Meals', 'Job help'], x: 48, y: 45 },
+      { id: 's33', type: 'shelter', name: 'Near West Side Shelter', city: 'Chicago, IL', distance: 0.7, hours: '24/7 Open', beds: 'Beds available', phone: '312-555-0150', address: '1000 W Madison St', services: ['Meals', 'Showers'], x: 36, y: 38 },
+      { id: 's34', type: 'shelter', name: 'South Side Family Center', city: 'Chicago, IL', distance: 3.5, hours: '24/7 Open', beds: 'Family rooms', phone: '773-555-0158', address: '6300 S Cottage Grove', services: ['Families', 'Childcare'], x: 58, y: 72 },
+      // New York
+      { id: 's13', type: 'shelter', name: 'Harlem Welcome Center', city: 'New York, NY', distance: 0.4, hours: '24/7 Open', beds: 'Beds available', phone: '212-555-0171', address: '300 W 125th St', services: ['Families', 'Meals'], x: 48, y: 36 },
+      { id: 's35', type: 'shelter', name: 'Bowery Mission Beds', city: 'New York, NY', distance: 0.8, hours: '24/7 Open', beds: 'Beds available', phone: '212-555-0178', address: '227 Bowery', services: ['Meals', 'Recovery support'], x: 42, y: 58 },
+      { id: 's36', type: 'shelter', name: 'Bronx Family Shelter', city: 'New York, NY', distance: 2.1, hours: '24/7 Open', beds: 'Family rooms', phone: '718-555-0184', address: '1400 Grand Concourse', services: ['Families', 'Case management'], x: 62, y: 28 },
+      { id: 's37', type: 'shelter', name: 'Brooklyn Safe Night', city: 'New York, NY', distance: 3.0, hours: 'Opens 5 PM', beds: 'Limited beds', phone: '718-555-0191', address: '500 Atlantic Ave', services: ['Overnight', 'Storage'], x: 55, y: 70 },
+      // Austin
+      { id: 's14', type: 'shelter', name: 'Capital Area Shelter', city: 'Austin, TX', distance: 0.9, hours: 'Closes 10 PM', beds: 'Limited beds', phone: '512-555-0149', address: '500 E 7th St', services: ['Meals', 'Job help'], x: 60, y: 58 },
+      { id: 's38', type: 'shelter', name: 'ARCH Downtown Austin', city: 'Austin, TX', distance: 0.5, hours: '24/7 Open', beds: 'Beds available', phone: '512-555-0156', address: '500 E 7th St', services: ['Meals', 'Showers', 'Case management'], x: 45, y: 45 },
+      { id: 's39', type: 'shelter', name: 'East Austin Family Beds', city: 'Austin, TX', distance: 1.8, hours: '24/7 Open', beds: 'Family rooms', phone: '512-555-0163', address: '2200 E 12th St', services: ['Families', 'Meals'], x: 70, y: 40 },
+    ];
+
+
+    const HOUSING = [
+  // San Francisco — market studios ~$2.6k–3.2k; include affordable + market mix
+  { id: 'h1', type: 'housing', homeType: 'Apartment', name: 'Tenderloin SRO Studios', city: 'San Francisco, CA', rent: 950, distance: 0.5, beds: 'Studio', status: 'Available Now', address: '400 Turk St', x: 40, y: 48 },
+  { id: 'h2', type: 'housing', homeType: 'Apartment', name: 'Mission Affordable Flats', city: 'San Francisco, CA', rent: 1450, distance: 1.2, beds: 'Studio', status: 'Waitlist open', address: '2100 Mission St', x: 38, y: 58 },
+  { id: 'h3', type: 'housing', homeType: 'Apartment', name: 'SOMA Workforce Housing', city: 'San Francisco, CA', rent: 1895, distance: 0.8, beds: '1 Bed', status: 'Available Now', address: '88 Folsom St', x: 55, y: 42 },
+  { id: 'h4', type: 'housing', homeType: 'Apartment', name: 'Bayview Family Apartments', city: 'San Francisco, CA', rent: 2150, distance: 3.4, beds: '2 Bed', status: 'Available Now', address: '5000 3rd St', x: 70, y: 72 },
+  { id: 'h5', type: 'housing', homeType: 'Apartment', name: 'Sunset Studio Courts', city: 'San Francisco, CA', rent: 2395, distance: 2.8, beds: 'Studio', status: 'Available Now', address: '1700 Irving St', x: 22, y: 65 },
+  { id: 'h6', type: 'housing', homeType: 'Apartment', name: 'Hayes Valley One-Beds', city: 'San Francisco, CA', rent: 2895, distance: 1.0, beds: '1 Bed', status: 'Available Now', address: '300 Hayes St', x: 48, y: 35 },
+  { id: 'h7', type: 'housing', homeType: 'Apartment', name: 'Marina Market Lofts', city: 'San Francisco, CA', rent: 3450, distance: 2.1, beds: '1 Bed', status: 'Available Now', address: '2000 Chestnut St', x: 30, y: 25 },
+  { id: 'h8', type: 'housing', homeType: 'House', name: 'Excelsior Shared House', city: 'San Francisco, CA', rent: 1650, distance: 4.0, beds: '1 Bed', status: 'Available Now', address: '200 Persia Ave', x: 75, y: 55 },
+  { id: 'h9', type: 'housing', homeType: 'House', name: 'Outer Richmond Cottage', city: 'San Francisco, CA', rent: 3200, distance: 3.6, beds: '2 Bed', status: 'Available Now', address: '700 30th Ave', x: 18, y: 40 },
+  // Oakland
+  { id: 'h10', type: 'housing', homeType: 'Apartment', name: 'Fruitvale Affordable Homes', city: 'Oakland, CA', rent: 895, distance: 1.8, beds: 'Studio', status: 'Available Now', address: '3100 International Blvd', x: 48, y: 62 },
+  { id: 'h11', type: 'housing', homeType: 'Apartment', name: 'West Oakland Studios', city: 'Oakland, CA', rent: 1295, distance: 1.1, beds: 'Studio', status: 'Available Now', address: '1400 7th St', x: 35, y: 50 },
+  { id: 'h12', type: 'housing', homeType: 'Apartment', name: 'Uptown Oakland Flats', city: 'Oakland, CA', rent: 1745, distance: 0.6, beds: '1 Bed', status: 'Available Now', address: '2000 Telegraph Ave', x: 50, y: 38 },
+  { id: 'h13', type: 'housing', homeType: 'Apartment', name: 'Lake Merritt Apartments', city: 'Oakland, CA', rent: 2195, distance: 1.4, beds: '1 Bed', status: 'Available Now', address: '300 Lakeside Dr', x: 58, y: 45 },
+  { id: 'h14', type: 'housing', homeType: 'Apartment', name: 'Jack London Market Lofts', city: 'Oakland, CA', rent: 2650, distance: 0.9, beds: '1 Bed', status: 'Available Now', address: '55 Embarcadero', x: 42, y: 30 },
+  { id: 'h15', type: 'housing', homeType: 'House', name: 'East Oakland Duplex Room', city: 'Oakland, CA', rent: 1100, distance: 3.2, beds: '1 Bed', status: 'Available Now', address: '8200 MacArthur Blvd', x: 72, y: 68 },
+  { id: 'h16', type: 'housing', homeType: 'House', name: 'Temescal Bungalow', city: 'Oakland, CA', rent: 2895, distance: 2.0, beds: '2 Bed', status: 'Available Now', address: '4800 Telegraph Ave', x: 40, y: 28 },
+  // Los Angeles
+  { id: 'h17', type: 'housing', homeType: 'Apartment', name: 'Skid Row Supportive Housing', city: 'Los Angeles, CA', rent: 750, distance: 0.4, beds: 'Studio', status: 'Waitlist open', address: '500 San Pedro St', x: 45, y: 52 },
+  { id: 'h18', type: 'housing', homeType: 'Apartment', name: 'Koreatown Affordable Studios', city: 'Los Angeles, CA', rent: 1195, distance: 1.2, beds: 'Studio', status: 'Available Now', address: '600 S Vermont Ave', x: 42, y: 36 },
+  { id: 'h19', type: 'housing', homeType: 'Apartment', name: 'Echo Park Residences', city: 'Los Angeles, CA', rent: 1695, distance: 0.8, beds: 'Studio', status: 'Available Now', address: '1200 Echo Park Ave', x: 55, y: 40 },
+  { id: 'h20', type: 'housing', homeType: 'Apartment', name: 'Downtown LA Live/Work', city: 'Los Angeles, CA', rent: 2145, distance: 0.6, beds: '1 Bed', status: 'Available Now', address: '300 S Spring St', x: 50, y: 48 },
+  { id: 'h21', type: 'housing', homeType: 'Apartment', name: 'Hollywood One-Beds', city: 'Los Angeles, CA', rent: 2495, distance: 2.5, beds: '1 Bed', status: 'Available Now', address: '1600 N Vine St', x: 60, y: 28 },
+  { id: 'h22', type: 'housing', homeType: 'Apartment', name: 'Westlake Family Apartments', city: 'Los Angeles, CA', rent: 1895, distance: 1.5, beds: '2 Bed', status: 'Available Now', address: '700 S Alvarado St', x: 38, y: 55 },
+  { id: 'h23', type: 'housing', homeType: 'House', name: 'South LA Shared House', city: 'Los Angeles, CA', rent: 1050, distance: 3.8, beds: '1 Bed', status: 'Available Now', address: '4500 S Broadway', x: 48, y: 75 },
+  { id: 'h24', type: 'housing', homeType: 'House', name: 'Highland Park Cottage', city: 'Los Angeles, CA', rent: 2750, distance: 4.2, beds: '2 Bed', status: 'Available Now', address: '200 Figueroa St', x: 70, y: 32 },
+  // San Diego
+  { id: 'h25', type: 'housing', homeType: 'Apartment', name: 'City Heights Affordable', city: 'San Diego, CA', rent: 1050, distance: 2.0, beds: 'Studio', status: 'Available Now', address: '4100 University Ave', x: 65, y: 55 },
+  { id: 'h26', type: 'housing', homeType: 'Apartment', name: 'East Village Studios', city: 'San Diego, CA', rent: 1595, distance: 0.5, beds: 'Studio', status: 'Available Now', address: '450 5th Ave', x: 48, y: 42 },
+  { id: 'h27', type: 'housing', homeType: 'Apartment', name: 'North Park Apartments', city: 'San Diego, CA', rent: 1895, distance: 1.6, beds: '1 Bed', status: 'Available Now', address: '3000 30th St', x: 55, y: 38 },
+  { id: 'h28', type: 'housing', homeType: 'Apartment', name: 'Gaslamp Market Flats', city: 'San Diego, CA', rent: 2295, distance: 0.7, beds: '1 Bed', status: 'Available Now', address: '600 F St', x: 42, y: 48 },
+  { id: 'h29', type: 'housing', homeType: 'Apartment', name: 'Pacific Beach Condos', city: 'San Diego, CA', rent: 2795, distance: 4.5, beds: '1 Bed', status: 'Available Now', address: '900 Garnet Ave', x: 30, y: 25 },
+  { id: 'h30', type: 'housing', homeType: 'House', name: 'Encanto Shared Home', city: 'San Diego, CA', rent: 1200, distance: 5.0, beds: '1 Bed', status: 'Available Now', address: '600 Imperial Ave', x: 72, y: 68 },
+  { id: 'h31', type: 'housing', homeType: 'House', name: 'Normal Heights Bungalow', city: 'San Diego, CA', rent: 2650, distance: 2.8, beds: '2 Bed', status: 'Available Now', address: '3500 Adams Ave', x: 58, y: 32 },
+  // Sacramento
+  { id: 'h32', type: 'housing', homeType: 'Apartment', name: 'Midtown Affordable Studios', city: 'Sacramento, CA', rent: 825, distance: 0.8, beds: 'Studio', status: 'Available Now', address: '1600 J St', x: 48, y: 45 },
+  { id: 'h33', type: 'housing', homeType: 'Apartment', name: 'Capitol Green Apts', city: 'Sacramento, CA', rent: 1195, distance: 0.5, beds: '1 Bed', status: 'Available Now', address: '800 J St', x: 50, y: 40 },
+  { id: 'h34', type: 'housing', homeType: 'Apartment', name: 'Land Park Flats', city: 'Sacramento, CA', rent: 1545, distance: 1.9, beds: '1 Bed', status: 'Available Now', address: '2200 11th Ave', x: 40, y: 62 },
+  { id: 'h35', type: 'housing', homeType: 'Apartment', name: 'Natomas One-Beds', city: 'Sacramento, CA', rent: 1695, distance: 4.0, beds: '1 Bed', status: 'Available Now', address: '2800 Gateway Oaks Dr', x: 30, y: 28 },
+  { id: 'h36', type: 'housing', homeType: 'Apartment', name: 'Downtown Market Lofts', city: 'Sacramento, CA', rent: 1895, distance: 0.6, beds: 'Studio', status: 'Available Now', address: '500 K St', x: 55, y: 48 },
+  { id: 'h37', type: 'housing', homeType: 'House', name: 'Oak Park Shared House', city: 'Sacramento, CA', rent: 950, distance: 2.4, beds: '1 Bed', status: 'Available Now', address: '3500 12th Ave', x: 65, y: 58 },
+  { id: 'h38', type: 'housing', homeType: 'House', name: 'Curtis Park Cottage', city: 'Sacramento, CA', rent: 2100, distance: 2.2, beds: '2 Bed', status: 'Available Now', address: '2700 24th St', x: 45, y: 70 },
+  // Seattle
+  { id: 'h39', type: 'housing', homeType: 'Apartment', name: 'Pioneer Square Affordable', city: 'Seattle, WA', rent: 995, distance: 0.5, beds: 'Studio', status: 'Waitlist open', address: '100 Yesler Way', x: 48, y: 50 },
+  { id: 'h40', type: 'housing', homeType: 'Apartment', name: 'Capitol Hill Rooms', city: 'Seattle, WA', rent: 1395, distance: 1.0, beds: 'Studio', status: 'Available Now', address: '1400 E Pine St', x: 58, y: 38 },
+  { id: 'h41', type: 'housing', homeType: 'Apartment', name: 'Rainier Commons', city: 'Seattle, WA', rent: 1645, distance: 1.8, beds: '1 Bed', status: 'Available Now', address: '3100 Rainier Ave S', x: 55, y: 68 },
+  { id: 'h42', type: 'housing', homeType: 'Apartment', name: 'Belltown One-Beds', city: 'Seattle, WA', rent: 2195, distance: 0.7, beds: '1 Bed', status: 'Available Now', address: '2200 2nd Ave', x: 42, y: 35 },
+  { id: 'h43', type: 'housing', homeType: 'Apartment', name: 'South Lake Union Flats', city: 'Seattle, WA', rent: 2695, distance: 1.3, beds: '1 Bed', status: 'Available Now', address: '400 Fairview Ave N', x: 50, y: 28 },
+  { id: 'h44', type: 'housing', homeType: 'House', name: 'Beacon Hill Shared Home', city: 'Seattle, WA', rent: 1150, distance: 2.6, beds: '1 Bed', status: 'Available Now', address: '1500 15th Ave S', x: 60, y: 60 },
+  { id: 'h45', type: 'housing', homeType: 'House', name: 'Ballard Craftsman', city: 'Seattle, WA', rent: 2950, distance: 3.5, beds: '2 Bed', status: 'Available Now', address: '2000 NW 60th St', x: 28, y: 22 },
+  // Portland
+  { id: 'h46', type: 'housing', homeType: 'Apartment', name: 'Old Town Affordable Studios', city: 'Portland, OR', rent: 850, distance: 0.4, beds: 'Studio', status: 'Available Now', address: '50 NW Davis St', x: 48, y: 48 },
+  { id: 'h47', type: 'housing', homeType: 'Apartment', name: 'Pearl District Flats', city: 'Portland, OR', rent: 1450, distance: 0.9, beds: 'Studio', status: 'Available Now', address: '45 NW Davis', x: 42, y: 38 },
+  { id: 'h48', type: 'housing', homeType: 'Apartment', name: 'Alberta Arts Apartments', city: 'Portland, OR', rent: 1595, distance: 2.4, beds: '1 Bed', status: 'Available Now', address: '1500 NE Alberta St', x: 60, y: 30 },
+  { id: 'h49', type: 'housing', homeType: 'Apartment', name: 'Downtown Portland Lofts', city: 'Portland, OR', rent: 1895, distance: 0.6, beds: '1 Bed', status: 'Available Now', address: '500 SW 5th Ave', x: 50, y: 45 },
+  { id: 'h50', type: 'housing', homeType: 'Apartment', name: 'Hawthorne Corridor Flats', city: 'Portland, OR', rent: 1745, distance: 1.8, beds: '1 Bed', status: 'Available Now', address: '3400 SE Hawthorne Blvd', x: 65, y: 55 },
+  { id: 'h51', type: 'housing', homeType: 'House', name: 'Lents Shared House', city: 'Portland, OR', rent: 975, distance: 4.5, beds: '1 Bed', status: 'Available Now', address: '8800 SE Foster Rd', x: 75, y: 65 },
+  { id: 'h52', type: 'housing', homeType: 'House', name: 'Sellwood Bungalow', city: 'Portland, OR', rent: 2350, distance: 3.2, beds: '2 Bed', status: 'Available Now', address: '1500 SE Tacoma St', x: 55, y: 72 },
+  // Phoenix
+  { id: 'h53', type: 'housing', homeType: 'Apartment', name: 'Central City Affordable', city: 'Phoenix, AZ', rent: 725, distance: 0.7, beds: 'Studio', status: 'Available Now', address: '1000 W Roosevelt St', x: 48, y: 48 },
+  { id: 'h54', type: 'housing', homeType: 'Apartment', name: 'Desert Bloom Courts', city: 'Phoenix, AZ', rent: 995, distance: 1.1, beds: '1 Bed', status: 'Available Now', address: '2200 E Van Buren', x: 55, y: 42 },
+  { id: 'h55', type: 'housing', homeType: 'Apartment', name: 'Midtown Phoenix Flats', city: 'Phoenix, AZ', rent: 1295, distance: 1.5, beds: '1 Bed', status: 'Available Now', address: '3000 N Central Ave', x: 50, y: 35 },
+  { id: 'h56', type: 'housing', homeType: 'Apartment', name: 'Tempe Border Apartments', city: 'Phoenix, AZ', rent: 1445, distance: 4.8, beds: '1 Bed', status: 'Available Now', address: '900 E Apache Blvd', x: 70, y: 55 },
+  { id: 'h57', type: 'housing', homeType: 'Apartment', name: 'Downtown Phoenix Lofts', city: 'Phoenix, AZ', rent: 1695, distance: 0.5, beds: 'Studio', status: 'Available Now', address: '1 E Washington St', x: 45, y: 50 },
+  { id: 'h58', type: 'housing', homeType: 'House', name: 'Maryvale Shared Home', city: 'Phoenix, AZ', rent: 850, distance: 5.2, beds: '1 Bed', status: 'Available Now', address: '5000 W Indian School Rd', x: 25, y: 45 },
+  { id: 'h59', type: 'housing', homeType: 'House', name: 'Encanto Ranch House', city: 'Phoenix, AZ', rent: 1850, distance: 2.0, beds: '2 Bed', status: 'Available Now', address: '2000 N 15th Ave', x: 38, y: 38 },
+  // Denver
+  { id: 'h60', type: 'housing', homeType: 'Apartment', name: 'Five Points Affordable', city: 'Denver, CO', rent: 895, distance: 1.0, beds: 'Studio', status: 'Available Now', address: '2600 Welton St', x: 55, y: 40 },
+  { id: 'h61', type: 'housing', homeType: 'Apartment', name: 'RiNo Workforce Housing', city: 'Denver, CO', rent: 1345, distance: 1.4, beds: '1 Bed', status: 'Available Now', address: '3000 Larimer St', x: 58, y: 35 },
+  { id: 'h62', type: 'housing', homeType: 'Apartment', name: 'Capitol Hill Studios', city: 'Denver, CO', rent: 1495, distance: 0.8, beds: 'Studio', status: 'Available Now', address: '1200 E Colfax Ave', x: 48, y: 48 },
+  { id: 'h63', type: 'housing', homeType: 'Apartment', name: 'LoDo Market Flats', city: 'Denver, CO', rent: 1895, distance: 0.5, beds: '1 Bed', status: 'Available Now', address: '1600 Wewatta St', x: 42, y: 42 },
+  { id: 'h64', type: 'housing', homeType: 'Apartment', name: 'Cherry Creek Apartments', city: 'Denver, CO', rent: 2295, distance: 2.8, beds: '1 Bed', status: 'Available Now', address: '200 Fillmore St', x: 60, y: 60 },
+  { id: 'h65', type: 'housing', homeType: 'House', name: 'Globeville Shared House', city: 'Denver, CO', rent: 1050, distance: 3.0, beds: '1 Bed', status: 'Available Now', address: '4500 Washington St', x: 50, y: 25 },
+  { id: 'h66', type: 'housing', homeType: 'House', name: 'Highland Bungalow', city: 'Denver, CO', rent: 2450, distance: 1.9, beds: '2 Bed', status: 'Available Now', address: '3000 Bryant St', x: 35, y: 32 },
+  // Chicago
+  { id: 'h67', type: 'housing', homeType: 'Apartment', name: 'Pilsen Affordable Studios', city: 'Chicago, IL', rent: 850, distance: 2.0, beds: 'Studio', status: 'Available Now', address: '1800 S Ashland Ave', x: 40, y: 60 },
+  { id: 'h68', type: 'housing', homeType: 'Apartment', name: 'South Loop Studios', city: 'Chicago, IL', rent: 1395, distance: 0.7, beds: 'Studio', status: 'Available Now', address: '1400 S Michigan', x: 52, y: 48 },
+  { id: 'h69', type: 'housing', homeType: 'Apartment', name: 'Near West Side Flats', city: 'Chicago, IL', rent: 1645, distance: 1.2, beds: '1 Bed', status: 'Available Now', address: '1000 W Madison St', x: 38, y: 42 },
+  { id: 'h70', type: 'housing', homeType: 'Apartment', name: 'River North Apartments', city: 'Chicago, IL', rent: 2195, distance: 0.9, beds: '1 Bed', status: 'Available Now', address: '400 N State St', x: 50, y: 35 },
+  { id: 'h71', type: 'housing', homeType: 'Apartment', name: 'Lincoln Park One-Beds', city: 'Chicago, IL', rent: 2495, distance: 2.5, beds: '1 Bed', status: 'Available Now', address: '2400 N Clark St', x: 45, y: 25 },
+  { id: 'h72', type: 'housing', homeType: 'House', name: 'Englewood Shared Home', city: 'Chicago, IL', rent: 900, distance: 5.5, beds: '1 Bed', status: 'Available Now', address: '6500 S Halsted St', x: 55, y: 75 },
+  { id: 'h73', type: 'housing', homeType: 'House', name: 'Logan Square Two-Flat', city: 'Chicago, IL', rent: 1950, distance: 3.8, beds: '2 Bed', status: 'Available Now', address: '2800 N Milwaukee Ave', x: 32, y: 30 },
+  // New York
+  { id: 'h74', type: 'housing', homeType: 'Apartment', name: 'Bronx Hope Residences', city: 'New York, NY', rent: 975, distance: 1.1, beds: 'Studio', status: 'Available Now', address: '900 Grand Concourse', x: 55, y: 28 },
+  { id: 'h75', type: 'housing', homeType: 'Apartment', name: 'Harlem Income-Restricted', city: 'New York, NY', rent: 1250, distance: 0.5, beds: 'Studio', status: 'Waitlist open', address: '245 W 125th St', x: 48, y: 36 },
+  { id: 'h76', type: 'housing', homeType: 'Apartment', name: 'Washington Heights Studios', city: 'New York, NY', rent: 1695, distance: 2.4, beds: 'Studio', status: 'Available Now', address: '700 W 181st St', x: 42, y: 22 },
+  { id: 'h77', type: 'housing', homeType: 'Apartment', name: 'Bed-Stuy Affordable 1BR', city: 'New York, NY', rent: 1895, distance: 3.2, beds: '1 Bed', status: 'Available Now', address: '400 Nostrand Ave', x: 60, y: 65 },
+  { id: 'h78', type: 'housing', homeType: 'Apartment', name: 'Upper Manhattan One-Beds', city: 'New York, NY', rent: 2450, distance: 1.0, beds: '1 Bed', status: 'Available Now', address: '100 W 116th St', x: 50, y: 40 },
+  { id: 'h79', type: 'housing', homeType: 'Apartment', name: 'Downtown Studio Market', city: 'New York, NY', rent: 3295, distance: 0.9, beds: 'Studio', status: 'Available Now', address: '50 Bowery', x: 45, y: 55 },
+  { id: 'h80', type: 'housing', homeType: 'Apartment', name: 'Williamsburg Loft', city: 'New York, NY', rent: 3895, distance: 2.8, beds: '1 Bed', status: 'Available Now', address: '200 N 7th St', x: 65, y: 50 },
+  { id: 'h81', type: 'housing', homeType: 'House', name: 'Queens Shared House Room', city: 'New York, NY', rent: 1100, distance: 4.5, beds: '1 Bed', status: 'Available Now', address: '80-00 Queens Blvd', x: 72, y: 42 },
+  { id: 'h82', type: 'housing', homeType: 'House', name: 'Brooklyn Brownstone Floor', city: 'New York, NY', rent: 2800, distance: 3.6, beds: '2 Bed', status: 'Available Now', address: '200 Park Pl', x: 58, y: 72 },
+  // Austin
+  { id: 'h83', type: 'housing', homeType: 'Apartment', name: 'East Austin Co-op', city: 'Austin, TX', rent: 895, distance: 1.6, beds: 'Studio', status: 'Available Now', address: '1800 E 12th St', x: 58, y: 45 },
+  { id: 'h84', type: 'housing', homeType: 'Apartment', name: 'Riverside Affordable Flats', city: 'Austin, TX', rent: 1145, distance: 2.0, beds: '1 Bed', status: 'Available Now', address: '2200 E Riverside Dr', x: 62, y: 58 },
+  { id: 'h85', type: 'housing', homeType: 'Apartment', name: 'North Loop Apartments', city: 'Austin, TX', rent: 1395, distance: 2.4, beds: '1 Bed', status: 'Available Now', address: '4500 Airport Blvd', x: 48, y: 30 },
+  { id: 'h86', type: 'housing', homeType: 'Apartment', name: 'Downtown Austin Studios', city: 'Austin, TX', rent: 1695, distance: 0.5, beds: 'Studio', status: 'Available Now', address: '300 W 6th St', x: 45, y: 48 },
+  { id: 'h87', type: 'housing', homeType: 'Apartment', name: 'South Congress Flats', city: 'Austin, TX', rent: 1895, distance: 1.8, beds: '1 Bed', status: 'Available Now', address: '1600 S Congress Ave', x: 50, y: 65 },
+  { id: 'h88', type: 'housing', homeType: 'House', name: 'Dove Springs Shared Home', city: 'Austin, TX', rent: 850, distance: 5.0, beds: '1 Bed', status: 'Available Now', address: '5000 E William Cannon', x: 70, y: 72 },
+  { id: 'h89', type: 'housing', homeType: 'House', name: 'Mueller Area Cottage', city: 'Austin, TX', rent: 2100, distance: 3.0, beds: '2 Bed', status: 'Available Now', address: '1400 Aldrich St', x: 55, y: 35 },
+];
+
+
+    const RESOURCES = [
+      {
+        title: 'Meals & food',
+        desc: 'Soup kitchens, food banks, and free groceries near your city.',
+        ico: '🍲',
+        // Google Maps is reliable; Feeding America / gov deep links often block or fail
+        kind: 'maps',
+        query: 'food bank OR soup kitchen',
+      },
+      {
+        title: 'Healthcare',
+        desc: 'Free & low-cost clinics near you. Crisis: call or text 988.',
+        ico: '🩺',
+        kind: 'maps',
+        query: 'community health center OR free clinic',
+        extra: 'https://988lifeline.org/',
+      },
+      {
+        title: 'Jobs & training',
+        desc: 'Workforce / American Job Centers and employment help nearby.',
+        ico: '💼',
+        kind: 'maps',
+        query: 'American Job Center OR workforce center',
+      },
+      {
+        title: 'Legal aid',
+        desc: 'Free civil legal help for housing, eviction, and IDs.',
+        ico: '⚖️',
+        kind: 'url',
+        link: 'https://www.lawhelp.org/',
+      },
+      {
+        title: 'Hot showers',
+        desc: 'Day shelters, hygiene centers, and public facilities nearby.',
+        ico: '🚿',
+        kind: 'maps',
+        query: 'day shelter OR public shower OR hygiene center',
+      },
+      {
+        title: 'Veterans help',
+        desc: 'VA homeless programs, housing vouchers, and a 24/7 hotline.',
+        ico: '🎖️',
+        kind: 'url',
+        link: 'https://www.va.gov/homeless/',
+      },
+    ];
+
+    function mapsSearchUrl(query) {
+      const place = (state.city || 'United States').trim();
+      return 'https://www.google.com/maps/search/?api=1&query=' + encodeURIComponent(`${query} near ${place}`);
+    }
+
+    function resourceHref(r) {
+      if (r.kind === 'maps') return mapsSearchUrl(r.query);
+      return r.link;
+    }
+
+    function openExternal(url) {
+      if (!url) return;
+      const a = document.createElement('a');
+      a.href = url;
+      a.target = '_blank';
+      a.rel = 'noopener noreferrer';
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+    }
+
+    const MERCH = [
+      { id: 'm1', name: 'Classic Logo Tee', price: 28, color: 'Cream', swatch: '#EDE6D8', text: '#2F363B', kind: 'apparel' },
+      { id: 'm2', name: 'Classic Logo Tee', price: 28, color: 'Slate Blue', swatch: '#5B7A8A', text: '#fff', kind: 'apparel' },
+      { id: 'm3', name: 'Classic Logo Tee', price: 28, color: 'Charcoal', swatch: '#2F363B', text: '#E3D9C6', kind: 'apparel' },
+      { id: 'm4', name: 'Classic Logo Tee', price: 28, color: 'White', swatch: '#FFFFFF', text: '#2F363B', kind: 'apparel' },
+      { id: 'm5', name: 'Mission Hoodie', price: 58, color: 'Black', swatch: '#1A1D1F', text: '#E3D9C6', kind: 'apparel' },
+      { id: 'm6', name: 'Slogan Hoodie', price: 62, color: 'Heather Grey', swatch: '#C5C8CA', text: '#2F363B', kind: 'apparel' },
+      { id: 'm7', name: 'Sleeve Logo Hoodie', price: 60, color: 'Slate Blue', swatch: '#5B7A8A', text: '#fff', kind: 'apparel' },
+      { id: 'm8', name: 'Dad Cap', price: 26, color: 'Cream', swatch: '#E8DFD0', text: '#2F363B', kind: 'hat' },
+      { id: 'm9', name: 'Dad Cap', price: 26, color: 'Black', swatch: '#1A1D1F', text: '#E3D9C6', kind: 'hat' },
+      { id: 'm10', name: 'Cuff Beanie', price: 24, color: 'Navy', swatch: '#3D5563', text: '#E3D9C6', kind: 'hat' },
+      { id: 'm11', name: 'Tag Beanie', price: 24, color: 'Black', swatch: '#1A1D1F', text: '#E3D9C6', kind: 'hat' },
+      { id: 'm12', name: 'Oversized Logo Tee', price: 32, color: 'Sand Wash', swatch: '#D9CDB8', text: '#5B7A8A', kind: 'apparel' },
+    ];
+
+    const REDFIN_CITY = {
+      'San Francisco, CA': { path: 'city/17420/CA/San-Francisco', slug: 'San-Francisco' },
+      'Oakland, CA': { path: 'city/14045/CA/Oakland', slug: 'Oakland' },
+      'Los Angeles, CA': { path: 'city/11215/CA/Los-Angeles', slug: 'Los-Angeles' },
+      'San Diego, CA': { path: 'city/16904/CA/San-Diego', slug: 'San-Diego' },
+      'Sacramento, CA': { path: 'city/16409/CA/Sacramento', slug: 'Sacramento' },
+      'Seattle, WA': { path: 'city/16163/WA/Seattle', slug: 'Seattle' },
+      'Portland, OR': { path: 'city/14855/OR/Portland', slug: 'Portland' },
+      'Phoenix, AZ': { path: 'city/14240/AZ/Phoenix', slug: 'Phoenix' },
+      'Denver, CO': { path: 'city/5155/CO/Denver', slug: 'Denver' },
+      'Chicago, IL': { path: 'city/29470/IL/Chicago', slug: 'Chicago' },
+      'New York, NY': { path: 'city/30749/NY/New-York', slug: 'New-York' },
+      'Austin, TX': { path: 'city/30818/TX/Austin', slug: 'Austin' },
+    };
+
+    const state = loadState();
+
+    function loadState() {
+      try {
+        let raw = localStorage.getItem(STORAGE_KEY);
+        if (!raw) raw = localStorage.getItem('shelterlink-v2');
+        if (raw) {
+          const merged = { ...defaults(), ...JSON.parse(raw) };
+          if (!merged.messages) merged.messages = {};
+          if (!merged.friends) merged.friends = [];
+          if (!merged.meetups) merged.meetups = [];
+          if (!merged.unread) merged.unread = {};
+          return merged;
+        }
+      } catch (_) {}
+      return defaults();
+    }
+
+    function defaults() {
+      return {
+        yearlyIncome: null,
+        rentBudget: 1500,
+        city: 'San Francisco, CA',
+        saved: [],
+        cart: [],
+        name: 'Guest',
+        seenSplash: false,
+        account: null,
+        friends: [],
+        messages: {},
+        meetups: [],
+        unread: {},
+        communityTab: 'friends',
+      };
+    }
+
+    function saveState() {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+    }
+
+    function money(n) {
+      return '$' + Math.round(n).toLocaleString();
+    }
+
+    function suggestedRent(income) {
+      if (!income || income <= 0) return null;
+      return Math.round((income / 12) * 0.3 / 50) * 50;
+    }
+
+    function redfinRentalsUrl(city, maxRent) {
+      const info = REDFIN_CITY[city] || REDFIN_CITY['San Francisco, CA'];
+      return `https://www.redfin.com/${info.path}/apartments-for-rent/filter/max-price=${maxRent}`;
+    }
+
+    function redfinListingUrl(item) {
+      const info = REDFIN_CITY[item.city] || REDFIN_CITY['San Francisco, CA'];
+      const q = encodeURIComponent(`${item.name} ${item.city} for rent`);
+      return `https://www.redfin.com/${info.path}/apartments-for-rent/filter/max-price=${Math.max(item.rent + 100, state.rentBudget)}#shelterlink=${encodeURIComponent(item.id)}&q=${q}`;
+    }
+
+    function toast(msg) {
+      const el = document.getElementById('toast');
+      el.textContent = msg;
+      el.classList.add('show');
+      clearTimeout(toast._t);
+      toast._t = setTimeout(() => el.classList.remove('show'), 2200);
+    }
+
+    function isSaved(id) {
+      return state.saved.includes(id);
+    }
+
+    function toggleSave(id) {
+      const wasSaved = isSaved(id);
+      if (wasSaved) state.saved = state.saved.filter(x => x !== id);
+      else state.saved.push(id);
+      saveState();
+      renderLists();
+      toast(wasSaved ? 'Removed from saved' : 'Saved');
+    }
+
+    function matchesQuery(item, q) {
+      if (!q) return true;
+      const hay = `${item.name} ${item.city} ${item.address || ''} ${item.beds || ''} ${item.hours || ''} ${item.status || ''} ${item.homeType || ''}`.toLowerCase();
+      return hay.includes(q.toLowerCase());
+    }
+
+    function countHomesInCity(city, maxRent) {
+      return HOUSING.filter(h => h.city === city && h.rent <= maxRent).length;
+    }
+
+    function updateMatchPreview() {
+      const preview = document.getElementById('matchPreview');
+      if (!preview) return;
+      const city = document.getElementById('citySelect')?.value || state.city;
+      const max = Number(document.getElementById('rentBudget')?.value || state.rentBudget);
+      const n = countHomesInCity(city, max);
+      const apts = HOUSING.filter(h => h.city === city && h.rent <= max && h.homeType === 'Apartment').length;
+      const houses = HOUSING.filter(h => h.city === city && h.rent <= max && h.homeType === 'House').length;
+      preview.textContent = n
+        ? `${n} homes in ${city.split(',')[0]} at or under ${money(max)} (${apts} apt · ${houses} house)`
+        : `No homes in ${city.split(',')[0]} at or under ${money(max)} — raise your budget`;
+    }
+
+    function filteredShelters() {
+      const q = document.getElementById('searchInput')?.value || '';
+      return SHELTERS
+        .filter(s => s.city === state.city || !state.city)
+        .filter(s => matchesQuery(s, q))
+        .sort((a, b) => a.distance - b.distance);
+    }
+
+    function filteredHousing() {
+      const q = document.getElementById('searchInput')?.value || '';
+      const max = state.rentBudget || 1500;
+      return HOUSING
+        .filter(h => h.city === state.city)
+        .filter(h => h.rent <= max)
+        .filter(h => matchesQuery(h, q))
+        .sort((a, b) => a.rent - b.rent || a.distance - b.distance);
+    }
+
+    function updateBudgetUI() {
+      const summary = document.getElementById('budgetSummary');
+      const hint = document.getElementById('budgetHint');
+      const profileSpan = document.getElementById('profileBudgetSpan');
+      const sug = suggestedRent(state.yearlyIncome);
+
+      if (state.yearlyIncome) {
+        summary.textContent = `${money(state.yearlyIncome)}/yr · max rent ${money(state.rentBudget)}`;
+        hint.textContent = sug
+          ? `30% guideline ≈ ${money(sug)}/mo · showing homes ≤ ${money(state.rentBudget)}`
+          : `Showing homes ≤ ${money(state.rentBudget)}/mo`;
+        profileSpan.textContent = `${money(state.rentBudget)}/mo`;
+      } else {
+        summary.textContent = `Max rent ${money(state.rentBudget)}/mo`;
+        hint.textContent = 'Add yearly income for a smarter match · showing homes ≤ ' + money(state.rentBudget);
+        profileSpan.textContent = `${money(state.rentBudget)}/mo`;
+      }
+      document.getElementById('locLabel').textContent = `Near you · ${state.city}`;
+    }
+
+    function shelterCard(s) {
+      const saved = isSaved(s.id);
+      return `
+        <div class="card" data-open="${s.id}" role="button" tabindex="0" aria-label="${s.name}">
+          <div class="card-icon">${ICONS.house}</div>
+          <div class="card-body">
+            <h4>${s.name}</h4>
+            <div class="card-meta">
+              <span>${s.distance} mi away</span>
+              <span>${s.hours}</span>
+            </div>
+            <div style="margin-top:8px">
+              <span class="badge ${s.beds.includes('Limited') ? 'badge-warn' : 'badge-ok'}">${s.beds}</span>
+            </div>
+          </div>
+          <button class="heart-btn ${saved ? 'saved' : ''}" data-save="${s.id}" type="button" aria-label="${saved ? 'Remove from saved' : 'Save'}">
+            ${saved ? ICONS.heartFill : ICONS.heart}
+          </button>
+        </div>`;
+    }
+
+    function housingCard(h) {
+      const saved = isSaved(h.id);
+      const waitlist = /waitlist/i.test(h.status);
+      const isHouse = h.homeType === 'House';
+      return `
+        <div class="card" data-open="${h.id}" role="button" tabindex="0" aria-label="${h.name}, ${money(h.rent)} per month">
+          <div class="card-icon">${isHouse ? ICONS.house : ICONS.building}</div>
+          <div class="card-body">
+            <h4>${h.name}</h4>
+            <div class="card-meta">
+              <span><strong>${money(h.rent)}</strong> / month</span>
+              <span>${h.distance} mi away</span>
+              <span>${h.beds}</span>
+              <span>${h.homeType || 'Apartment'}</span>
+            </div>
+            <div style="margin-top:8px;display:flex;gap:6px;flex-wrap:wrap">
+              <span class="badge ${waitlist ? 'badge-warn' : 'badge-ok'}">${h.status}</span>
+              <span class="badge badge-slate">Redfin</span>
+            </div>
+          </div>
+          <button class="heart-btn ${saved ? 'saved' : ''}" data-save="${h.id}" type="button" aria-label="${saved ? 'Remove from saved' : 'Save'}">
+            ${saved ? ICONS.heartFill : ICONS.heart}
+          </button>
+        </div>`;
+    }
+
+    function findItem(id) {
+      return SHELTERS.find(x => x.id === id) || HOUSING.find(x => x.id === id);
+    }
+
+    function renderLists() {
+      const screensEl = document.querySelector('.screens');
+      const keepY = screensEl ? screensEl.scrollTop : 0;
+      const shelters = filteredShelters();
+      const housing = filteredHousing();
+      const shelterList = document.getElementById('shelterList');
+      const housingList = document.getElementById('housingList');
+      const mapList = document.getElementById('mapList');
+      if (!shelterList || !housingList) return;
+      const q = document.getElementById('searchInput')?.value || '';
+
+      const shelterCount = document.getElementById('shelterCount');
+      const housingCount = document.getElementById('housingCount');
+      if (shelterCount) shelterCount.textContent = shelters.length ? `(${shelters.length})` : '';
+      if (housingCount) housingCount.textContent = housing.length ? `(${housing.length})` : '';
+
+      const clearBtn = document.getElementById('searchClear');
+      if (clearBtn) clearBtn.classList.toggle('show', !!q);
+
+      shelterList.innerHTML = shelters.length
+        ? shelters.slice(0, 6).map(shelterCard).join('')
+        : `<div class="empty"><strong>No shelters in this city yet</strong>Try another city in Budget.</div>`;
+
+      housingList.innerHTML = housing.length
+        ? housing.slice(0, 10).map(housingCard).join('')
+        : `<div class="empty"><strong>No homes under ${money(state.rentBudget)}/mo</strong>Raise your rent budget or <button type="button" id="emptyRedfin" style="color:var(--slate);font:inherit;font-weight:700;background:none;border:none;cursor:pointer;text-decoration:underline">search Redfin</button>.</div>`;
+
+      const mapItems = [...shelters.slice(0, 4), ...housing.slice(0, 6)];
+      if (mapList) {
+        mapList.innerHTML = mapItems.map(i => i.type === 'shelter' ? shelterCard(i) : housingCard(i)).join('')
+          || `<div class="empty"><strong>Nothing nearby</strong>Adjust your city or budget.</div>`;
+      }
+
+      const mapScreen = document.getElementById('screen-map');
+      if (mapScreen?.classList.contains('active')) {
+        renderMap([...shelters, ...housing]);
+      }
+
+      const emptyRedfin = document.getElementById('emptyRedfin');
+      if (emptyRedfin) emptyRedfin.onclick = openRedfin;
+
+      renderSaved();
+      updateSavedBadge();
+      if (screensEl) screensEl.scrollTop = keepY;
+    }
+
+    function updateSavedBadge() {
+      const badge = document.getElementById('savedBadge');
+      if (!badge) return;
+      const n = state.saved.length;
+      badge.textContent = n > 9 ? '9+' : String(n);
+      badge.classList.toggle('show', n > 0);
+    }
+
+    function renderMap(items) {
+      const canvas = document.getElementById('mapCanvas');
+      if (!canvas) return;
+      canvas.querySelectorAll('.map-pin').forEach(p => p.remove());
+      items.slice(0, 10).forEach(item => {
+        const pin = document.createElement('button');
+        pin.type = 'button';
+        pin.className = `map-pin ${item.type === 'housing' ? 'housing' : ''}`;
+        pin.style.left = item.x + '%';
+        pin.style.top = item.y + '%';
+        pin.title = item.name;
+        pin.setAttribute('data-open', item.id);
+        pin.setAttribute('aria-label', item.name);
+        pin.innerHTML = `<div class="pin-dot"><span>${item.type === 'housing' ? (item.homeType === 'House' ? 'H' : '$') : 'S'}</span></div>`;
+        canvas.appendChild(pin);
+      });
+    }
+
+    function renderSaved() {
+      const list = document.getElementById('savedList');
+      if (!list) return;
+      const items = state.saved.map(findItem).filter(Boolean);
+      if (!items.length) {
+        list.innerHTML = `<div class="empty"><strong>Nothing saved yet</strong>Tap the heart on a shelter or apartment.</div>`;
+        return;
+      }
+      list.innerHTML = items.map(i => i.type === 'shelter' ? shelterCard(i) : housingCard(i)).join('');
+    }
+
+    function isLoggedIn() {
+      return !!(state.account && state.account.username);
+    }
+
+    function loadAccounts() {
+      try {
+        return JSON.parse(localStorage.getItem(ACCOUNTS_KEY) || '{}');
+      } catch (_) { return {}; }
+    }
+
+    function saveAccounts(map) {
+      localStorage.setItem(ACCOUNTS_KEY, JSON.stringify(map));
+    }
+
+    function getPerson(id) {
+      return COMMUNITY_PEOPLE.find(p => p.id === id);
+    }
+
+    function friendPeople() {
+      return state.friends.map(getPerson).filter(Boolean);
+    }
+
+    function ensureSocialSeed() {
+      if (!isLoggedIn()) return;
+      if (!state.friends.length) {
+        state.friends = ['u_maya', 'u_jordan', 'u_riley'];
+        state.messages = seedMessagesFor(state.friends);
+        state.unread = { u_maya: true, u_riley: true };
+        state.meetups = state.meetups || [];
+        saveState();
+      }
+    }
+
+    function updateProfileUI() {
+      const nameEl = document.getElementById('profileName');
+      const subEl = document.getElementById('profileSub');
+      const av = document.getElementById('avatarInitials');
+      const rowSpan = document.getElementById('accountRowSpan');
+      if (!nameEl) return;
+      if (isLoggedIn()) {
+        nameEl.textContent = state.account.name;
+        subEl.textContent = `@${state.account.username} · ${state.account.city}`;
+        av.textContent = initialsFrom(state.account.name);
+        rowSpan.textContent = 'Signed in';
+      } else {
+        nameEl.textContent = 'Guest';
+        subEl.textContent = 'Browsing as guest · account optional';
+        av.textContent = 'SL';
+        rowSpan.textContent = 'Optional';
+      }
+    }
+
+    function updateMsgBadge() {
+      const badge = document.getElementById('msgBadge');
+      if (!badge) return;
+      const n = Object.values(state.unread || {}).filter(Boolean).length;
+      badge.textContent = n > 9 ? '9+' : String(n);
+      badge.classList.toggle('show', n > 0);
+      badge.setAttribute('aria-hidden', n ? 'false' : 'true');
+    }
+
+    function setCommunityTab(tab) {
+      state.communityTab = tab || 'friends';
+      document.querySelectorAll('.comm-tab').forEach(b => {
+        const on = b.getAttribute('data-comm-tab') === state.communityTab;
+        b.classList.toggle('active', on);
+        b.setAttribute('aria-selected', on ? 'true' : 'false');
+      });
+      document.querySelectorAll('.comm-panel').forEach(p => {
+        p.classList.toggle('active', p.getAttribute('data-panel') === state.communityTab);
+      });
+      saveState();
+      renderCommunity();
+    }
+
+    function renderAccountGate() {
+      const gate = document.getElementById('accountGate');
+      if (!gate) return;
+      if (isLoggedIn()) {
+        gate.innerHTML = `
+          <div class="account-banner">
+            <strong>Hi, ${state.account.name}</strong>
+            <p>Message friends, plan meetups, and cheer on housed wins. Store is in Profile anytime.</p>
+            <div class="btn-row">
+              <button class="btn btn-ghost" type="button" id="signOutBtn">Sign out</button>
+              <button class="btn btn-primary" type="button" data-comm-tab="housed">See housed</button>
+            </div>
+          </div>`;
+        document.getElementById('signOutBtn')?.addEventListener('click', signOut);
+      } else {
+        gate.innerHTML = `
+          <div class="account-banner">
+            <strong>Account is optional</strong>
+            <p>Browse shelters and the Housed board freely. Create an account only if you want friends, messages, and meetups.</p>
+            <div class="btn-row">
+              <button class="btn btn-ghost" type="button" data-comm-tab="housed">See housed</button>
+              <button class="btn btn-primary" type="button" id="openAccountFromGate">Create account</button>
+            </div>
+          </div>`;
+        document.getElementById('openAccountFromGate')?.addEventListener('click', () => openAccountModal('create'));
+      }
+    }
+
+    function renderFriends() {
+      const list = document.getElementById('friendsList');
+      if (!list) return;
+      if (!isLoggedIn()) {
+        list.innerHTML = `<div class="empty"><strong>Friends unlock with an account</strong>Create an optional account to add friends, message, and plan meetups. Or open Housed to see wins.</div>`;
+        return;
+      }
+      ensureSocialSeed();
+      const people = friendPeople();
+      const meetups = (state.meetups || []).filter(m => state.friends.includes(m.friendId));
+      const suggest = COMMUNITY_PEOPLE.filter(p => !state.friends.includes(p.id)).slice(0, 3);
+
+      let html = '';
+      if (meetups.length) {
+        html += `<div class="section-head"><h3>Upcoming meetups</h3></div>`;
+        html += meetups.map(m => {
+          const p = getPerson(m.friendId);
+          return `<div class="meetup-card">
+            <div class="friend-avatar">${p?.initials || '?'}</div>
+            <div class="friend-body">
+              <strong>With ${p?.name || 'Friend'}</strong>
+              <div class="friend-meta">${m.place} · ${formatMeetupWhen(m.when)}${m.note ? ' · ' + m.note : ''}</div>
+            </div>
+          </div>`;
+        }).join('');
+      }
+
+      html += `<div class="section-head"><h3>Your friends<span class="section-count">${people.length}</span></h3></div>`;
+      if (!people.length) {
+        html += `<div class="empty"><strong>No friends yet</strong>Add someone below to start messaging.</div>`;
+      } else {
+        html += people.map(p => `
+          <div class="friend-card">
+            <div class="friend-avatar">${p.initials}</div>
+            <div class="friend-body">
+              <strong>${p.name}</strong>
+              <div class="friend-meta">${p.city} · ${p.status}</div>
+              <div class="friend-actions">
+                <button type="button" class="mini-btn primary" data-chat="${p.id}">Message</button>
+                <button type="button" class="mini-btn" data-meetup="${p.id}">Plan meetup</button>
+              </div>
+            </div>
+          </div>`).join('');
+      }
+
+      if (suggest.length) {
+        html += `<div class="section-head"><h3>Suggested</h3></div>`;
+        html += suggest.map(p => `
+          <div class="friend-card">
+            <div class="friend-avatar">${p.initials}</div>
+            <div class="friend-body">
+              <strong>${p.name}</strong>
+              <div class="friend-meta">@${p.username} · ${p.city}</div>
+              <div class="friend-actions">
+                <button type="button" class="mini-btn primary" data-add-friend="${p.id}">Add friend</button>
+              </div>
+            </div>
+          </div>`).join('');
+      }
+
+      list.innerHTML = html;
+    }
+
+    function renderMessages() {
+      const list = document.getElementById('messagesList');
+      if (!list) return;
+      if (!isLoggedIn()) {
+        list.innerHTML = `<div class="empty"><strong>Messages need an account</strong>Optional — create one to chat with friends about housing and meetups.</div>`;
+        return;
+      }
+      ensureSocialSeed();
+      const rows = friendPeople().map(p => {
+        const thread = state.messages[p.id] || [];
+        const last = thread[thread.length - 1];
+        const unread = !!(state.unread && state.unread[p.id]);
+        return `
+          <div class="msg-row ${unread ? 'unread' : ''}" data-chat="${p.id}" role="button" tabindex="0">
+            <div class="friend-avatar">${p.initials}</div>
+            <div class="msg-body">
+              <strong>${p.name}</strong>
+              <div class="msg-preview">${last ? last.text : 'Say hello'} · ${last ? formatWhen(last.at) : ''}</div>
+            </div>
+          </div>`;
+      }).join('');
+      list.innerHTML = rows || `<div class="empty"><strong>No conversations</strong>Add a friend first.</div>`;
+    }
+
+    function renderHoused() {
+      const stats = document.getElementById('housedStats');
+      const list = document.getElementById('housedList');
+      if (!list) return;
+      const total = HOUSED_STORIES.length;
+      const cities = new Set(HOUSED_STORIES.map(h => h.city)).size;
+      if (stats) {
+        stats.innerHTML = `
+          <div class="housed-stat"><strong>${total}+</strong><span>Housed via ShelterLink</span></div>
+          <div class="housed-stat"><strong>${cities}</strong><span>Cities represented</span></div>`;
+      }
+      list.innerHTML = HOUSED_STORIES.map(h => `
+        <article class="housed-card">
+          <div class="housed-top">
+            <div class="housed-avatar">${h.initials}</div>
+            <div class="housed-body">
+              <strong>${h.name}</strong>
+              <div class="housed-meta">${h.city} · ${h.when}</div>
+              <div class="housed-meta" style="margin-top:4px;color:var(--ok);font-weight:700">${h.home} · ${money(h.rent)}/mo</div>
+            </div>
+          </div>
+          <p class="housed-quote">“${h.quote}”</p>
+        </article>`).join('');
+    }
+
+    function renderCommunity() {
+      renderAccountGate();
+      renderFriends();
+      renderMessages();
+      renderHoused();
+      updateMsgBadge();
+      updateProfileUI();
+    }
+
+    function openAccountModal(mode) {
+      authMode = mode === 'signin' ? 'signin' : 'create';
+      document.querySelectorAll('#authToggle button').forEach(b => {
+        b.classList.toggle('active', b.getAttribute('data-auth-mode') === authMode);
+      });
+      document.getElementById('authFormCreate').hidden = authMode !== 'create';
+      document.getElementById('authFormSignin').hidden = authMode !== 'signin';
+      document.getElementById('submitAccountBtn').textContent = authMode === 'create' ? 'Create account' : 'Sign in';
+      document.getElementById('authHint').textContent = 'Demo accounts are stored only in this browser. No real server.';
+      if (authMode === 'create') {
+        document.getElementById('acctCity').value = state.city;
+      }
+      setModalOpen(document.getElementById('accountModal'), true);
+    }
+
+    let authMode = 'create';
+
+    function submitAccount() {
+      const accounts = loadAccounts();
+      if (authMode === 'create') {
+        const name = document.getElementById('acctName').value.trim();
+        const username = document.getElementById('acctUser').value.trim().toLowerCase().replace(/[^a-z0-9_]/g, '');
+        const pass = document.getElementById('acctPass').value;
+        const city = document.getElementById('acctCity').value;
+        if (!name || name.length < 2) { toast('Enter a display name'); return; }
+        if (!username || username.length < 3) { toast('Username needs 3+ letters'); return; }
+        if (!pass || pass.length < 4) { toast('Password needs 4+ characters'); return; }
+        if (accounts[username]) { toast('Username taken — try another'); return; }
+        accounts[username] = { name, username, pass, city, createdAt: Date.now() };
+        saveAccounts(accounts);
+        state.account = { name, username, city, createdAt: Date.now() };
+        state.name = name;
+        state.city = city;
+        state.friends = ['u_maya', 'u_jordan', 'u_riley'];
+        state.messages = seedMessagesFor(state.friends);
+        state.unread = { u_maya: true, u_riley: true };
+        state.meetups = [];
+        saveState();
+        setModalOpen(document.getElementById('accountModal'), false);
+        renderCommunity();
+        updateBudgetUI();
+        toast('Account created — welcome!');
+      } else {
+        const username = document.getElementById('signinUser').value.trim().toLowerCase();
+        const pass = document.getElementById('signinPass').value;
+        const acct = accounts[username];
+        if (!acct || acct.pass !== pass) {
+          document.getElementById('authHint').textContent = 'Username or password not found on this device.';
+          toast('Sign in failed');
+          return;
+        }
+        state.account = { name: acct.name, username: acct.username, city: acct.city, createdAt: acct.createdAt };
+        state.name = acct.name;
+        if (acct.city) state.city = acct.city;
+        ensureSocialSeed();
+        saveState();
+        setModalOpen(document.getElementById('accountModal'), false);
+        renderCommunity();
+        updateBudgetUI();
+        toast('Signed in');
+      }
+    }
+
+    function signOut() {
+      state.account = null;
+      state.name = 'Guest';
+      state.friends = [];
+      state.messages = {};
+      state.meetups = [];
+      state.unread = {};
+      saveState();
+      renderCommunity();
+      toast('Signed out — still browsing as guest');
+    }
+
+    function addFriend(id) {
+      if (!isLoggedIn()) { openAccountModal('create'); return; }
+      if (state.friends.includes(id)) return;
+      state.friends.push(id);
+      if (!state.messages[id]) {
+        state.messages[id] = [
+          { from: 'them', text: 'Thanks for connecting on ShelterLink!', at: Date.now() },
+        ];
+      }
+      state.unread = state.unread || {};
+      state.unread[id] = true;
+      saveState();
+      renderCommunity();
+      toast('Friend added');
+    }
+
+    function openChat(friendId) {
+      if (!isLoggedIn()) { openAccountModal('create'); return; }
+      const person = getPerson(friendId);
+      if (!person) return;
+      if (!state.friends.includes(friendId)) addFriend(friendId);
+      if (state.unread) state.unread[friendId] = false;
+      saveState();
+      updateMsgBadge();
+
+      const modal = document.getElementById('chatModal');
+      const content = document.getElementById('chatContent');
+      const thread = state.messages[friendId] || [];
+      content.innerHTML = `
+        <div class="detail-hero">
+          <div class="friend-avatar">${person.initials}</div>
+          <div>
+            <h3>${person.name}</h3>
+            <p class="sub" style="margin:0">${person.city} · @${person.username}</p>
+          </div>
+        </div>
+        <div class="chat-thread" id="chatThread">
+          ${thread.map(m => `
+            <div class="bubble ${m.from === 'me' ? 'me' : 'them'}">
+              ${m.text}
+              <span class="when">${formatWhen(m.at)}</span>
+            </div>`).join('') || '<p class="hint">Say hello and plan a meetup.</p>'}
+        </div>
+        <div class="chat-compose">
+          <textarea id="chatInput" rows="2" maxlength="400" placeholder="Message ${person.name.split(' ')[0]}…"></textarea>
+          <button class="btn btn-primary" type="button" id="sendChatBtn" style="width:auto;padding:12px 16px">Send</button>
+        </div>
+        <div class="btn-row" style="margin-top:12px">
+          <button class="btn btn-ghost" type="button" data-close-chat>Close</button>
+          <button class="btn btn-ghost" type="button" data-meetup="${friendId}">Plan meetup</button>
+        </div>`;
+      setModalOpen(modal, true);
+      const threadEl = document.getElementById('chatThread');
+      if (threadEl) threadEl.scrollTop = threadEl.scrollHeight;
+      content.querySelector('[data-close-chat]')?.addEventListener('click', () => setModalOpen(modal, false));
+      document.getElementById('sendChatBtn')?.addEventListener('click', () => sendChat(friendId));
+      document.getElementById('chatInput')?.addEventListener('keydown', e => {
+        if (e.key === 'Enter' && !e.shiftKey) {
+          e.preventDefault();
+          sendChat(friendId);
+        }
+      });
+      renderMessages();
+    }
+
+    function sendChat(friendId) {
+      const input = document.getElementById('chatInput');
+      const text = (input?.value || '').trim();
+      if (!text) return;
+      if (!state.messages[friendId]) state.messages[friendId] = [];
+      const mine = { from: 'me', text, at: Date.now() };
+      state.messages[friendId].push(mine);
+      saveState();
+      if (input) input.value = '';
+      appendChatBubble(mine);
+      renderMessages();
+      toast('Message sent');
+
+      clearTimeout(sendChat._replyT);
+      sendChat._replyT = setTimeout(() => {
+        if (!state.messages[friendId]) return;
+        const replies = [
+          'Sounds good — keep me posted.',
+          'I can meet near the library if that helps.',
+          'Want me to look at that listing with you?',
+          'Proud of you for keeping at it.',
+        ];
+        const reply = {
+          from: 'them',
+          text: replies[Math.floor(Math.random() * replies.length)],
+          at: Date.now(),
+        };
+        state.messages[friendId].push(reply);
+        state.unread = state.unread || {};
+        const chatOpen = document.getElementById('chatModal')?.classList.contains('open');
+        if (!chatOpen) state.unread[friendId] = true;
+        saveState();
+        if (chatOpen) appendChatBubble(reply);
+        renderMessages();
+        updateMsgBadge();
+      }, 900);
+    }
+
+    function appendChatBubble(msg) {
+      const thread = document.getElementById('chatThread');
+      if (!thread) return;
+      thread.querySelector('.hint')?.remove();
+      const div = document.createElement('div');
+      div.className = `bubble ${msg.from === 'me' ? 'me' : 'them'}`;
+      const textNode = document.createElement('span');
+      textNode.textContent = msg.text;
+      const when = document.createElement('span');
+      when.className = 'when';
+      when.textContent = formatWhen(msg.at);
+      div.appendChild(textNode);
+      div.appendChild(when);
+      thread.appendChild(div);
+      thread.scrollTop = thread.scrollHeight;
+    }
+
+    function openMeetup(friendId) {
+      if (!isLoggedIn()) { openAccountModal('create'); return; }
+      const person = getPerson(friendId);
+      if (!person) return;
+      document.getElementById('meetupFriendId').value = friendId;
+      document.getElementById('meetupSub').textContent = `Plan a meetup with ${person.name}.`;
+      document.getElementById('meetupPlace').value = '';
+      document.getElementById('meetupNote').value = '';
+      const soon = new Date(Date.now() + 86400000 * 2);
+      soon.setMinutes(0, 0, 0);
+      const local = new Date(soon.getTime() - soon.getTimezoneOffset() * 60000).toISOString().slice(0, 16);
+      document.getElementById('meetupWhen').value = local;
+      setModalOpen(document.getElementById('meetupModal'), true);
+    }
+
+    function saveMeetup() {
+      const friendId = document.getElementById('meetupFriendId').value;
+      const place = document.getElementById('meetupPlace').value.trim();
+      const when = document.getElementById('meetupWhen').value;
+      const note = document.getElementById('meetupNote').value.trim();
+      if (!place) { toast('Add a place'); return; }
+      if (!when) { toast('Pick a time'); return; }
+      state.meetups = state.meetups || [];
+      state.meetups.push({ id: 'm_' + Date.now(), friendId, place, when, note });
+      if (!state.messages[friendId]) state.messages[friendId] = [];
+      state.messages[friendId].push({
+        from: 'me',
+        text: `Meetup invite: ${place} · ${formatMeetupWhen(when)}${note ? ' — ' + note : ''}`,
+        at: Date.now(),
+      });
+      saveState();
+      setModalOpen(document.getElementById('meetupModal'), false);
+      setCommunityTab('friends');
+      toast('Meetup invite sent');
+    }
+
+    function setModalOpen(modal, open) {
+      if (!modal) return;
+      if (open) {
+        document.querySelectorAll('.modal-backdrop.open').forEach(m => {
+          if (m !== modal) m.classList.remove('open');
+        });
+      }
+      modal.classList.toggle('open', !!open);
+      const anyOpen = [...document.querySelectorAll('.modal-backdrop')].some(m => m.classList.contains('open'));
+      document.body.classList.toggle('modal-open', anyOpen);
+      document.getElementById('app')?.classList.toggle('modal-open', anyOpen);
+      if (open) {
+        const sheet = modal.querySelector('.modal') || modal.firstElementChild;
+        if (sheet) sheet.scrollTop = 0;
+        modal.scrollTop = 0;
+        // Avoid focusing text inputs on open — mobile keyboards jump scroll
+        const focusable = modal.querySelector('#closeBudgetBtn, #closeAccountBtn, #closeMeetupBtn, [data-close-detail], [data-close-chat], [data-close-merch], .btn-ghost, .btn-primary, button');
+        try { focusable?.focus({ preventScroll: true }); } catch (_) { focusable?.focus(); }
+      }
+    }
+
+    function closeAllModals() {
+      document.querySelectorAll('.modal-backdrop.open').forEach(m => m.classList.remove('open'));
+      document.body.classList.remove('modal-open');
+      document.getElementById('app')?.classList.remove('modal-open');
+    }
+
+    function hideSplash() {
+      const splash = document.getElementById('splash');
+      if (!splash) return;
+      splash.classList.add('hide');
+      splash.setAttribute('aria-hidden', 'true');
+      splash.setAttribute('hidden', '');
+    }
+
+    function openDetail(id) {
+      const item = findItem(id);
+      if (!item) return;
+      const modal = document.getElementById('detailModal');
+      const content = document.getElementById('detailContent');
+      const saved = isSaved(id);
+
+      if (item.type === 'shelter') {
+        content.innerHTML = `
+          <div class="detail-hero">
+            <div class="card-icon">${ICONS.house}</div>
+            <div>
+              <h3>${item.name}</h3>
+              <p class="sub" style="margin:0">${item.address} · ${item.city}</p>
+            </div>
+          </div>
+          <div class="chips">
+            <span class="badge badge-slate">${item.distance} mi</span>
+            <span class="badge badge-ok">${item.hours}</span>
+            <span class="badge ${item.beds.includes('Limited') ? 'badge-warn' : 'badge-ok'}">${item.beds}</span>
+          </div>
+          <p style="font-size:0.9rem;color:var(--muted);margin-bottom:12px">Services: ${item.services.join(' · ')}</p>
+          <div class="btn-row">
+            <button class="btn btn-ghost" type="button" data-close-detail>Close</button>
+            <a class="btn btn-primary" style="text-align:center;text-decoration:none" href="tel:${item.phone}">Call ${item.phone}</a>
+          </div>
+          <div class="btn-row">
+            <button class="btn btn-ghost" type="button" id="detailSave">${saved ? 'Unsave' : 'Save'}</button>
+            <a class="btn btn-ghost" style="text-align:center;text-decoration:none" target="_blank" rel="noopener"
+              href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(item.address + ' ' + item.city)}">Directions</a>
+          </div>`;
+      } else {
+        content.innerHTML = `
+          <div class="detail-hero">
+            <div class="card-icon">${ICONS.building}</div>
+            <div>
+              <h3>${item.name}</h3>
+              <p class="sub" style="margin:0">${item.address} · ${item.city}</p>
+            </div>
+          </div>
+          <div class="chips">
+            <span class="badge badge-slate">${money(item.rent)} / mo</span>
+            <span class="badge badge-ok">${item.beds}</span>
+            <span class="badge badge-slate">${item.homeType || 'Apartment'}</span>
+            <span class="badge ${/waitlist/i.test(item.status) ? 'badge-warn' : 'badge-ok'}">${item.status}</span>
+            <span class="badge badge-slate">Via Redfin</span>
+          </div>
+          <div class="redfin-note">
+            Opens Redfin rentals in ${item.city} filtered near your budget of ${money(state.rentBudget)}/mo.
+          </div>
+          <div class="btn-row">
+            <button class="btn btn-ghost" type="button" data-close-detail>Close</button>
+            <a class="btn btn-primary" style="text-align:center;text-decoration:none" target="_blank" rel="noopener"
+              href="${redfinListingUrl(item)}">View on Redfin</a>
+          </div>
+          <div class="btn-row">
+            <button class="btn btn-ghost" type="button" id="detailSave">${saved ? 'Unsave' : 'Save'}</button>
+          </div>`;
+      }
+
+      setModalOpen(modal, true);
+      content.querySelector('[data-close-detail]')?.addEventListener('click', () => setModalOpen(modal, false));
+      content.querySelector('#detailSave')?.addEventListener('click', () => {
+        toggleSave(id);
+        openDetail(id);
+      });
+    }
+
+    function renderResources() {
+      const grid = document.getElementById('resourceGrid');
+      if (!grid) return;
+      grid.innerHTML = RESOURCES.map((r, i) => `
+        <a class="resource-card" href="${resourceHref(r)}" target="_blank" rel="noopener noreferrer" data-resource="${i}">
+          <div class="ico">${r.ico}</div>
+          <h4>${r.title}</h4>
+          <p>${r.desc}</p>
+        </a>`).join('');
+    }
+
+    function renderMerch() {
+      const grid = document.getElementById('merchGrid');
+      if (!grid) return;
+      grid.innerHTML = MERCH.map(m => `
+        <button class="merch-card" type="button" data-merch="${m.id}">
+          <div class="merch-swatch" style="background:${m.swatch};color:${m.text}">
+            <img class="logo-mark" src="assets/shelterlink/mark.svg" alt="" style="width:44px;height:auto;opacity:0.92;filter:${m.text === '#fff' || m.text === '#E3D9C6' ? 'brightness(10)' : 'none'}">
+          </div>
+          <div class="merch-info">
+            <h4>${m.name}</h4>
+            <div class="color-label">${m.color}</div>
+            <div class="price">${money(m.price)}</div>
+          </div>
+        </button>`).join('');
+      updateCartBar();
+    }
+
+    function openMerch(id) {
+      const item = MERCH.find(m => m.id === id);
+      if (!item) return;
+      const modal = document.getElementById('merchModal');
+      const content = document.getElementById('merchContent');
+      const isHat = item.kind === 'hat';
+      let size = isHat ? 'One Size' : 'M';
+      let qty = 1;
+      const sizeOptions = isHat ? ['One Size'] : ['XS','S','M','L','XL','2XL'];
+      content.innerHTML = `
+        <div class="merch-swatch" style="background:${item.swatch};color:${item.text};border-radius:14px;height:140px;margin-bottom:14px">
+          <img src="assets/shelterlink/mark.svg" alt="" style="width:72px;height:auto;opacity:0.95;filter:${item.text === '#fff' || item.text === '#E3D9C6' ? 'brightness(10)' : 'none'}">
+        </div>
+        <h3>${item.name}</h3>
+        <p class="sub">${item.color} · ${money(item.price)}</p>
+        <div class="field">
+          <label>Size</label>
+          <div class="size-pills" id="sizePills">
+            ${sizeOptions.map(s => `<button type="button" data-size="${s}" class="${s===size?'active':''}">${s}</button>`).join('')}
+          </div>
+        </div>
+        <div class="field">
+          <label>Quantity</label>
+          <div class="qty-row">
+            <button type="button" id="qtyMinus" aria-label="Decrease quantity">−</button>
+            <strong id="qtyVal">1</strong>
+            <button type="button" id="qtyPlus" aria-label="Increase quantity">+</button>
+          </div>
+        </div>
+        <div class="btn-row">
+          <button class="btn btn-ghost" type="button" data-close-merch>Close</button>
+          <button class="btn btn-primary" type="button" id="addCartBtn">Add to cart</button>
+        </div>`;
+      setModalOpen(modal, true);
+
+      content.querySelectorAll('[data-size]').forEach(b => {
+        b.onclick = () => {
+          size = b.getAttribute('data-size');
+          content.querySelectorAll('[data-size]').forEach(x => x.classList.toggle('active', x === b));
+        };
+      });
+      content.querySelector('[data-close-merch]')?.addEventListener('click', () => setModalOpen(modal, false));
+      content.querySelector('#addCartBtn')?.addEventListener('click', () => {
+        const existing = state.cart.find(c => c.id === item.id && c.size === size && c.color === item.color);
+        if (existing) existing.qty = Math.min(10, existing.qty + qty);
+        else state.cart.push({ id: item.id, name: item.name, color: item.color, size, qty, price: item.price });
+        saveState();
+        updateCartBar();
+        setModalOpen(modal, false);
+        toast('Added to cart');
+      });
+      content.querySelector('#qtyMinus')?.addEventListener('click', () => {
+        qty = Math.max(1, qty - 1);
+        const val = content.querySelector('#qtyVal');
+        if (val) val.textContent = qty;
+      });
+      content.querySelector('#qtyPlus')?.addEventListener('click', () => {
+        qty = Math.min(10, qty + 1);
+        const val = content.querySelector('#qtyVal');
+        if (val) val.textContent = qty;
+      });
+    }
+
+    function updateCartBar() {
+      const bar = document.getElementById('cartBar');
+      const count = state.cart.reduce((n, i) => n + i.qty, 0);
+      const total = state.cart.reduce((n, i) => n + i.qty * i.price, 0);
+      if (count > 0) {
+        bar.classList.add('show');
+        document.getElementById('cartCount').textContent = `${count} item${count === 1 ? '' : 's'}`;
+        document.getElementById('cartTotal').textContent = money(total);
+      } else {
+        bar.classList.remove('show');
+      }
+    }
+
+    let rentTouched = false;
+
+    function openBudget() {
+      rentTouched = false;
+      document.getElementById('yearlyIncome').value = state.yearlyIncome || '';
+      document.getElementById('rentBudget').value = state.rentBudget;
+      document.getElementById('rentBudgetLabel').textContent = money(state.rentBudget);
+      document.getElementById('citySelect').value = state.city;
+      updateAffordHint();
+      updateMatchPreview();
+      setModalOpen(document.getElementById('budgetModal'), true);
+    }
+
+    function updateAffordHint() {
+      const income = Number(document.getElementById('yearlyIncome').value) || state.yearlyIncome;
+      const sug = suggestedRent(income);
+      const hint = document.getElementById('affordHint');
+      if (sug) {
+        hint.textContent = `Based on ${money(income)}/yr, ~30% of monthly income is ${money(sug)}. Drag the slider to set what you want to spend.`;
+      } else {
+        hint.textContent = 'Tip: many advisors suggest keeping rent near 30% of monthly income.';
+      }
+    }
+
+    function saveBudget() {
+      const incomeVal = document.getElementById('yearlyIncome').value;
+      state.yearlyIncome = incomeVal === '' ? null : Math.max(0, Number(incomeVal));
+      state.rentBudget = Number(document.getElementById('rentBudget').value);
+      const nextCity = document.getElementById('citySelect').value;
+      if (nextCity !== state.city) {
+        const search = document.getElementById('searchInput');
+        if (search) search.value = '';
+      }
+      state.city = nextCity;
+      saveState();
+      setModalOpen(document.getElementById('budgetModal'), false);
+      updateBudgetUI();
+      renderLists();
+      renderResources();
+      document.querySelector('.screens')?.scrollTo({ top: 0, behavior: 'smooth' });
+      toast('Budget updated');
+    }
+
+    function openRedfin() {
+      openExternal(redfinRentalsUrl(state.city, state.rentBudget));
+    }
+
+    function go(screen) {
+      closeAllModals();
+      document.querySelectorAll('.screen').forEach(s => s.classList.toggle('active', s.dataset.screen === screen));
+      document.querySelectorAll('.nav-btn').forEach(b => b.classList.toggle('active', b.dataset.nav === screen));
+      document.querySelector('.screens')?.scrollTo({ top: 0 });
+      if (screen === 'community') renderCommunity();
+      if (screen === 'store') renderMerch();
+      if (screen === 'resources') renderResources();
+      if (screen === 'map') {
+        const shelters = filteredShelters();
+        const housing = filteredHousing();
+        renderMap([...shelters, ...housing]);
+      }
+    }
+
+    function openProfile() {
+      closeAllModals();
+      document.querySelectorAll('.screen').forEach(s => s.classList.toggle('active', s.dataset.screen === 'profile'));
+      document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+      document.querySelector('.screens')?.scrollTo({ top: 0 });
+      updateProfileUI();
+    }
+
+    function renderAll() {
+      updateBudgetUI();
+      renderLists();
+      renderResources();
+      renderMerch();
+      renderCommunity();
+      updateProfileUI();
+    }
+
+    const appEl = document.getElementById('app');
+    const fsEnterIcon = `<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"><path d="M8 3H3v5M16 3h5v5M8 21H3v-5M16 21h5v-5"/></svg>`;
+    const fsExitIcon = `<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 8h5V3M16 3v5h5M3 16h5v5M21 16h-5v5"/></svg>`;
+
+    function isFullscreen() {
+      return !!(document.fullscreenElement || document.webkitFullscreenElement);
+    }
+
+    function updateFullscreenUI() {
+      const on = isFullscreen() || appEl.classList.contains('is-fullscreen');
+      const btn = document.getElementById('fullscreenBtn');
+      if (btn) {
+        btn.innerHTML = on ? fsExitIcon : fsEnterIcon;
+        btn.title = on ? 'Exit full screen' : 'Full screen';
+        btn.setAttribute('aria-label', on ? 'Exit full screen' : 'Enter full screen');
+      }
+    }
+
+    async function requestAppFullscreen() {
+      appEl.classList.add('is-fullscreen');
+      try {
+        if (appEl.requestFullscreen) await appEl.requestFullscreen();
+        else if (appEl.webkitRequestFullscreen) await appEl.webkitRequestFullscreen();
+      } catch (_) {}
+      updateFullscreenUI();
+    }
+
+    async function exitAppFullscreen() {
+      appEl.classList.remove('is-fullscreen');
+      try {
+        if (document.fullscreenElement || document.webkitFullscreenElement) {
+          if (document.exitFullscreen) await document.exitFullscreen();
+          else if (document.webkitExitFullscreen) await document.webkitExitFullscreen();
+        }
+      } catch (_) {}
+      updateFullscreenUI();
+    }
+
+    async function toggleFullscreen() {
+      if (isFullscreen() || appEl.classList.contains('is-fullscreen')) await exitAppFullscreen();
+      else await requestAppFullscreen();
+    }
+
+    document.addEventListener('fullscreenchange', updateFullscreenUI);
+    document.addEventListener('webkitfullscreenchange', updateFullscreenUI);
+
+    document.getElementById('closeBudgetBtn').onclick = () => setModalOpen(document.getElementById('budgetModal'), false);
+    document.getElementById('saveBudgetBtn').onclick = saveBudget;
+
+    document.getElementById('rentBudget').addEventListener('input', e => {
+      rentTouched = true;
+      document.getElementById('rentBudgetLabel').textContent = money(Number(e.target.value));
+      updateMatchPreview();
+    });
+    document.getElementById('citySelect').addEventListener('change', updateMatchPreview);
+    document.getElementById('yearlyIncome').addEventListener('input', () => {
+      updateAffordHint();
+      const income = Number(document.getElementById('yearlyIncome').value);
+      const sug = suggestedRent(income);
+      if (!rentTouched && sug && sug >= 400 && sug <= 5500) {
+        document.getElementById('rentBudget').value = sug;
+        document.getElementById('rentBudgetLabel').textContent = money(sug);
+      }
+      updateMatchPreview();
+    });
+
+    let searchTimer = null;
+    document.getElementById('searchInput').addEventListener('input', () => {
+      clearTimeout(searchTimer);
+      searchTimer = setTimeout(renderLists, 120);
+    });
+    document.getElementById('searchClear').onclick = () => {
+      document.getElementById('searchInput').value = '';
+      renderLists();
+      document.getElementById('searchInput').focus();
+    };
+
+    // Single delegated click handler — survives list re-renders and avoids dead buttons
+    appEl.addEventListener('click', e => {
+      const saveBtn = e.target.closest('[data-save]');
+      if (saveBtn && appEl.contains(saveBtn)) {
+        e.preventDefault();
+        e.stopPropagation();
+        toggleSave(saveBtn.getAttribute('data-save'));
+        return;
+      }
+
+      const openEl = e.target.closest('[data-open]');
+      if (openEl && appEl.contains(openEl) && !e.target.closest('[data-save]')) {
+        openDetail(openEl.getAttribute('data-open'));
+        return;
+      }
+
+      const merchBtn = e.target.closest('[data-merch]');
+      if (merchBtn && appEl.contains(merchBtn)) {
+        openMerch(merchBtn.getAttribute('data-merch'));
+        return;
+      }
+
+      const navBtn = e.target.closest('[data-nav]');
+      if (navBtn && appEl.contains(navBtn)) {
+        go(navBtn.getAttribute('data-nav'));
+        return;
+      }
+
+      const goBtn = e.target.closest('[data-go]');
+      if (goBtn && appEl.contains(goBtn)) {
+        const tab = goBtn.getAttribute('data-comm-tab');
+        go(goBtn.getAttribute('data-go'));
+        if (tab) setCommunityTab(tab);
+        return;
+      }
+
+      const commTab = e.target.closest('[data-comm-tab]');
+      if (commTab && appEl.contains(commTab) && !commTab.hasAttribute('data-go')) {
+        setCommunityTab(commTab.getAttribute('data-comm-tab'));
+        return;
+      }
+
+      const chatBtn = e.target.closest('[data-chat]');
+      if (chatBtn && appEl.contains(chatBtn)) {
+        openChat(chatBtn.getAttribute('data-chat'));
+        return;
+      }
+
+      const meetupBtn = e.target.closest('[data-meetup]');
+      if (meetupBtn && appEl.contains(meetupBtn)) {
+        openMeetup(meetupBtn.getAttribute('data-meetup'));
+        return;
+      }
+
+      const addFriendBtn = e.target.closest('[data-add-friend]');
+      if (addFriendBtn && appEl.contains(addFriendBtn)) {
+        addFriend(addFriendBtn.getAttribute('data-add-friend'));
+        return;
+      }
+
+      if (e.target.closest('#openRedfinBtn') || e.target.id === 'emptyRedfin') {
+        openRedfin();
+        return;
+      }
+
+      if (e.target.closest('#openBudgetBtn') || e.target.closest('#budgetQuickBtn') || e.target.closest('#editBudgetBtn') || e.target.closest('#profileBudgetRow')) {
+        openBudget();
+        return;
+      }
+
+      if (e.target.closest('#accountRow')) {
+        if (isLoggedIn()) go('community');
+        else openAccountModal('create');
+      }
+    });
+
+    appEl.addEventListener('keydown', e => {
+      if (e.key !== 'Enter' && e.key !== ' ') return;
+      const openEl = e.target.closest('[data-open]');
+      if (openEl && !e.target.closest('[data-save]')) {
+        e.preventDefault();
+        openDetail(openEl.getAttribute('data-open'));
+      }
+    });
+
+    document.getElementById('checkoutBtn').onclick = () => {
+      if (!state.cart.length) return;
+      const total = state.cart.reduce((n, i) => n + i.qty * i.price, 0);
+      state.cart = [];
+      saveState();
+      updateCartBar();
+      toast(`Demo checkout · ${money(total)} — thank you!`);
+    };
+
+    document.getElementById('shareAppBtn').onclick = async () => {
+      const shareUrl = 'https://6kevinraphael-tech.github.io/soul-catcher/shelter-link.html';
+      const data = { title: 'ShelterLink', text: 'Find shelters & affordable housing with ShelterLink.', url: shareUrl };
+      if (navigator.share) {
+        try { await navigator.share(data); } catch (_) {}
+      } else {
+        try {
+          await navigator.clipboard?.writeText(shareUrl);
+          toast('Link copied');
+        } catch (_) {
+          toast(shareUrl);
+        }
+      }
+    };
+
+    document.getElementById('crisisBtn').onclick = () => {
+      window.location.href = 'tel:988';
+    };
+
+    document.addEventListener('keydown', e => {
+      if (e.key === 'Escape') closeAllModals();
+    });
+
+    document.getElementById('closeAccountBtn').onclick = () => setModalOpen(document.getElementById('accountModal'), false);
+    document.getElementById('submitAccountBtn').onclick = submitAccount;
+    document.getElementById('authToggle').addEventListener('click', e => {
+      const btn = e.target.closest('[data-auth-mode]');
+      if (!btn) return;
+      openAccountModal(btn.getAttribute('data-auth-mode'));
+    });
+    document.getElementById('closeMeetupBtn').onclick = () => setModalOpen(document.getElementById('meetupModal'), false);
+    document.getElementById('saveMeetupBtn').onclick = saveMeetup;
+
+    ['budgetModal', 'detailModal', 'merchModal', 'accountModal', 'chatModal', 'meetupModal'].forEach(id => {
+      document.getElementById(id).addEventListener('click', e => {
+        if (e.target.id === id) setModalOpen(e.target, false);
+      });
+    });
+
+    document.getElementById('startBtn').onclick = async () => {
+      state.seenSplash = true;
+      saveState();
+      hideSplash();
+      openBudget();
+    };
+
+    document.getElementById('fullscreenBtn').onclick = () => toggleFullscreen();
+    document.getElementById('profileBtn').onclick = openProfile;
+
+    if (state.seenSplash) hideSplash();
+
+    renderAll();
+  </script>
+</body>
+</html>

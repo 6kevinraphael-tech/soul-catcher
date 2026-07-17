@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 72" fill="none">
+  <defs>
+    <linearGradient id="sl" x1="4" y1="8" x2="60" y2="64" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#5B7A8A"/>
+      <stop offset="1" stop-color="#D8CDB8"/>
+    </linearGradient>
+  </defs>
+  <!-- Roof diamond -->
+  <path d="M32 4L52 24L32 44L12 24L32 4Z" fill="url(#sl)"/>
+  <!-- Twin pillars / arch -->
+  <path d="M16 38V66H26V50H38V66H48V38" stroke="url(#sl)" stroke-width="7.5" stroke-linejoin="round" stroke-linecap="round" fill="none"/>
+</svg>
