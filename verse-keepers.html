@@ -1,0 +1,4883 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Verse Keepers — memorize popular Bible verses together, grow a Faith Journey, and crown a weekly champion.">
+  <meta name="theme-color" content="#1a4d4a">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-title" content="Verse Keepers">
+  <meta property="og:title" content="Verse Keepers">
+  <meta property="og:description" content="A peaceful Bible verse game for siblings and friends. Master verses, keep a streak, and win the weekly podium.">
+  <meta property="og:type" content="website">
+  <link rel="manifest" href="verse-keepers.webmanifest">
+  <link rel="icon" href="verse-keepers-icon.svg">
+  <title>Verse Keepers</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;0,700;1,500&family=Outfit:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --ink: #142826;
+      --deep: #1a4d4a;
+      --sea: #2a7a74;
+      --mist: #d8ece8;
+      --foam: #f3faf8;
+      --gold: #c9a227;
+      --gold-soft: #e8d48b;
+      --dawn: #ff8f6b;
+      --correct: #2f8f5b;
+      --wrong: #c45c4a;
+      --shadow: rgba(20, 40, 38, 0.18);
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      min-height: 100vh;
+      font-family: 'Outfit', sans-serif;
+      color: var(--ink);
+      background:
+        radial-gradient(ellipse 90% 60% at 10% 0%, rgba(255, 143, 107, 0.28), transparent 55%),
+        radial-gradient(ellipse 70% 50% at 90% 10%, rgba(201, 162, 39, 0.22), transparent 50%),
+        radial-gradient(ellipse 80% 70% at 50% 100%, rgba(42, 122, 116, 0.2), transparent 55%),
+        linear-gradient(165deg, #eef7f4 0%, #dceee9 45%, #c9e2db 100%);
+      overflow-x: hidden;
+    }
+
+    body[data-theme="dark"] {
+      --ink: #e8f5f1;
+      --deep: #a9ddd5;
+      --sea: #65bdb2;
+      --mist: #24433f;
+      --foam: #142b28;
+      --gold: #e4c75a;
+      --gold-soft: #f1dfa0;
+      --shadow: rgba(0, 0, 0, 0.4);
+      background:
+        radial-gradient(ellipse 70% 50% at 10% 0%, rgba(255, 143, 107, 0.12), transparent 55%),
+        radial-gradient(ellipse 60% 45% at 90% 10%, rgba(201, 162, 39, 0.12), transparent 50%),
+        linear-gradient(165deg, #0c1918 0%, #102825 48%, #173b36 100%);
+    }
+
+    body[data-theme="sunset"] {
+      --deep: #713c50;
+      --sea: #b85f67;
+      --mist: #f6d9d1;
+      --foam: #fff8f3;
+      --gold: #d49335;
+      --shadow: rgba(113, 60, 80, 0.2);
+      background:
+        radial-gradient(ellipse 80% 55% at 10% 0%, rgba(255, 153, 112, 0.5), transparent 58%),
+        radial-gradient(ellipse 65% 50% at 90% 10%, rgba(255, 210, 120, 0.45), transparent 55%),
+        linear-gradient(165deg, #fff7ef 0%, #f7ded7 50%, #edc6c0 100%);
+    }
+
+    body[data-theme="lavender"] {
+      --deep: #50417d;
+      --sea: #7868a8;
+      --mist: #e5e0f4;
+      --foam: #faf8ff;
+      --gold: #c49a42;
+      --shadow: rgba(80, 65, 125, 0.2);
+      background:
+        radial-gradient(ellipse 80% 55% at 8% 0%, rgba(223, 180, 239, 0.45), transparent 55%),
+        radial-gradient(ellipse 65% 50% at 92% 8%, rgba(255, 218, 145, 0.36), transparent 52%),
+        linear-gradient(165deg, #faf8ff 0%, #e9e3f5 48%, #d9d0ec 100%);
+    }
+
+    body[data-theme="dark"] .panel,
+    body[data-theme="dark"] .score-chip,
+    body[data-theme="dark"] .user-card,
+    body[data-theme="dark"] .mode-btn,
+    body[data-theme="dark"] .choice,
+    body[data-theme="dark"] .word-chip,
+    body[data-theme="dark"] .account-select,
+    body[data-theme="dark"] .vault-card,
+    body[data-theme="dark"] .track-btn,
+    body[data-theme="dark"] .reminder-row,
+    body[data-theme="dark"] .music-box,
+    body[data-theme="dark"] .reminders {
+      background: rgba(17, 43, 40, 0.94);
+      border-color: #315b55;
+      color: var(--ink);
+    }
+
+    body[data-theme="dark"] .panel { background: rgba(13, 34, 32, 0.9); }
+    body[data-theme="dark"] .partner-box,
+    body[data-theme="dark"] .slot-row { background: rgba(31, 67, 62, 0.58); }
+    body[data-theme="dark"] .translation,
+    body[data-theme="dark"] .hint,
+    body[data-theme="dark"] .empty-hint,
+    body[data-theme="dark"] .footer-note,
+    body[data-theme="dark"] .week-note,
+    body[data-theme="dark"] .music-status,
+    body[data-theme="dark"] .notify-status,
+    body[data-theme="dark"] .brand p,
+    body[data-theme="dark"] .mode-btn p,
+    body[data-theme="dark"] .score-chip .name,
+    body[data-theme="dark"] .vault-card .who,
+    body[data-theme="dark"] .vault-card .sub {
+      color: #a9c7c2;
+    }
+
+    body.reduce-motion *,
+    body.reduce-motion *::before,
+    body.reduce-motion *::after {
+      animation-duration: 0.001ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.001ms !important;
+      scroll-behavior: auto !important;
+    }
+
+    .hidden { display: none !important; }
+
+    .sky {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: 0;
+      overflow: hidden;
+    }
+
+    .orb {
+      position: absolute;
+      border-radius: 50%;
+      filter: blur(2px);
+      opacity: 0.45;
+      animation: drift 14s ease-in-out infinite;
+    }
+
+    .orb:nth-child(1) {
+      width: 220px; height: 220px;
+      background: radial-gradient(circle, var(--gold-soft), transparent 70%);
+      top: -40px; right: 8%;
+    }
+
+    .orb:nth-child(2) {
+      width: 160px; height: 160px;
+      background: radial-gradient(circle, rgba(255, 143, 107, 0.7), transparent 70%);
+      bottom: 12%; left: -30px;
+      animation-delay: -4s;
+    }
+
+    .orb:nth-child(3) {
+      width: 100px; height: 100px;
+      background: radial-gradient(circle, rgba(42, 122, 116, 0.5), transparent 70%);
+      top: 42%; right: -20px;
+      animation-delay: -8s;
+    }
+
+    @keyframes drift {
+      0%, 100% { transform: translateY(0) scale(1); }
+      50% { transform: translateY(-18px) scale(1.04); }
+    }
+
+    .app {
+      position: relative;
+      z-index: 1;
+      max-width: 720px;
+      margin: 0 auto;
+      padding: 28px 18px 48px;
+      min-height: 100vh;
+    }
+
+    .screen {
+      display: none;
+      animation: rise 0.45s cubic-bezier(0.22, 1, 0.36, 1);
+    }
+
+    .screen.active { display: block; }
+
+    @keyframes rise {
+      from { opacity: 0; transform: translateY(16px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .brand {
+      text-align: center;
+      margin-bottom: 28px;
+    }
+
+    .brand-mark {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 64px;
+      height: 64px;
+      border-radius: 50%;
+      background: linear-gradient(145deg, var(--deep), var(--sea));
+      color: var(--gold-soft);
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1.8rem;
+      font-weight: 700;
+      margin-bottom: 14px;
+      box-shadow: 0 10px 28px var(--shadow);
+      animation: pulseSoft 3.2s ease-in-out infinite;
+    }
+
+    @keyframes pulseSoft {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.05); }
+    }
+
+    .brand h1 {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: clamp(2.6rem, 9vw, 3.4rem);
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      line-height: 0.95;
+      color: var(--deep);
+    }
+
+    .brand p {
+      margin-top: 10px;
+      color: #3d5c58;
+      font-size: 1.02rem;
+      line-height: 1.45;
+      max-width: 30ch;
+      margin-left: auto;
+      margin-right: auto;
+    }
+
+    .panel {
+      background: rgba(243, 250, 248, 0.88);
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(255, 255, 255, 0.7);
+      border-radius: 28px;
+      padding: 28px 24px;
+      box-shadow: 0 18px 40px var(--shadow);
+    }
+
+    .home-toolbar {
+      display: flex;
+      justify-content: flex-end;
+      gap: 8px;
+      margin-bottom: 8px;
+    }
+
+    .icon-btn {
+      width: 46px;
+      height: 46px;
+      border: 1px solid rgba(255,255,255,0.8);
+      border-radius: 50%;
+      background: rgba(255,255,255,0.82);
+      color: var(--deep);
+      box-shadow: 0 6px 18px var(--shadow);
+      font-size: 1.25rem;
+      cursor: pointer;
+    }
+
+    body[data-theme="dark"] .icon-btn {
+      background: rgba(17, 43, 40, 0.94);
+      border-color: #315b55;
+    }
+
+    .month-banner { text-align: center; margin-bottom: 22px; }
+
+    .month-label {
+      display: inline-block;
+      font-size: 0.78rem;
+      font-weight: 700;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--sea);
+      margin-bottom: 10px;
+    }
+
+    .ref {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1.85rem;
+      font-weight: 700;
+      color: var(--deep);
+      line-height: 1.15;
+    }
+
+    .verse-text {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: clamp(1.25rem, 4.2vw, 1.55rem);
+      font-style: italic;
+      font-weight: 500;
+      line-height: 1.45;
+      color: var(--ink);
+      text-align: center;
+      margin: 18px 0 8px;
+    }
+
+    .translation {
+      text-align: center;
+      font-size: 0.82rem;
+      color: #5a746f;
+      letter-spacing: 0.04em;
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      width: 100%;
+      padding: 15px 22px;
+      border: none;
+      border-radius: 16px;
+      font-family: inherit;
+      font-size: 1.02rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: transform 0.15s ease, box-shadow 0.15s ease;
+    }
+
+    .btn:active { transform: scale(0.97); }
+    .btn:disabled { opacity: 0.55; cursor: not-allowed; transform: none; }
+
+    .btn-primary {
+      background: linear-gradient(135deg, var(--deep), var(--sea));
+      color: white;
+      box-shadow: 0 10px 24px rgba(26, 77, 74, 0.35);
+      margin-top: 16px;
+    }
+
+    .btn-gold {
+      background: linear-gradient(135deg, #b8921f, var(--gold));
+      color: #1f1a08;
+      box-shadow: 0 10px 24px rgba(201, 162, 39, 0.35);
+      margin-top: 10px;
+    }
+
+    .btn-ghost {
+      background: transparent;
+      color: var(--deep);
+      border: 2px solid #b7d0cb;
+      margin-top: 10px;
+    }
+
+    .btn-google {
+      background: white;
+      color: #3c4043;
+      border: 2px solid #dadce0;
+      margin-top: 18px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+    }
+
+    .btn-google svg { flex-shrink: 0; }
+
+    .btn-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin-top: 12px;
+    }
+
+    .btn-row .btn { margin-top: 0; }
+
+    .hero-play {
+      min-height: 62px;
+      margin: 14px 0 4px;
+      font-size: 1.16rem;
+      font-weight: 700;
+      box-shadow: 0 12px 28px rgba(26, 77, 74, 0.38);
+    }
+
+    .dashboard-grid { display: grid; gap: 0; }
+
+    .settings-section {
+      padding: 16px 0;
+      border-bottom: 1px solid #d5e6e2;
+    }
+
+    .settings-section:last-child { border-bottom: 0; }
+
+    .settings-section h2 {
+      font-family: 'Cormorant Garamond', serif;
+      color: var(--deep);
+      font-size: 1.35rem;
+      margin-bottom: 5px;
+    }
+
+    .settings-section > p {
+      color: #5a746f;
+      font-size: 0.84rem;
+      line-height: 1.4;
+      margin-bottom: 12px;
+    }
+
+    .theme-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 8px;
+    }
+
+    .theme-btn {
+      padding: 13px 10px;
+      border: 2px solid #c5d9d4;
+      border-radius: 14px;
+      background: white;
+      color: var(--deep);
+      font-family: inherit;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    .theme-btn.active {
+      border-color: var(--sea);
+      box-shadow: 0 0 0 3px rgba(42, 122, 116, 0.15);
+    }
+
+    body[data-theme="dark"] .theme-btn {
+      background: #112b28;
+      border-color: #315b55;
+    }
+
+    .setting-toggle {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 12px 0;
+      color: var(--ink);
+      font-weight: 600;
+    }
+
+    .setting-toggle input {
+      width: 22px;
+      height: 22px;
+      accent-color: var(--sea);
+    }
+
+    .danger-zone {
+      margin-top: 18px;
+      padding: 16px;
+      border: 1px solid rgba(196, 92, 74, 0.4);
+      border-radius: 16px;
+      background: rgba(196, 92, 74, 0.07);
+    }
+
+    .danger-zone h2 { color: var(--wrong); }
+
+    .btn-danger {
+      background: var(--wrong);
+      color: white;
+      box-shadow: 0 8px 20px rgba(196, 92, 74, 0.25);
+    }
+
+    .ceremony-panel {
+      position: relative;
+      overflow: hidden;
+      text-align: center;
+      min-height: 520px;
+    }
+
+    .ceremony-content { position: relative; z-index: 2; }
+
+    .ceremony-trophy {
+      display: block;
+      font-size: 5rem;
+      margin: 6px 0 12px;
+      animation: bounce 1.4s ease-in-out infinite;
+    }
+
+    .ceremony-title {
+      font-family: 'Cormorant Garamond', serif;
+      color: var(--deep);
+      font-size: clamp(2.1rem, 8vw, 3rem);
+      line-height: 1;
+    }
+
+    .ceremony-subtitle {
+      color: #5a746f;
+      margin: 12px auto 20px;
+      max-width: 34ch;
+      line-height: 1.45;
+    }
+
+    .ceremony-standings {
+      display: grid;
+      gap: 9px;
+      max-width: 430px;
+      margin: 0 auto 18px;
+    }
+
+    .ceremony-place {
+      display: grid;
+      grid-template-columns: 42px 1fr auto;
+      align-items: center;
+      gap: 10px;
+      padding: 12px 14px;
+      border-radius: 15px;
+      background: rgba(255,255,255,0.9);
+      border: 1px solid #d5e6e2;
+      text-align: left;
+    }
+
+    .ceremony-place:first-child {
+      border-color: var(--gold);
+      background: rgba(255, 246, 207, 0.94);
+      transform: scale(1.02);
+    }
+
+    .ceremony-place .place-rank { font-size: 1.45rem; text-align: center; }
+    .ceremony-place .place-name { color: var(--deep); font-weight: 700; }
+    .ceremony-place .place-score {
+      color: #7a5f10;
+      font-weight: 800;
+      white-space: nowrap;
+    }
+
+    body[data-theme="dark"] .ceremony-place {
+      background: rgba(17, 43, 40, 0.94);
+      border-color: #315b55;
+    }
+
+    body[data-theme="dark"] .ceremony-place:first-child {
+      background: rgba(84, 71, 28, 0.82);
+      border-color: var(--gold);
+    }
+
+    .fireworks-layer {
+      position: absolute;
+      inset: 0;
+      z-index: 1;
+      pointer-events: none;
+      overflow: hidden;
+    }
+
+    .firework-spark {
+      position: absolute;
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: var(--spark-color);
+      box-shadow: 0 0 8px var(--spark-color);
+      opacity: 0;
+      animation: fireworkBurst 1.35s ease-out var(--spark-delay) infinite;
+    }
+
+    @keyframes fireworkBurst {
+      0% { opacity: 1; transform: translate(0, 0) scale(0.4); }
+      75% { opacity: 0.9; }
+      100% {
+        opacity: 0;
+        transform: translate(var(--spark-x), var(--spark-y)) scale(0.05);
+      }
+    }
+
+    .ceremony-intro {
+      position: absolute;
+      inset: 0;
+      z-index: 5;
+      display: grid;
+      place-items: center;
+      padding: 30px;
+      background: radial-gradient(circle, #fff9d9, #123f3c 72%);
+      color: white;
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    .ceremony-intro span {
+      max-width: 12ch;
+      font-family: 'Cormorant Garamond', serif;
+      font-size: clamp(2.2rem, 9vw, 4rem);
+      font-weight: 700;
+      line-height: 1;
+      text-shadow: 0 3px 20px rgba(0,0,0,0.35);
+    }
+
+    .screen.active.cutscene-playing .ceremony-intro {
+      animation: ceremonyCurtain 2.5s ease-in-out forwards;
+    }
+
+    .screen.active.cutscene-playing .ceremony-content {
+      animation: ceremonyReveal 0.9s 1.85s both;
+    }
+
+    @keyframes ceremonyCurtain {
+      0% { opacity: 1; clip-path: inset(0); }
+      58% { opacity: 1; clip-path: inset(0); }
+      100% { opacity: 0; clip-path: inset(0 50%); }
+    }
+
+    @keyframes ceremonyReveal {
+      from { opacity: 0; transform: translateY(24px) scale(0.96); }
+      to { opacity: 1; transform: translateY(0) scale(1); }
+    }
+
+    .ceremony-stage {
+      position: relative;
+      min-height: 260px;
+      display: grid;
+      align-items: end;
+      margin: 8px auto 12px;
+      max-width: 520px;
+    }
+
+    .ceremony-rays {
+      position: absolute;
+      width: 300px;
+      height: 300px;
+      left: 50%;
+      bottom: -12px;
+      transform: translateX(-50%);
+      border-radius: 50%;
+      opacity: 0.23;
+      background: repeating-conic-gradient(
+        from 0deg,
+        var(--gold-soft) 0deg 12deg,
+        transparent 12deg 25deg
+      );
+      animation: raySpin 18s linear infinite;
+    }
+
+    @keyframes raySpin {
+      to { transform: translateX(-50%) rotate(360deg); }
+    }
+
+    .ceremony-podium {
+      position: relative;
+      z-index: 2;
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      align-items: end;
+      gap: 7px;
+      width: 100%;
+    }
+
+    .podium-slot {
+      display: grid;
+      justify-items: center;
+      min-width: 0;
+    }
+
+    .podium-person {
+      display: grid;
+      justify-items: center;
+      gap: 4px;
+      margin-bottom: 7px;
+      min-height: 82px;
+      align-content: end;
+    }
+
+    .podium-person img,
+    .podium-person .avatar-fallback {
+      width: 58px;
+      height: 58px;
+      border: 3px solid white;
+      box-shadow: 0 5px 16px rgba(14, 55, 51, 0.28);
+    }
+
+    .podium-slot.first .podium-person img,
+    .podium-slot.first .podium-person .avatar-fallback {
+      width: 76px;
+      height: 76px;
+      border-color: #f4ce54;
+    }
+
+    .podium-crown {
+      position: absolute;
+      margin-top: -30px;
+      font-size: 2rem;
+      animation: crownFloat 1.3s ease-in-out infinite;
+    }
+
+    @keyframes crownFloat {
+      0%, 100% { transform: translateY(0) rotate(-4deg); }
+      50% { transform: translateY(-7px) rotate(4deg); }
+    }
+
+    .podium-name {
+      max-width: 100%;
+      color: var(--deep);
+      font-size: 0.76rem;
+      font-weight: 800;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .podium-block {
+      width: 100%;
+      min-height: 70px;
+      padding: 10px 5px;
+      border-radius: 12px 12px 4px 4px;
+      display: grid;
+      align-content: start;
+      justify-items: center;
+      color: #163d3a;
+      background: linear-gradient(180deg, #d8e4e2, #a9bfbb);
+      box-shadow: inset 0 2px 0 rgba(255,255,255,0.65);
+    }
+
+    .podium-slot.first .podium-block {
+      min-height: 125px;
+      background: linear-gradient(180deg, #ffe78e, #d1a52d);
+    }
+
+    .podium-slot.second .podium-block { min-height: 92px; }
+    .podium-slot.third .podium-block {
+      min-height: 70px;
+      background: linear-gradient(180deg, #e8b98e, #b97845);
+    }
+
+    .podium-medal { font-size: 1.6rem; }
+    .podium-score { font-size: 0.7rem; font-weight: 800; }
+
+    .winner-callout {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      margin: 0 auto 8px;
+      padding: 7px 12px;
+      border-radius: 999px;
+      color: #72570d;
+      background: #fff2bd;
+      border: 1px solid #e2bf47;
+      font-size: 0.78rem;
+      font-weight: 800;
+    }
+
+    .reduce-motion .ceremony-intro { display: none; }
+    .reduce-motion .ceremony-content { animation: none !important; }
+    .reduce-motion .ceremony-rays,
+    .reduce-motion .podium-crown { animation: none; }
+
+    .blessing-card {
+      margin-top: 14px;
+      padding: 14px 16px;
+      border-radius: 18px;
+      background: rgba(255,255,255,0.82);
+      border: 1px solid #d5e6e2;
+      text-align: left;
+    }
+
+    .blessing-card .label {
+      color: #7a5f10;
+      font-size: 0.68rem;
+      font-weight: 800;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+    }
+
+    .blessing-card p {
+      margin-top: 5px;
+      color: var(--deep);
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1.2rem;
+      line-height: 1.25;
+    }
+
+    .badge-case {
+      margin-top: 16px;
+      padding: 16px;
+      border-radius: 18px;
+      background: rgba(255,255,255,0.78);
+      border: 1px solid #d5e6e2;
+    }
+
+    .badge-case h2 {
+      font-family: 'Cormorant Garamond', serif;
+      color: var(--deep);
+      font-size: 1.4rem;
+    }
+
+    .badge-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 8px;
+      margin-top: 12px;
+    }
+
+    .badge-tile {
+      min-height: 92px;
+      padding: 10px 6px;
+      border-radius: 14px;
+      background: #f4faf8;
+      border: 1px solid #d5e6e2;
+      text-align: center;
+      opacity: 0.42;
+      filter: grayscale(1);
+    }
+
+    .badge-tile.earned {
+      opacity: 1;
+      filter: none;
+      background: linear-gradient(180deg, #fff8de, #fff);
+      border-color: #e2bf47;
+    }
+
+    .badge-tile .icon { display: block; font-size: 1.45rem; }
+    .badge-tile .name {
+      display: block;
+      margin-top: 4px;
+      color: var(--deep);
+      font-size: 0.72rem;
+      font-weight: 800;
+    }
+
+    .howto-list {
+      display: grid;
+      gap: 10px;
+      margin: 16px 0 18px;
+      text-align: left;
+    }
+
+    .howto-list li {
+      list-style: none;
+      padding: 12px 14px;
+      border-radius: 14px;
+      background: rgba(255,255,255,0.86);
+      border: 1px solid #d5e6e2;
+      color: #456661;
+      line-height: 1.4;
+    }
+
+    .howto-list strong { color: var(--deep); }
+
+    .toast-stack {
+      position: fixed;
+      right: 16px;
+      bottom: 16px;
+      z-index: 40;
+      display: grid;
+      gap: 8px;
+      width: min(320px, calc(100vw - 32px));
+      pointer-events: none;
+    }
+
+    .toast {
+      padding: 12px 14px;
+      border-radius: 16px;
+      background: rgba(18, 63, 60, 0.94);
+      color: white;
+      box-shadow: 0 10px 24px rgba(18, 63, 60, 0.28);
+      animation: toastIn 0.35s ease;
+    }
+
+    .toast strong { display: block; font-size: 0.92rem; }
+    .toast span { display: block; margin-top: 2px; color: #d7ece8; font-size: 0.78rem; }
+
+    @keyframes toastIn {
+      from { opacity: 0; transform: translateY(12px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .confetti-layer {
+      position: fixed;
+      inset: 0;
+      z-index: 30;
+      pointer-events: none;
+      overflow: hidden;
+    }
+
+    .confetti-piece {
+      position: absolute;
+      top: -12px;
+      width: 8px;
+      height: 12px;
+      border-radius: 2px;
+      background: var(--confetti-color);
+      animation: confettiFall 1.6s ease-in forwards;
+    }
+
+    @keyframes confettiFall {
+      to { transform: translateY(110vh) rotate(360deg); opacity: 0.2; }
+    }
+
+    .share-row { display: grid; gap: 8px; margin-top: 14px; }
+
+    @media (max-width: 420px) {
+      .badge-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    }
+
+    .auth-error {
+      margin-top: 12px;
+      text-align: center;
+      color: var(--wrong);
+      font-size: 0.9rem;
+      font-weight: 600;
+      min-height: 1.3em;
+    }
+
+    .field {
+      margin-top: 14px;
+      text-align: left;
+    }
+
+    .field label {
+      display: block;
+      font-size: 0.82rem;
+      font-weight: 600;
+      color: var(--deep);
+      margin-bottom: 6px;
+    }
+
+    .field input {
+      width: 100%;
+      padding: 12px 14px;
+      border: 2px solid #c5d9d4;
+      border-radius: 14px;
+      background: white;
+      font-family: inherit;
+      font-size: 1rem;
+      font-weight: 500;
+      color: var(--ink);
+    }
+
+    .field input:focus {
+      outline: none;
+      border-color: var(--sea);
+      box-shadow: 0 0 0 3px rgba(42, 122, 116, 0.18);
+    }
+
+    .user-card {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      padding: 14px;
+      border-radius: 18px;
+      background: white;
+      border: 1px solid #d5e6e2;
+      margin: 18px 0 8px;
+    }
+
+    .user-card img, .avatar-fallback {
+      width: 52px;
+      height: 52px;
+      border-radius: 50%;
+      object-fit: cover;
+      flex-shrink: 0;
+    }
+
+    .avatar-fallback {
+      display: grid;
+      place-items: center;
+      background: linear-gradient(145deg, var(--deep), var(--sea));
+      color: var(--gold-soft);
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1.4rem;
+      font-weight: 700;
+    }
+
+    .user-card .info { min-width: 0; flex: 1; }
+
+    .user-card .info .name {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1.35rem;
+      font-weight: 700;
+      color: var(--deep);
+      line-height: 1.1;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .user-card .info .email {
+      font-size: 0.8rem;
+      color: #5a746f;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .account-list {
+      display: grid;
+      gap: 10px;
+      margin: 16px 0;
+    }
+
+    .account-select {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      width: 100%;
+      padding: 12px;
+      border: 2px solid #c5d9d4;
+      border-radius: 16px;
+      background: white;
+      font-family: inherit;
+      color: var(--ink);
+      text-align: left;
+      cursor: pointer;
+      transition: border-color 0.15s, transform 0.15s;
+    }
+
+    .account-select:hover {
+      border-color: var(--sea);
+      transform: translateY(-1px);
+    }
+
+    .account-select img,
+    .account-select .avatar-fallback {
+      width: 48px;
+      height: 48px;
+    }
+
+    .account-select .account-name {
+      display: block;
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1.25rem;
+      font-weight: 700;
+      color: var(--deep);
+    }
+
+    .account-select .account-meta {
+      display: block;
+      margin-top: 2px;
+      font-size: 0.78rem;
+      color: #5a746f;
+    }
+
+    .avatar-picker {
+      display: block;
+      margin-top: 10px;
+      padding: 10px 14px;
+      border: 2px dashed #b7d0cb;
+      border-radius: 12px;
+      color: var(--deep);
+      font-size: 0.88rem;
+      font-weight: 600;
+      text-align: center;
+      cursor: pointer;
+    }
+
+    .avatar-picker input { display: none; }
+
+    .avatar-options {
+      display: grid;
+      grid-template-columns: repeat(6, 1fr);
+      gap: 8px;
+      margin-top: 10px;
+    }
+
+    .avatar-option {
+      aspect-ratio: 1;
+      border: 2px solid rgba(255,255,255,0.75);
+      border-radius: 50%;
+      font-size: clamp(1.2rem, 5vw, 1.65rem);
+      cursor: pointer;
+      box-shadow: 0 3px 10px rgba(20, 40, 38, 0.13);
+      transition: transform 0.15s, box-shadow 0.15s;
+    }
+
+    .avatar-option:hover,
+    .avatar-option.selected {
+      transform: scale(1.08);
+      box-shadow: 0 0 0 3px var(--gold);
+    }
+
+    .avatar-settings-preview {
+      display: flex;
+      justify-content: center;
+      margin: 12px 0;
+    }
+
+    .avatar-settings-preview img,
+    .avatar-settings-preview .avatar-fallback {
+      width: 84px;
+      height: 84px;
+      font-size: 2rem;
+      border: 3px solid white;
+      box-shadow: 0 7px 20px var(--shadow);
+    }
+
+    .pin-note {
+      margin-top: 10px;
+      color: #5a746f;
+      font-size: 0.78rem;
+      line-height: 1.4;
+      text-align: center;
+    }
+
+    .partner-box {
+      margin-top: 14px;
+      padding: 14px;
+      border-radius: 16px;
+      background: rgba(255,255,255,0.7);
+      border: 1px dashed #b7d0cb;
+    }
+
+    .partner-box h3 {
+      font-size: 0.9rem;
+      color: var(--deep);
+      margin-bottom: 8px;
+    }
+
+    .leaderboard {
+      margin-top: 16px;
+      padding: 16px;
+      border-radius: 18px;
+      background: linear-gradient(145deg, rgba(201, 162, 39, 0.13), rgba(26, 77, 74, 0.08));
+      border: 1px solid rgba(201, 162, 39, 0.28);
+    }
+
+    .leaderboard-head {
+      display: flex;
+      align-items: baseline;
+      justify-content: space-between;
+      gap: 10px;
+      margin-bottom: 10px;
+    }
+
+    .leaderboard-head h2 {
+      font-family: 'Cormorant Garamond', serif;
+      color: var(--deep);
+      font-size: 1.45rem;
+    }
+
+    .leaderboard-head span {
+      color: #7a5f10;
+      font-size: 0.75rem;
+      font-weight: 700;
+    }
+
+    .leaderboard-list { display: grid; gap: 8px; }
+
+    .leaderboard-row {
+      display: grid;
+      grid-template-columns: 34px 42px minmax(0, 1fr) auto;
+      align-items: center;
+      gap: 9px;
+      padding: 10px;
+      border-radius: 13px;
+      background: rgba(255,255,255,0.86);
+      border: 1px solid #d5e6e2;
+    }
+
+    .leaderboard-row.current {
+      border-color: var(--gold);
+      box-shadow: 0 0 0 2px rgba(201, 162, 39, 0.13);
+    }
+
+    .leaderboard-rank {
+      color: var(--deep);
+      font-weight: 800;
+      text-align: center;
+    }
+
+    .leaderboard-row img,
+    .leaderboard-row .avatar-fallback {
+      width: 42px;
+      height: 42px;
+    }
+
+    .leaderboard-name {
+      min-width: 0;
+      font-weight: 700;
+      color: var(--deep);
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .leaderboard-vault {
+      display: block;
+      color: #5a746f;
+      font-size: 0.72rem;
+      font-weight: 500;
+      margin-top: 2px;
+    }
+
+    .leaderboard-points {
+      color: var(--deep);
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1.35rem;
+      font-weight: 700;
+      text-align: right;
+      white-space: nowrap;
+    }
+
+    body[data-theme="dark"] .leaderboard-row {
+      background: rgba(17, 43, 40, 0.94);
+      border-color: #315b55;
+    }
+
+    body[data-theme="dark"] .leaderboard-vault { color: #a9c7c2; }
+
+    .journey-card {
+      margin-top: 16px;
+      padding: 16px;
+      border-radius: 20px;
+      color: white;
+      background:
+        radial-gradient(circle at 90% 10%, rgba(242, 201, 76, 0.28), transparent 35%),
+        linear-gradient(135deg, #123f3c, #2a7a74);
+      box-shadow: 0 12px 28px rgba(18, 63, 60, 0.2);
+    }
+
+    .journey-top {
+      display: grid;
+      grid-template-columns: 58px minmax(0, 1fr) auto;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .journey-emblem {
+      width: 58px;
+      height: 58px;
+      display: grid;
+      place-items: center;
+      border-radius: 18px;
+      font-size: 2rem;
+      background: rgba(255,255,255,0.15);
+      border: 1px solid rgba(255,255,255,0.24);
+    }
+
+    .journey-label {
+      color: #bfe2dc;
+      font-size: 0.68rem;
+      font-weight: 800;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+    }
+
+    .journey-title {
+      margin-top: 2px;
+      font-family: 'Cormorant Garamond', serif;
+      color: white;
+      font-size: 1.55rem;
+      line-height: 1;
+    }
+
+    .journey-xp {
+      color: var(--gold-soft);
+      font-size: 0.78rem;
+      font-weight: 800;
+      text-align: right;
+      white-space: nowrap;
+    }
+
+    .journey-track {
+      height: 9px;
+      margin-top: 13px;
+      overflow: hidden;
+      border-radius: 999px;
+      background: rgba(0,0,0,0.24);
+    }
+
+    .journey-track span {
+      display: block;
+      width: 0;
+      height: 100%;
+      border-radius: inherit;
+      background: linear-gradient(90deg, #f0c94d, #fff2b8);
+      transition: width 0.7s ease;
+    }
+
+    .journey-next {
+      margin-top: 6px;
+      color: #cce5e1;
+      font-size: 0.72rem;
+    }
+
+    .journey-goals {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 9px;
+      margin-top: 13px;
+    }
+
+    .journey-goal {
+      padding: 10px;
+      border-radius: 13px;
+      background: rgba(255,255,255,0.1);
+      border: 1px solid rgba(255,255,255,0.14);
+    }
+
+    .journey-goal strong {
+      display: block;
+      color: white;
+      font-size: 0.82rem;
+    }
+
+    .journey-goal span {
+      display: block;
+      margin-top: 3px;
+      color: #cce5e1;
+      font-size: 0.69rem;
+      line-height: 1.3;
+    }
+
+    .quest-dots {
+      display: flex;
+      gap: 5px;
+      margin-top: 8px;
+    }
+
+    .quest-dot {
+      width: 9px;
+      height: 9px;
+      border-radius: 50%;
+      background: rgba(255,255,255,0.2);
+      border: 1px solid rgba(255,255,255,0.28);
+    }
+
+    .quest-dot.complete {
+      background: #f2c94c;
+      border-color: #ffe99c;
+      box-shadow: 0 0 8px rgba(242, 201, 76, 0.7);
+    }
+
+    @media (max-width: 420px) {
+      .journey-top { grid-template-columns: 50px minmax(0, 1fr); }
+      .journey-emblem { width: 50px; height: 50px; }
+      .journey-xp { grid-column: 2; text-align: left; margin-top: -7px; }
+      .journey-goals { grid-template-columns: 1fr; }
+    }
+
+    .scoreboard {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin-top: 18px;
+    }
+
+    .score-chip {
+      background: white;
+      border-radius: 16px;
+      padding: 12px 14px;
+      text-align: center;
+      border: 1px solid #d5e6e2;
+    }
+
+    .score-chip .name {
+      font-size: 0.78rem;
+      font-weight: 600;
+      color: #5a746f;
+      margin-bottom: 2px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .score-chip .pts {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1.7rem;
+      font-weight: 700;
+      color: var(--deep);
+      line-height: 1;
+    }
+
+    .modes { display: grid; gap: 10px; margin-top: 8px; }
+
+    .mode-btn {
+      text-align: left;
+      padding: 16px 18px;
+      border-radius: 18px;
+      border: 2px solid #c8ddd8;
+      background: white;
+      cursor: pointer;
+      font-family: inherit;
+      transition: border-color 0.15s, transform 0.15s;
+    }
+
+    .mode-btn:hover { border-color: var(--sea); transform: translateY(-1px); }
+    .mode-btn h3 { font-size: 1.05rem; color: var(--deep); margin-bottom: 4px; }
+    .mode-btn p { font-size: 0.88rem; color: #5a746f; line-height: 1.35; }
+
+    .mode-btn.test-mode {
+      padding: 20px;
+      border-color: var(--gold);
+      background: linear-gradient(135deg, var(--deep), var(--sea));
+      color: white;
+      box-shadow: 0 10px 24px rgba(26, 77, 74, 0.28);
+    }
+
+    .mode-btn.test-mode h3 {
+      color: white;
+      font-size: 1.25rem;
+    }
+
+    .mode-btn.test-mode p { color: rgba(255,255,255,0.86); }
+    body[data-theme="dark"] .mode-btn.test-mode {
+      background: linear-gradient(135deg, #285f59, #3d8178);
+      border-color: var(--gold);
+    }
+
+    .topbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 16px;
+    }
+
+    .topbar .back {
+      border: none;
+      background: white;
+      color: var(--deep);
+      font-family: inherit;
+      font-weight: 600;
+      font-size: 0.9rem;
+      padding: 8px 14px;
+      border-radius: 999px;
+      cursor: pointer;
+      box-shadow: 0 4px 14px var(--shadow);
+    }
+
+    .turn-pill {
+      background: linear-gradient(135deg, var(--dawn), #ffb089);
+      color: #3a1d12;
+      font-size: 0.82rem;
+      font-weight: 700;
+      padding: 8px 14px;
+      border-radius: 999px;
+      max-width: 60%;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .progress {
+      height: 8px;
+      background: rgba(255, 255, 255, 0.7);
+      border-radius: 999px;
+      overflow: hidden;
+      margin-bottom: 18px;
+    }
+
+    .progress > span {
+      display: block;
+      height: 100%;
+      width: 0%;
+      background: linear-gradient(90deg, var(--sea), var(--gold));
+      border-radius: inherit;
+      transition: width 0.35s ease;
+    }
+
+    .prompt {
+      text-align: center;
+      font-size: 0.92rem;
+      color: #456661;
+      margin-bottom: 14px;
+    }
+
+    .blank-verse {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: clamp(1.2rem, 4vw, 1.45rem);
+      line-height: 1.7;
+      text-align: center;
+      margin-bottom: 18px;
+    }
+
+    .blank {
+      display: inline-block;
+      min-width: 4.2ch;
+      margin: 0 2px;
+      padding: 0 6px 2px;
+      border-bottom: 2px solid var(--sea);
+      color: var(--deep);
+      font-weight: 700;
+      font-style: normal;
+    }
+
+    .blank.filled { color: var(--correct); border-color: var(--correct); }
+    .blank.miss { color: var(--wrong); border-color: var(--wrong); }
+
+    .choices {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      justify-content: center;
+    }
+
+    .choice {
+      padding: 10px 14px;
+      border-radius: 12px;
+      border: 2px solid #c5d9d4;
+      background: white;
+      font-family: inherit;
+      font-size: 0.95rem;
+      font-weight: 600;
+      color: var(--ink);
+      cursor: pointer;
+      transition: transform 0.12s, border-color 0.12s, background 0.12s;
+    }
+
+    .choice:hover:not(:disabled) { border-color: var(--sea); transform: translateY(-1px); }
+    .choice:disabled { opacity: 0.4; cursor: default; }
+    .choice.correct { background: #dff3e8; border-color: var(--correct); color: var(--correct); }
+    .choice.wrong { background: #f8e4e0; border-color: var(--wrong); color: var(--wrong); }
+
+    .word-bank {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      justify-content: center;
+      min-height: 52px;
+      margin-bottom: 14px;
+    }
+
+    .slot-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      justify-content: center;
+      min-height: 56px;
+      padding: 14px;
+      border-radius: 16px;
+      background: rgba(255, 255, 255, 0.7);
+      border: 2px dashed #b7d0cb;
+      margin-bottom: 16px;
+    }
+
+    .word-chip {
+      padding: 9px 12px;
+      border-radius: 11px;
+      background: white;
+      border: 2px solid #c5d9d4;
+      font-family: inherit;
+      font-weight: 600;
+      font-size: 0.92rem;
+      cursor: pointer;
+      animation: chipIn 0.25s ease;
+    }
+
+    .word-chip.in-slot { background: var(--mist); border-color: var(--sea); }
+
+    @keyframes chipIn {
+      from { opacity: 0; transform: scale(0.85); }
+      to { opacity: 1; transform: scale(1); }
+    }
+
+    .type-area textarea {
+      width: 100%;
+      min-height: 140px;
+      padding: 16px;
+      border: 2px solid #c5d9d4;
+      border-radius: 16px;
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1.25rem;
+      line-height: 1.45;
+      resize: vertical;
+      background: white;
+      color: var(--ink);
+    }
+
+    .type-area textarea:focus {
+      outline: none;
+      border-color: var(--sea);
+      box-shadow: 0 0 0 3px rgba(42, 122, 116, 0.16);
+    }
+
+    .hint {
+      margin-top: 10px;
+      text-align: center;
+      font-size: 0.88rem;
+      color: #5a746f;
+    }
+
+    .feedback {
+      margin-top: 14px;
+      text-align: center;
+      font-weight: 600;
+      min-height: 1.4em;
+    }
+
+    .feedback.good { color: var(--correct); }
+    .feedback.bad { color: var(--wrong); }
+
+    .study-reveal { text-align: center; }
+
+    .study-reveal .verse-text {
+      opacity: 0;
+      transform: translateY(8px);
+      transition: opacity 0.5s ease, transform 0.5s ease;
+    }
+
+    .study-reveal.shown .verse-text {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .study-cover {
+      margin: 18px auto;
+      max-width: 280px;
+      padding: 28px 18px;
+      border-radius: 18px;
+      background: linear-gradient(145deg, var(--deep), var(--sea));
+      color: var(--gold-soft);
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1.35rem;
+      font-weight: 600;
+      cursor: pointer;
+      user-select: none;
+      transition: transform 0.2s;
+    }
+
+    .study-cover:hover { transform: scale(1.02); }
+    .study-reveal.shown .study-cover { display: none; }
+
+    .result-hero { text-align: center; margin-bottom: 8px; }
+
+    .result-hero .emoji {
+      font-size: 2.8rem;
+      display: block;
+      margin-bottom: 8px;
+      animation: bounce 1.4s ease-in-out infinite;
+    }
+
+    @keyframes bounce {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-8px); }
+    }
+
+    .result-hero h2 {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 2.1rem;
+      color: var(--deep);
+      line-height: 1.1;
+    }
+
+    .accuracy {
+      font-size: 1rem;
+      color: #456661;
+      margin-top: 8px;
+    }
+
+    .streak {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      margin-top: 14px;
+      padding: 8px 14px;
+      border-radius: 999px;
+      background: rgba(201, 162, 39, 0.18);
+      color: #7a5f10;
+      font-size: 0.88rem;
+      font-weight: 700;
+    }
+
+    .footer-note {
+      text-align: center;
+      margin-top: 18px;
+      font-size: 0.8rem;
+      color: #5f7a75;
+      line-height: 1.4;
+    }
+
+    .vault {
+      margin-top: 18px;
+      padding: 16px;
+      border-radius: 18px;
+      background: linear-gradient(145deg, rgba(26, 77, 74, 0.08), rgba(201, 162, 39, 0.12));
+      border: 1px solid rgba(26, 77, 74, 0.12);
+    }
+
+    .vault-head {
+      display: flex;
+      align-items: baseline;
+      justify-content: space-between;
+      gap: 10px;
+      margin-bottom: 10px;
+    }
+
+    .vault-head h2 {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1.35rem;
+      color: var(--deep);
+      font-weight: 700;
+    }
+
+    .vault-count {
+      font-size: 0.82rem;
+      font-weight: 700;
+      color: #7a5f10;
+      white-space: nowrap;
+    }
+
+    .vault-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+
+    .vault-card {
+      background: rgba(255, 255, 255, 0.85);
+      border-radius: 14px;
+      padding: 12px;
+      text-align: center;
+    }
+
+    .vault-card .who {
+      font-size: 0.75rem;
+      font-weight: 600;
+      color: #5a746f;
+      margin-bottom: 2px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .vault-card .num {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 2rem;
+      font-weight: 700;
+      color: var(--deep);
+      line-height: 1;
+    }
+
+    .vault-card .sub {
+      margin-top: 4px;
+      font-size: 0.72rem;
+      color: #5a746f;
+    }
+
+    .memorized-list {
+      margin-top: 12px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      justify-content: center;
+    }
+
+    .mem-pill {
+      font-size: 0.75rem;
+      font-weight: 600;
+      padding: 5px 10px;
+      border-radius: 999px;
+      background: white;
+      color: var(--deep);
+      border: 1px solid #c5d9d4;
+    }
+
+    .status-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      justify-content: center;
+      margin: 14px 0 4px;
+    }
+
+    .status-pill {
+      font-size: 0.78rem;
+      font-weight: 700;
+      padding: 7px 12px;
+      border-radius: 999px;
+      background: white;
+      border: 1px solid #c5d9d4;
+      color: var(--deep);
+    }
+
+    .status-pill.done {
+      background: #dff3e8;
+      border-color: #8fcea8;
+      color: var(--correct);
+    }
+
+    .status-pill.warn {
+      background: rgba(255, 143, 107, 0.16);
+      border-color: rgba(255, 143, 107, 0.35);
+      color: #9a4a2e;
+    }
+
+    .week-note {
+      text-align: center;
+      font-size: 0.78rem;
+      color: #5a746f;
+      margin-top: 10px;
+      line-height: 1.4;
+    }
+
+    .reminders {
+      margin-top: 18px;
+      padding: 16px;
+      border-radius: 18px;
+      background: rgba(255, 255, 255, 0.72);
+      border: 1px solid #d5e6e2;
+    }
+
+    .reminders h2 {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1.35rem;
+      color: var(--deep);
+      font-weight: 700;
+      margin-bottom: 4px;
+    }
+
+    .reminders .sub {
+      font-size: 0.82rem;
+      color: #5a746f;
+      margin-bottom: 12px;
+      line-height: 1.4;
+    }
+
+    .reminder-list {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      margin-bottom: 12px;
+    }
+
+    .reminder-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      padding: 10px 12px;
+      border-radius: 12px;
+      background: var(--foam);
+      border: 1px solid #d5e6e2;
+    }
+
+    .reminder-row .time {
+      font-weight: 700;
+      color: var(--deep);
+      font-size: 1.05rem;
+    }
+
+    .reminder-row .remove {
+      border: none;
+      background: transparent;
+      color: var(--wrong);
+      font-family: inherit;
+      font-weight: 700;
+      font-size: 0.82rem;
+      cursor: pointer;
+      padding: 4px 6px;
+    }
+
+    .reminder-add {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 8px;
+      margin-bottom: 10px;
+    }
+
+    .reminder-add input[type="time"] {
+      width: 100%;
+      padding: 12px 14px;
+      border: 2px solid #c5d9d4;
+      border-radius: 12px;
+      font-family: inherit;
+      font-size: 1rem;
+      font-weight: 600;
+      color: var(--ink);
+      background: white;
+    }
+
+    .reminder-add input[type="time"]:focus {
+      outline: none;
+      border-color: var(--sea);
+    }
+
+    .btn-small {
+      padding: 12px 16px;
+      border: none;
+      border-radius: 12px;
+      font-family: inherit;
+      font-size: 0.92rem;
+      font-weight: 600;
+      cursor: pointer;
+      background: linear-gradient(135deg, var(--deep), var(--sea));
+      color: white;
+      white-space: nowrap;
+    }
+
+    .notify-status {
+      font-size: 0.8rem;
+      color: #5a746f;
+      text-align: center;
+      margin-top: 8px;
+      line-height: 1.4;
+      min-height: 1.2em;
+    }
+
+    .empty-hint {
+      text-align: center;
+      font-size: 0.85rem;
+      color: #5a746f;
+      padding: 8px;
+    }
+
+    .music-box {
+      margin-top: 18px;
+      padding: 16px;
+      border-radius: 18px;
+      background: rgba(255, 255, 255, 0.72);
+      border: 1px solid #d5e6e2;
+    }
+
+    .music-box h2 {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1.35rem;
+      color: var(--deep);
+      font-weight: 700;
+      margin-bottom: 4px;
+    }
+
+    .music-box .sub {
+      font-size: 0.82rem;
+      color: #5a746f;
+      margin-bottom: 12px;
+      line-height: 1.4;
+    }
+
+    .music-controls {
+      display: grid;
+      grid-template-columns: auto 1fr;
+      gap: 12px;
+      align-items: center;
+    }
+
+    .track-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+      margin-bottom: 12px;
+    }
+
+    .track-btn {
+      border: 2px solid #c5d9d4;
+      border-radius: 14px;
+      padding: 12px 10px;
+      background: white;
+      font-family: inherit;
+      font-weight: 600;
+      font-size: 0.88rem;
+      color: var(--deep);
+      cursor: pointer;
+      text-align: center;
+      line-height: 1.25;
+    }
+
+    .track-btn.active {
+      border-color: var(--sea);
+      background: linear-gradient(160deg, #ffffff, #e7f4f1);
+      box-shadow: 0 0 0 3px rgba(42, 122, 116, 0.14);
+    }
+
+    .track-btn .label {
+      display: block;
+      font-size: 0.7rem;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: #5a746f;
+      margin-bottom: 2px;
+    }
+
+    .music-toggle {
+      border: none;
+      border-radius: 14px;
+      padding: 12px 16px;
+      font-family: inherit;
+      font-weight: 700;
+      font-size: 0.92rem;
+      cursor: pointer;
+      background: linear-gradient(135deg, var(--deep), var(--sea));
+      color: white;
+      white-space: nowrap;
+    }
+
+    .music-toggle.off {
+      background: white;
+      color: var(--deep);
+      border: 2px solid #c5d9d4;
+    }
+
+    .volume-wrap {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .volume-wrap label {
+      font-size: 0.78rem;
+      font-weight: 600;
+      color: #5a746f;
+    }
+
+    .volume-wrap input[type="range"] {
+      width: 100%;
+      accent-color: var(--sea);
+    }
+
+    .music-status {
+      margin-top: 10px;
+      font-size: 0.8rem;
+      color: #5a746f;
+      text-align: center;
+      line-height: 1.4;
+    }
+
+    .loading-dot {
+      text-align: center;
+      color: #5a746f;
+      font-weight: 600;
+      padding: 20px;
+    }
+
+    @media (max-width: 420px) {
+      .app { padding: 14px 12px 36px; }
+      .brand { margin-bottom: 18px; }
+      .brand-mark { width: 54px; height: 54px; margin-bottom: 10px; }
+      .brand h1 { font-size: 2.45rem; }
+      .panel { padding: 20px 14px; border-radius: 22px; }
+      .btn-row { grid-template-columns: 1fr; }
+      .vault-grid { grid-template-columns: 1fr; }
+      .scoreboard { grid-template-columns: 1fr; }
+      .btn, .mode-btn { min-height: 50px; }
+      .hero-play { min-height: 64px; }
+      .music-controls { grid-template-columns: 1fr; }
+    }
+
+    @media (min-width: 700px) {
+      .app { padding: 36px 28px 60px; }
+      .panel { padding: 34px; }
+      .modes { grid-template-columns: repeat(2, 1fr); }
+      .mode-btn.test-mode { grid-column: 1 / -1; }
+      .dashboard-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 14px;
+        margin-top: 18px;
+      }
+      .dashboard-grid > * { margin-top: 0; }
+      .dashboard-grid .reminders { grid-column: 1 / -1; }
+      .theme-grid { grid-template-columns: repeat(4, 1fr); }
+    }
+  </style>
+</head>
+<body>
+  <div class="sky" aria-hidden="true">
+    <div class="orb"></div>
+    <div class="orb"></div>
+    <div class="orb"></div>
+  </div>
+
+  <div class="app">
+    <!-- AUTH -->
+    <section id="screen-auth" class="screen active">
+      <div class="brand">
+        <div class="brand-mark" aria-hidden="true">V</div>
+        <h1>Verse Keepers</h1>
+        <p>Choose who is practicing. No Gmail or password needed.</p>
+      </div>
+      <div class="panel">
+        <p class="translation">Choose an account, then enter its PIN</p>
+        <div class="account-list" id="account-list"></div>
+        <button class="btn btn-primary" id="btn-new-account">Create a new account</button>
+        <p class="footer-note">Accounts and photos stay on this device. A local PIN keeps siblings from accidentally using each other's account.</p>
+      </div>
+    </section>
+
+    <!-- SETUP / CREATE ACCOUNT -->
+    <section id="screen-setup" class="screen">
+      <div class="brand">
+        <div class="brand-mark" aria-hidden="true">V</div>
+        <h1 id="setup-heading">Create account</h1>
+        <p>Finish setting up your Verse Keepers profile.</p>
+      </div>
+      <div class="panel">
+        <div class="user-card" id="setup-user-card">
+          <img id="setup-photo" class="hidden" alt="Selected avatar">
+          <div class="avatar-fallback" id="setup-avatar">V</div>
+          <div class="info">
+            <div class="name" id="setup-account-title">New account</div>
+            <div class="email">Choose a name, PIN, and optional picture</div>
+          </div>
+        </div>
+        <label class="avatar-picker" for="avatar-file">
+          Upload your own picture
+          <input id="avatar-file" type="file" accept="image/*">
+        </label>
+        <div class="avatar-options" id="setup-avatar-options" aria-label="Choose a preset avatar"></div>
+        <div class="field">
+          <label for="display-name">Display name</label>
+          <input id="display-name" type="text" maxlength="40" placeholder="e.g. Rachel Booth" autocomplete="nickname">
+        </div>
+        <div class="field">
+          <label for="setup-pin">Create a 4–6 digit PIN</label>
+          <input id="setup-pin" type="password" inputmode="numeric" pattern="[0-9]*" maxlength="6" placeholder="••••" autocomplete="new-password">
+        </div>
+        <div class="field">
+          <label for="confirm-pin">Confirm PIN</label>
+          <input id="confirm-pin" type="password" inputmode="numeric" pattern="[0-9]*" maxlength="6" placeholder="••••" autocomplete="new-password">
+        </div>
+        <p class="pin-note">This PIN is only for this device. It cannot be recovered if forgotten.</p>
+        <button class="btn btn-primary" id="btn-create-account">Save account</button>
+        <button class="btn btn-ghost" id="btn-setup-back">Back to accounts</button>
+        <p class="auth-error" id="setup-error"></p>
+      </div>
+    </section>
+
+    <!-- PIN LOGIN -->
+    <section id="screen-login" class="screen">
+      <div class="brand">
+        <div class="brand-mark" aria-hidden="true">V</div>
+        <h1>Welcome back</h1>
+        <p>Enter your PIN to open your verse vault.</p>
+      </div>
+      <div class="panel">
+        <div class="user-card">
+          <img id="login-photo" class="hidden" alt="Account avatar">
+          <div class="avatar-fallback" id="login-avatar">V</div>
+          <div class="info">
+            <div class="name" id="login-name">Account</div>
+            <div class="email">Local account</div>
+          </div>
+        </div>
+        <div class="field">
+          <label for="login-pin">PIN</label>
+          <input id="login-pin" type="password" inputmode="numeric" pattern="[0-9]*" maxlength="6" placeholder="••••" autocomplete="current-password">
+        </div>
+        <button class="btn btn-primary" id="btn-unlock-account">Open account</button>
+        <button class="btn btn-ghost" id="btn-login-back">Back to accounts</button>
+        <p class="auth-error" id="login-error"></p>
+      </div>
+    </section>
+
+    <!-- HOME -->
+    <section id="screen-home" class="screen">
+      <div class="home-toolbar">
+        <button class="icon-btn" id="btn-open-howto" aria-label="How to play" title="How to play">?</button>
+        <button class="icon-btn" id="btn-share-game" aria-label="Share Verse Keepers" title="Share">↗</button>
+        <button class="icon-btn" id="btn-open-settings" aria-label="Open settings" title="Settings">⚙</button>
+      </div>
+      <div class="brand">
+        <div class="brand-mark" aria-hidden="true">V</div>
+        <h1>Verse Keepers</h1>
+        <p>Start fresh every Monday. Master a verse, then keep going.</p>
+      </div>
+
+      <div class="panel">
+        <div class="month-banner">
+          <div class="month-label" id="home-month">This week</div>
+          <div class="ref" id="home-ref">—</div>
+          <p class="verse-text" id="home-verse"></p>
+          <div class="translation">NIV · master it to unlock the next verse</div>
+        </div>
+
+        <div class="user-card">
+          <img id="user-photo" class="hidden" alt="">
+          <div class="avatar-fallback" id="user-avatar">V</div>
+          <div class="info">
+            <div class="name" id="user-name">—</div>
+            <div class="email" id="user-email">—</div>
+          </div>
+        </div>
+
+        <button class="btn btn-primary hero-play" id="btn-play">Start practicing</button>
+        <div class="share-row">
+          <button class="btn btn-gold" id="btn-share-home">Share this game</button>
+        </div>
+
+        <div class="blessing-card">
+          <div class="label" id="blessing-label">Today’s blessing</div>
+          <p id="daily-blessing">Come back each day and hide one more verse in your heart.</p>
+        </div>
+
+        <div class="journey-card">
+          <div class="journey-top">
+            <div class="journey-emblem" id="journey-emblem">🌱</div>
+            <div>
+              <div class="journey-label">Your Faith Journey · Level <span id="journey-level">1</span></div>
+              <h2 class="journey-title" id="journey-title">Faith Seedling</h2>
+            </div>
+            <div class="journey-xp" id="journey-xp">0 / 120 XP</div>
+          </div>
+          <div class="journey-track"><span id="journey-progress"></span></div>
+          <div class="journey-next" id="journey-next">Practice to grow your journey.</div>
+          <div class="journey-goals">
+            <div class="journey-goal">
+              <strong id="journey-streak">🔥 0 day streak</strong>
+              <span>Come back each day to keep your flame alive. Your first activity earns bonus XP.</span>
+            </div>
+            <div class="journey-goal">
+              <strong id="journey-quest">Weekly quest · 0/3</strong>
+              <span>Master 3 verses this week for 50 bonus XP.</span>
+              <div class="quest-dots" id="journey-quest-dots"></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="badge-case">
+          <div class="vault-head">
+            <h2>Badge case</h2>
+            <div class="vault-count" id="badge-count">0 / 10</div>
+          </div>
+          <p class="sub" style="margin-top:4px">Earn keepsakes for streaks, vaults, and championships.</p>
+          <div class="badge-grid" id="badge-grid"></div>
+        </div>
+
+        <div class="leaderboard">
+          <div class="leaderboard-head">
+            <h2>Weekly leaderboard</h2>
+            <span>Verses reset Monday</span>
+          </div>
+          <div class="leaderboard-list" id="leaderboard-list"></div>
+        </div>
+
+        <div class="status-row">
+          <div class="status-pill" id="month-status">This week: not memorized yet</div>
+          <div class="status-pill warn" id="week-status">Week scores active</div>
+        </div>
+
+        <div class="scoreboard">
+          <div class="score-chip">
+            <div class="name" id="score-name-1">You</div>
+            <div class="pts" id="score-pts-1">0</div>
+          </div>
+          <div class="score-chip">
+            <div class="name" id="score-name-2">Partner</div>
+            <div class="pts" id="score-pts-2">—</div>
+          </div>
+        </div>
+        <p class="week-note" id="week-note">Weekly points reset every Saturday at 8:30 AM.</p>
+
+        <div class="dashboard-grid">
+        <div class="vault">
+          <div class="vault-head">
+            <h2>Memorized vault</h2>
+            <div class="vault-count" id="vault-total">0 verses</div>
+          </div>
+          <div class="vault-grid">
+            <div class="vault-card">
+              <div class="who" id="vault-name-1">You</div>
+              <div class="num" id="vault-pts-1">0</div>
+              <div class="sub">verses kept</div>
+            </div>
+            <div class="vault-card">
+              <div class="who" id="vault-name-2">Partner</div>
+              <div class="num" id="vault-pts-2">—</div>
+              <div class="sub">verses kept</div>
+            </div>
+          </div>
+          <div class="memorized-list" id="memorized-list"></div>
+        </div>
+
+        <div class="music-box">
+          <h2>Background music</h2>
+          <p class="sub">Pick a YouTube track and set the volume. Playback stays inside YouTube's official player.</p>
+          <div class="track-row" role="group" aria-label="Choose a track">
+            <button type="button" class="track-btn active" data-track="1" id="track-btn-1">
+              <span class="label">Track 1</span>
+              Background track 1
+            </button>
+            <button type="button" class="track-btn" data-track="2" id="track-btn-2">
+              <span class="label">Track 2</span>
+              Background track 2
+            </button>
+          </div>
+          <div id="youtube-music-player" aria-hidden="true" style="position:absolute;width:1px;height:1px;overflow:hidden;opacity:0;pointer-events:none"></div>
+          <div class="music-controls">
+            <button type="button" class="music-toggle off" id="btn-music-toggle">Play</button>
+            <div class="volume-wrap">
+              <label for="music-volume" id="music-volume-label">Volume 40%</label>
+              <input type="range" id="music-volume" min="0" max="100" value="40" aria-valuemin="0" aria-valuemax="100" aria-valuenow="40">
+            </div>
+          </div>
+          <p class="music-status" id="music-status">Looking for track files…</p>
+        </div>
+
+        <div class="reminders">
+          <h2>Practice reminders</h2>
+          <p class="sub" id="reminder-for">Your reminder times for your current verse.</p>
+          <div class="reminder-list" id="reminder-list"></div>
+          <div class="reminder-add">
+            <input type="time" id="reminder-time" value="08:30">
+            <button type="button" class="btn-small" id="btn-add-reminder">Add time</button>
+          </div>
+          <button class="btn btn-gold" id="btn-enable-notify" style="margin-top:0">Enable notifications</button>
+          <button class="btn btn-ghost" id="btn-test-notify">Send test notification</button>
+          <p class="notify-status" id="notify-status"></p>
+        </div>
+        </div>
+
+        <button class="btn btn-ghost" id="btn-reset-scores">Reset my week score</button>
+        <p class="footer-note">A fresh verse arrives every Monday. Pass the Verse Test to add it to your vault and unlock the next verse right away. Week scores clear every Saturday at 8:30 AM. Add this page to your Home Screen to play it like an app.</p>
+      </div>
+    </section>
+
+    <!-- HOW TO PLAY -->
+    <section id="screen-howto" class="screen">
+      <div class="panel">
+        <div class="month-banner">
+          <div class="month-label">Welcome</div>
+          <div class="ref">How to play</div>
+        </div>
+        <ul class="howto-list">
+          <li><strong>Study first.</strong> Use flash, blanks, scramble, or typing until the verse feels familiar.</li>
+          <li><strong>Take the Verse Test.</strong> Pass all 3 challenges to lock the verse in your vault and unlock a new one the same week.</li>
+          <li><strong>Grow your Faith Journey.</strong> Practice earns XP, titles, a daily streak bonus, and weekly quest rewards.</li>
+          <li><strong>Win the Monday ceremony.</strong> Whoever mastered the most verses last week gets the podium, fireworks, and a champion badge.</li>
+        </ul>
+        <button class="btn btn-primary" id="btn-howto-done">Let’s go</button>
+      </div>
+    </section>
+
+    <!-- SETTINGS -->
+    <section id="screen-settings" class="screen">
+      <div class="topbar">
+        <button class="back" data-goto="home">← Home</button>
+        <div class="turn-pill">Settings</div>
+      </div>
+      <div class="panel">
+        <div class="month-banner">
+          <div class="month-label">Make it yours</div>
+          <div class="ref">Settings</div>
+        </div>
+
+        <div class="settings-section">
+          <h2>Color theme</h2>
+          <p>Change the mood without changing the peaceful Verse Keepers vibe.</p>
+          <div class="theme-grid">
+            <button class="theme-btn active" data-theme-choice="calm">Calm</button>
+            <button class="theme-btn" data-theme-choice="dark">Dark</button>
+            <button class="theme-btn" data-theme-choice="sunset">Sunset</button>
+            <button class="theme-btn" data-theme-choice="lavender">Lavender</button>
+          </div>
+        </div>
+
+        <div class="settings-section">
+          <h2>Your avatar</h2>
+          <p>Pick a colorful character or upload your own picture.</p>
+          <div class="avatar-settings-preview">
+            <img id="settings-avatar-photo" class="hidden" alt="Current avatar">
+            <div class="avatar-fallback" id="settings-avatar-fallback">V</div>
+          </div>
+          <div class="avatar-options" id="settings-avatar-options" aria-label="Choose a preset avatar"></div>
+          <label class="avatar-picker" for="settings-avatar-file">
+            Upload a new picture
+            <input id="settings-avatar-file" type="file" accept="image/*">
+          </label>
+          <button class="btn btn-ghost" id="btn-remove-avatar">Use my initial instead</button>
+          <p class="notify-status" id="avatar-settings-status"></p>
+        </div>
+
+        <div class="settings-section">
+          <h2>Background music</h2>
+          <p>Choose the default soundtrack and adjust its volume.</p>
+          <div class="track-row">
+            <button type="button" class="track-btn" data-track="1">
+              <span class="label">Track 1</span>
+              Background track 1
+            </button>
+            <button type="button" class="track-btn" data-track="2">
+              <span class="label">Track 2</span>
+              Background track 2
+            </button>
+          </div>
+          <div class="volume-wrap">
+            <label for="settings-volume" id="settings-volume-label">Volume 40%</label>
+            <input type="range" id="settings-volume" min="0" max="100" value="40">
+          </div>
+          <label class="setting-toggle">
+            <span>Start Track 2 after opening an account</span>
+            <input type="checkbox" id="settings-autoplay" checked>
+          </label>
+        </div>
+
+        <div class="settings-section">
+          <h2>Comfort</h2>
+          <label class="setting-toggle">
+            <span>Reduce animations</span>
+            <input type="checkbox" id="settings-reduce-motion">
+          </label>
+          <label class="setting-toggle">
+            <span>Play celebration sounds</span>
+            <input type="checkbox" id="settings-sound" checked>
+          </label>
+        </div>
+
+        <div class="danger-zone">
+          <h2>Remove account</h2>
+          <p class="footer-note" style="margin-top:4px;margin-bottom:12px">
+            Permanently deletes this account, its avatar, points, reminders, and verse vault from this device.
+          </p>
+          <button class="btn btn-danger" id="btn-delete-account">Delete this account</button>
+        </div>
+
+        <button class="btn btn-primary" data-goto="home">Done</button>
+      </div>
+    </section>
+
+    <!-- MODE PICK -->
+    <section id="screen-modes" class="screen">
+      <div class="topbar">
+        <button class="back" data-goto="home">← Home</button>
+        <div class="turn-pill" id="turn-pill">You</div>
+      </div>
+      <div class="panel">
+        <div class="month-banner">
+          <div class="month-label">Choose a game</div>
+          <div class="ref" id="mode-ref">—</div>
+        </div>
+        <div class="modes">
+          <button class="mode-btn test-mode" data-mode="test">
+            <h3>🏆 Take the Verse Test</h3>
+            <p>Hard mode: pass all 3 challenges to master the current verse and unlock the next.</p>
+          </button>
+          <button class="mode-btn" data-mode="study">
+            <h3>Study flash</h3>
+            <p>Hide and reveal the verse until it sticks.</p>
+          </button>
+          <button class="mode-btn" data-mode="blanks">
+            <h3>Fill the blanks</h3>
+            <p>Tap the missing words in order.</p>
+          </button>
+          <button class="mode-btn" data-mode="scramble">
+            <h3>Word scramble</h3>
+            <p>Build the verse from shuffled words.</p>
+          </button>
+          <button class="mode-btn" data-mode="type">
+            <h3>Type from memory</h3>
+            <p>Write it out. Close enough still counts.</p>
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- GAME -->
+    <section id="screen-game" class="screen">
+      <div class="topbar">
+        <button class="back" data-goto="modes">← Modes</button>
+        <div class="turn-pill" id="game-turn">Playing</div>
+      </div>
+      <div class="progress" aria-hidden="true"><span id="progress-bar"></span></div>
+      <div class="panel">
+        <div class="month-banner">
+          <div class="month-label" id="game-mode-label">Practice</div>
+          <div class="ref" id="game-ref">—</div>
+        </div>
+        <p class="prompt" id="game-prompt"></p>
+        <div id="game-body"></div>
+        <div class="feedback" id="game-feedback"></div>
+        <div id="game-actions"></div>
+      </div>
+    </section>
+
+    <!-- RESULT -->
+    <section id="screen-result" class="screen">
+      <div class="panel">
+        <div class="result-hero">
+          <span class="emoji" id="result-emoji">✨</span>
+          <h2 id="result-title">Nice work</h2>
+          <p class="accuracy" id="result-detail"></p>
+          <div class="streak" id="result-streak">Keep going</div>
+        </div>
+        <div class="scoreboard">
+          <div class="score-chip">
+            <div class="name" id="result-name-1">You</div>
+            <div class="pts" id="result-pts-1">0</div>
+          </div>
+          <div class="score-chip">
+            <div class="name" id="result-name-2">Partner</div>
+            <div class="pts" id="result-pts-2">—</div>
+          </div>
+        </div>
+        <button class="btn btn-primary" data-goto="modes">Play another mode</button>
+        <div class="btn-row">
+          <button class="btn btn-gold" id="btn-again">Same mode again</button>
+          <button class="btn btn-ghost" data-goto="home">Home</button>
+        </div>
+      </div>
+    </section>
+    <div class="confetti-layer" id="confetti-layer" aria-hidden="true"></div>
+    <div class="toast-stack" id="toast-stack" aria-live="polite"></div>
+
+    <!-- WEEKLY AWARD CEREMONY -->
+    <section id="screen-ceremony" class="screen">
+      <div class="panel ceremony-panel">
+        <div class="fireworks-layer" id="fireworks-layer" aria-hidden="true"></div>
+        <div class="ceremony-intro"><span>Last week’s Verse Champion is…</span></div>
+        <div class="ceremony-content">
+          <div class="month-label">Weekly award ceremony</div>
+          <div class="winner-callout" id="ceremony-callout">🏆 A new champion has risen</div>
+          <h1 class="ceremony-title" id="ceremony-title">Congratulations!</h1>
+          <p class="ceremony-subtitle" id="ceremony-subtitle"></p>
+          <div class="ceremony-stage">
+            <div class="ceremony-rays" aria-hidden="true"></div>
+            <div class="ceremony-podium" id="ceremony-podium"></div>
+          </div>
+          <button class="btn btn-primary" id="btn-ceremony-continue">Begin the new week</button>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <script>
+const VERSES = [
+      { ref: "John 3:16", text: "For God so loved the world that he gave his one and only Son, that whoever believes in him shall not perish but have eternal life." },
+      { ref: "Philippians 4:13", text: "I can do all this through him who gives me strength." },
+      { ref: "Psalm 23:1", text: "The Lord is my shepherd, I lack nothing." },
+      { ref: "Proverbs 3:5-6", text: "Trust in the Lord with all your heart and lean not on your own understanding; in all your ways submit to him, and he will make your paths straight." },
+      { ref: "Romans 8:28", text: "And we know that in all things God works for the good of those who love him, who have been called according to his purpose." },
+      { ref: "Jeremiah 29:11", text: "For I know the plans I have for you, declares the Lord, plans to prosper you and not to harm you, plans to give you hope and a future." },
+      { ref: "Isaiah 41:10", text: "So do not fear, for I am with you; do not be dismayed, for I am your God. I will strengthen you and help you; I will uphold you with my righteous right hand." },
+      { ref: "Matthew 6:33", text: "But seek first his kingdom and his righteousness, and all these things will be given to you as well." },
+      { ref: "Joshua 1:9", text: "Have I not commanded you? Be strong and courageous. Do not be afraid; do not be discouraged, for the Lord your God will be with you wherever you go." },
+      { ref: "Psalm 46:10", text: "He says, Be still, and know that I am God; I will be exalted among the nations, I will be exalted in the earth." },
+      { ref: "Romans 12:2", text: "Do not conform to the pattern of this world, but be transformed by the renewing of your mind." },
+      { ref: "Galatians 5:22-23", text: "But the fruit of the Spirit is love, joy, peace, forbearance, kindness, goodness, faithfulness, gentleness and self-control." },
+      { ref: "Ephesians 2:8-9", text: "For it is by grace you have been saved, through faith—and this is not from yourselves, it is the gift of God—not by works, so that no one can boast." },
+      { ref: "Matthew 11:28", text: "Come to me, all you who are weary and burdened, and I will give you rest." },
+      { ref: "Psalm 119:105", text: "Your word is a lamp for my feet, a light on my path." },
+      { ref: "2 Timothy 1:7", text: "For the Spirit God gave us does not make us timid, but gives us power, love and self-discipline." },
+      { ref: "1 Corinthians 13:4-5", text: "Love is patient, love is kind. It does not envy, it does not boast, it is not proud. It does not dishonor others, it is not self-seeking, it is not easily angered, it keeps no record of wrongs." },
+      { ref: "Hebrews 11:1", text: "Now faith is confidence in what we hope for and assurance about what we do not see." },
+      { ref: "Colossians 3:23", text: "Whatever you do, work at it with all your heart, as working for the Lord, not for human masters." },
+      { ref: "Psalm 27:1", text: "The Lord is my light and my salvation—whom shall I fear? The Lord is the stronghold of my life—of whom shall I be afraid?" },
+      { ref: "Romans 5:8", text: "But God demonstrates his own love for us in this: While we were still sinners, Christ died for us." },
+      { ref: "Isaiah 40:31", text: "But those who hope in the Lord will renew their strength. They will soar on wings like eagles; they will run and not grow weary, they will walk and not be faint." },
+      { ref: "Matthew 5:16", text: "In the same way, let your light shine before others, that they may see your good deeds and glorify your Father in heaven." },
+      { ref: "1 John 4:19", text: "We love because he first loved us." },
+      { ref: "James 1:5", text: "If any of you lacks wisdom, you should ask God, who gives generously to all without finding fault, and it will be given to you." },
+      { ref: "Psalm 139:14", text: "I praise you because I am fearfully and wonderfully made; your works are wonderful, I know that full well." },
+      { ref: "John 14:6", text: "Jesus answered, I am the way and the truth and the life. No one comes to the Father except through me." },
+      { ref: "Philippians 4:6-7", text: "Do not be anxious about anything, but in every situation, by prayer and petition, with thanksgiving, present your requests to God. And the peace of God, which transcends all understanding, will guard your hearts and your minds in Christ Jesus." },
+      { ref: "Micah 6:8", text: "He has shown you, O mortal, what is good. And what does the Lord require of you? To act justly and to love mercy and to walk humbly with your God." },
+      { ref: "Romans 8:38-39", text: "For I am convinced that neither death nor life, neither angels nor demons, neither the present nor the future, nor any powers, neither height nor depth, nor anything else in all creation, will be able to separate us from the love of God that is in Christ Jesus our Lord." },
+      { ref: "Matthew 22:37", text: "Jesus replied: Love the Lord your God with all your heart and with all your soul and with all your mind." },
+      { ref: "Psalm 37:4", text: "Take delight in the Lord, and he will give you the desires of your heart." },
+      { ref: "John 15:5", text: "I am the vine; you are the branches. If you remain in me and I in you, you will bear much fruit; apart from me you can do nothing." },
+      { ref: "2 Corinthians 5:17", text: "Therefore, if anyone is in Christ, the new creation has come: The old has gone, the new is here!" },
+      { ref: "Proverbs 22:6", text: "Start children off on the way they should go, and even when they are old they will not turn from it." },
+      { ref: "Matthew 28:19-20", text: "Therefore go and make disciples of all nations, baptizing them in the name of the Father and of the Son and of the Holy Spirit, and teaching them to obey everything I have commanded you. And surely I am with you always, to the very end of the age." },
+      { ref: "Psalm 51:10", text: "Create in me a pure heart, O God, and renew a steadfast spirit within me." },
+      { ref: "1 Thessalonians 5:16-18", text: "Rejoice always, pray continually, give thanks in all circumstances; for this is God's will for you in Christ Jesus." },
+      { ref: "Ephesians 4:32", text: "Be kind and compassionate to one another, forgiving each other, just as in Christ God forgave you." },
+      { ref: "John 1:1", text: "In the beginning was the Word, and the Word was with God, and the Word was God." },
+      { ref: "Romans 10:9", text: "If you declare with your mouth, Jesus is Lord, and believe in your heart that God raised him from the dead, you will be saved." },
+      { ref: "Psalm 100:1-2", text: "Shout for joy to the Lord, all the earth. Worship the Lord with gladness; come before him with joyful songs." },
+      { ref: "Hebrews 13:8", text: "Jesus Christ is the same yesterday and today and forever." },
+      { ref: "Isaiah 26:3", text: "You will keep in perfect peace those whose minds are steadfast, because they trust in you." },
+      { ref: "Luke 6:31", text: "Do to others as you would have them do to you." },
+      { ref: "1 Peter 5:7", text: "Cast all your anxiety on him because he cares for you." },
+      { ref: "Genesis 1:1", text: "In the beginning God created the heavens and the earth." },
+      { ref: "Revelation 21:4", text: "He will wipe every tear from their eyes. There will be no more death or mourning or crying or pain, for the old order of things has passed away." }
+    ];
+
+    const MONTH_NAMES = ["January","February","March","April","May","June","July","August","September","October","November","December"];
+    const VK_ICON =
+      "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='22' fill='%231a4d4a'/><text x='50' y='68' text-anchor='middle' font-size='52' font-family='Georgia, serif' fill='%23e8d48b'>V</text></svg>";
+
+    const state = {
+      user: null,
+      profile: null,
+      partner: null,
+      verse: null,
+      verseKey: "",
+      mode: null,
+      lastMode: null,
+      round: null,
+      lastNotifyKey: "",
+      authReady: false
+    };
+
+    const localNotifyTimers = [];
+    const MUSIC_TRACKS = {
+      1: { videoId: "3G3vzexbf64", name: "Track 1" },
+      2: { videoId: "NH8uI4EJ0bo", name: "Track 2" }
+    };
+    const MUSIC_VOL_KEY = "vk-music-volume";
+    const MUSIC_TRACK_KEY = "vk-music-track";
+    const THEME_KEY = "vk-theme";
+    const REDUCE_MOTION_KEY = "vk-reduce-motion";
+    const AUTOPLAY_MUSIC_KEY = "vk-autoplay-track2";
+    const SOUND_KEY = "vk-sound-fx";
+    const SHARE_URL = "https://6kevinraphael-tech.github.io/soul-catcher/verse-keepers.html";
+    const BLESSINGS = [
+      "A quiet minute with one verse is enough for today.",
+      "Hide this verse in your heart, then live it out loud.",
+      "Come back tomorrow. Faith grows a little every day.",
+      "Do not rush. Repeat the words until they feel like home.",
+      "Practice is worship when you give it your attention.",
+      "The next verse is waiting, but this one still has more to give.",
+      "Small faithfulness beats a perfect week you never start."
+    ];
+    const ACHIEVEMENTS = [
+      { id: "first-verse", name: "First Light", icon: "✨", desc: "Master your first verse." },
+      { id: "three-verses", name: "Keeper", icon: "📖", desc: "Keep 3 verses in your vault." },
+      { id: "seven-verses", name: "Lamp Bearer", icon: "🏮", desc: "Keep 7 verses in your vault." },
+      { id: "twelve-verses", name: "Word Warrior", icon: "⚔️", desc: "Keep 12 verses in your vault." },
+      { id: "streak-3", name: "Faithful Three", icon: "🔥", desc: "Keep a 3-day streak." },
+      { id: "streak-7", name: "Week of Fire", icon: "🌟", desc: "Keep a 7-day streak." },
+      { id: "quest", name: "Quest Completer", icon: "🎯", desc: "Finish a weekly quest." },
+      { id: "champion", name: "Verse Champion", icon: "🏆", desc: "Win a Monday ceremony." },
+      { id: "level-3", name: "Rising Keeper", icon: "🛡️", desc: "Reach Faith Journey level 3." },
+      { id: "level-6", name: "Crown Seeker", icon: "👑", desc: "Reach Faith Journey level 6." }
+    ];
+    const AVATAR_PRESETS = [
+      { emoji: "🌟", color: "#1a4d4a" },
+      { emoji: "📖", color: "#7868a8" },
+      { emoji: "🕊️", color: "#4b8fa8" },
+      { emoji: "🦁", color: "#d49335" },
+      { emoji: "🌈", color: "#b85f67" },
+      { emoji: "🔥", color: "#8c4a3f" },
+      { emoji: "🌻", color: "#73934b" },
+      { emoji: "🦋", color: "#4d70ae" },
+      { emoji: "⚔️", color: "#455a64" },
+      { emoji: "👑", color: "#8b6b22" },
+      { emoji: "🌊", color: "#287b91" },
+      { emoji: "💜", color: "#724b8f" }
+    ];
+    const JOURNEY_LEVELS = [
+      { title: "Faith Seedling", icon: "🌱" },
+      { title: "Word Explorer", icon: "🧭" },
+      { title: "Verse Keeper", icon: "📖" },
+      { title: "Lamp Bearer", icon: "🏮" },
+      { title: "Wisdom Guardian", icon: "🛡️" },
+      { title: "Scripture Champion", icon: "🏆" },
+      { title: "Lion of Faith", icon: "🦁" },
+      { title: "Crown of Wisdom", icon: "👑" }
+    ];
+    const XP_PER_LEVEL = 120;
+    let youtubePlayer = null;
+    let musicReady = false;
+    let musicWanted = false;
+    let activeTrack = 1;
+
+    function mondayStart(d = new Date()) {
+      const start = new Date(d);
+      const daysSinceMonday = (d.getDay() + 6) % 7;
+      start.setDate(d.getDate() - daysSinceMonday);
+      start.setHours(0, 0, 0, 0);
+      return start;
+    }
+
+    function verseWeekKey(d = new Date()) {
+      const start = mondayStart(d);
+      const y = start.getFullYear();
+      const m = String(start.getMonth() + 1).padStart(2, "0");
+      const day = String(start.getDate()).padStart(2, "0");
+      return `${y}-${m}-${day}`;
+    }
+
+    function weekKey(d = new Date()) {
+      const start = lastSaturdayReset(d);
+      const y = start.getFullYear();
+      const m = String(start.getMonth() + 1).padStart(2, "0");
+      const day = String(start.getDate()).padStart(2, "0");
+      return `${y}-${m}-${day}`;
+    }
+
+    function lastSaturdayReset(d = new Date()) {
+      const start = new Date(d);
+      const daysSinceSat = (d.getDay() + 1) % 7;
+      start.setDate(d.getDate() - daysSinceSat);
+      start.setHours(8, 30, 0, 0);
+      if (d < start) start.setDate(start.getDate() - 7);
+      return start;
+    }
+
+    function nextSaturdayReset(d = new Date()) {
+      const next = lastSaturdayReset(d);
+      next.setDate(next.getDate() + 7);
+      return next;
+    }
+
+    function formatResetCountdown(d = new Date()) {
+      const next = nextSaturdayReset(d);
+      const ms = next - d;
+      if (ms <= 0) return "Resetting now…";
+      const hours = Math.floor(ms / 3600000);
+      const mins = Math.floor((ms % 3600000) / 60000);
+      if (hours >= 48) {
+        const days = Math.floor(hours / 24);
+        return `Next reset: Saturday 8:30 AM (${days}d ${hours % 24}h)`;
+      }
+      if (hours >= 1) return `Next reset: Saturday 8:30 AM (${hours}h ${mins}m)`;
+      return `Next reset: Saturday 8:30 AM (${mins}m)`;
+    }
+
+    function hashString(str) {
+      let h = 2166136261;
+      for (let i = 0; i < str.length; i++) {
+        h ^= str.charCodeAt(i);
+        h = Math.imul(h, 16777619);
+      }
+      return h >>> 0;
+    }
+
+    function verseForWeek(key, progression = 0) {
+      const base = hashString(`verse-keepers-week:${key}`) % VERSES.length;
+      const idx = (base + progression * 7) % VERSES.length;
+      return VERSES[idx];
+    }
+
+    function normalizeTimes(list) {
+      if (!Array.isArray(list)) return [];
+      return [...new Set(list.filter((t) => /^\d{2}:\d{2}$/.test(t)))].sort();
+    }
+
+    function shortName(name) {
+      if (!name) return "Friend";
+      return name.trim().split(/\s+/)[0];
+    }
+
+    function currentName() {
+      return state.profile?.displayName || state.user?.displayName || "Friend";
+    }
+
+    function emailKey(email) {
+      return (email || "").trim().toLowerCase();
+    }
+
+    function showScreen(id) {
+      document.querySelectorAll(".screen").forEach((el) => el.classList.remove("active"));
+      document.getElementById(`screen-${id}`).classList.add("active");
+    }
+
+    function getAutoplayMusic() {
+      return localStorage.getItem(AUTOPLAY_MUSIC_KEY) !== "false";
+    }
+
+    function applyPreferences() {
+      const theme = localStorage.getItem(THEME_KEY) || "calm";
+      const reduceMotion = localStorage.getItem(REDUCE_MOTION_KEY) === "true";
+      document.body.dataset.theme = theme;
+      document.body.classList.toggle("reduce-motion", reduceMotion);
+      document.querySelectorAll("[data-theme-choice]").forEach((button) => {
+        button.classList.toggle("active", button.dataset.themeChoice === theme);
+      });
+      document.getElementById("settings-reduce-motion").checked = reduceMotion;
+      document.getElementById("settings-autoplay").checked = getAutoplayMusic();
+      document.getElementById("settings-sound").checked = localStorage.getItem(SOUND_KEY) !== "false";
+    }
+
+    const LOCAL_ACCOUNTS_KEY = "verse-keepers-local-accounts-v1";
+    let localAccounts = {};
+    let selectedAccountId = null;
+    let setupAvatarData = "";
+
+    function makeLocalProfile(uid, displayName) {
+      return {
+        uid,
+        email: "Local account",
+        displayName,
+        photoURL: "",
+        weekKey: weekKey(),
+        weekScore: 0,
+        memorized: [],
+        masteryLog: [],
+        weeklyVerseKey: verseWeekKey(),
+        weeklyVerseIndex: 0,
+        journeyXP: 0,
+        streakDays: 0,
+        lastActiveDate: "",
+        weeklyQuestRewards: [],
+        badges: [],
+        championships: 0,
+        seenHowTo: false,
+        reminders: [],
+        lastNotifyKey: ""
+      };
+    }
+
+    function loadLocalAccounts() {
+      try {
+        localAccounts = JSON.parse(localStorage.getItem(LOCAL_ACCOUNTS_KEY)) || {};
+      } catch {
+        localAccounts = {};
+      }
+      for (const [uid, profile] of Object.entries(localAccounts)) {
+        localAccounts[uid] = {
+          ...makeLocalProfile(uid, profile.displayName || "Verse Keeper"),
+          ...profile,
+          memorized: Array.isArray(profile.memorized) ? profile.memorized : [],
+          masteryLog: Array.isArray(profile.masteryLog) ? profile.masteryLog : [],
+          journeyXP: Number.isFinite(profile.journeyXP)
+            ? profile.journeyXP
+            : (Array.isArray(profile.memorized) ? profile.memorized.length * XP_PER_LEVEL : 0),
+          streakDays: Number.isFinite(profile.streakDays) ? profile.streakDays : 0,
+          lastActiveDate: profile.lastActiveDate || "",
+          weeklyQuestRewards: Array.isArray(profile.weeklyQuestRewards)
+            ? profile.weeklyQuestRewards
+            : [],
+          badges: Array.isArray(profile.badges) ? profile.badges : [],
+          championships: Number.isFinite(profile.championships) ? profile.championships : 0,
+          seenHowTo: Boolean(profile.seenHowTo),
+          reminders: normalizeTimes(profile.reminders)
+        };
+      }
+    }
+
+    function persistLocalAccounts() {
+      localStorage.setItem(LOCAL_ACCOUNTS_KEY, JSON.stringify(localAccounts));
+    }
+
+    async function saveProfile(patch = {}) {
+      if (!state.user || !state.profile) return;
+      state.profile = { ...state.profile, ...patch };
+      localAccounts[state.user.uid] = state.profile;
+      persistLocalAccounts();
+    }
+
+    function ensureWeeklyVerseProgress() {
+      if (!state.profile) return;
+      const key = verseWeekKey();
+      if (state.profile.weeklyVerseKey !== key) {
+        state.profile.weeklyVerseKey = key;
+        state.profile.weeklyVerseIndex = 0;
+        saveProfile({ weeklyVerseKey: key, weeklyVerseIndex: 0 });
+      }
+      state.verseKey = key;
+      state.verse = verseForWeek(key, state.profile.weeklyVerseIndex || 0);
+    }
+
+    function localDayKey(date = new Date()) {
+      const year = date.getFullYear();
+      const month = String(date.getMonth() + 1).padStart(2, "0");
+      const day = String(date.getDate()).padStart(2, "0");
+      return `${year}-${month}-${day}`;
+    }
+
+    function recordJourneyActivity(earnedXP) {
+      const today = localDayKey();
+      let dailyBonus = 0;
+      if (state.profile.lastActiveDate !== today) {
+        const yesterday = new Date();
+        yesterday.setDate(yesterday.getDate() - 1);
+        state.profile.streakDays =
+          state.profile.lastActiveDate === localDayKey(yesterday)
+            ? (state.profile.streakDays || 0) + 1
+            : 1;
+        state.profile.lastActiveDate = today;
+        dailyBonus = 15;
+      }
+      state.profile.journeyXP =
+        (state.profile.journeyXP || 0) + earnedXP + dailyBonus;
+      return dailyBonus;
+    }
+
+    function awardWeeklyQuestIfReady() {
+      const key = verseWeekKey();
+      const mastered = state.profile.masteryLog.filter(
+        (entry) => entry.verseKey === key
+      ).length;
+      if (
+        mastered >= 3 &&
+        !state.profile.weeklyQuestRewards.includes(key)
+      ) {
+        state.profile.weeklyQuestRewards = [
+          ...state.profile.weeklyQuestRewards,
+          key
+        ];
+        state.profile.journeyXP = (state.profile.journeyXP || 0) + 50;
+        return 50;
+      }
+      return 0;
+    }
+
+    function updateProgressionUI() {
+      if (!state.profile) return;
+      const xp = state.profile.journeyXP || 0;
+      const levelIndex = Math.min(
+        Math.floor(xp / XP_PER_LEVEL),
+        JOURNEY_LEVELS.length - 1
+      );
+      const level = JOURNEY_LEVELS[levelIndex];
+      const isMaxLevel = levelIndex === JOURNEY_LEVELS.length - 1;
+      const levelStart = levelIndex * XP_PER_LEVEL;
+      const progressXP = isMaxLevel ? XP_PER_LEVEL : xp - levelStart;
+      const progressPercent = isMaxLevel
+        ? 100
+        : Math.round((progressXP / XP_PER_LEVEL) * 100);
+
+      document.getElementById("journey-emblem").textContent = level.icon;
+      document.getElementById("journey-level").textContent = levelIndex + 1;
+      document.getElementById("journey-title").textContent = level.title;
+      document.getElementById("journey-xp").textContent = isMaxLevel
+        ? `${xp} lifetime XP`
+        : `${progressXP} / ${XP_PER_LEVEL} XP`;
+      document.getElementById("journey-progress").style.width = `${progressPercent}%`;
+      document.getElementById("journey-next").textContent = isMaxLevel
+        ? "Highest journey title unlocked — keep building your lifetime XP!"
+        : `${XP_PER_LEVEL - progressXP} XP until ${JOURNEY_LEVELS[levelIndex + 1].title}`;
+
+      const streak = state.profile.streakDays || 0;
+      const yesterday = new Date();
+      yesterday.setDate(yesterday.getDate() - 1);
+      const streakIsAlive =
+        state.profile.lastActiveDate === localDayKey() ||
+        state.profile.lastActiveDate === localDayKey(yesterday);
+      const visibleStreak = streakIsAlive ? streak : 0;
+      document.getElementById("journey-streak").textContent =
+        `🔥 ${visibleStreak}-day streak`;
+
+      const mastered = state.profile.masteryLog.filter(
+        (entry) => entry.verseKey === verseWeekKey()
+      ).length;
+      const questProgress = Math.min(mastered, 3);
+      const questComplete = state.profile.weeklyQuestRewards.includes(verseWeekKey());
+      document.getElementById("journey-quest").textContent = questComplete
+        ? "Weekly quest complete! ✨"
+        : `Weekly quest · ${questProgress}/3`;
+      const dots = document.getElementById("journey-quest-dots");
+      dots.innerHTML = "";
+      for (let index = 0; index < 3; index++) {
+        const dot = document.createElement("span");
+        dot.className = `quest-dot${index < questProgress ? " complete" : ""}`;
+        dots.appendChild(dot);
+      }
+    }
+
+    function soundEnabled() {
+      return localStorage.getItem(SOUND_KEY) !== "false";
+    }
+
+    function playChime(kind = "success") {
+      if (!soundEnabled()) return;
+      const AudioCtx = window.AudioContext || window.webkitAudioContext;
+      if (!AudioCtx) return;
+      const ctx = new AudioCtx();
+      const notes = kind === "badge"
+        ? [523, 659, 784]
+        : kind === "mastery"
+          ? [392, 523, 659, 784]
+          : [440, 554];
+      notes.forEach((freq, index) => {
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        osc.type = "sine";
+        osc.frequency.value = freq;
+        gain.gain.setValueAtTime(0.0001, ctx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.08, ctx.currentTime + 0.02 + index * 0.08);
+        gain.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime + 0.28 + index * 0.1);
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+        osc.start(ctx.currentTime + index * 0.08);
+        osc.stop(ctx.currentTime + 0.36 + index * 0.1);
+      });
+      setTimeout(() => ctx.close(), 900);
+    }
+
+    function showToast(title, detail) {
+      const stack = document.getElementById("toast-stack");
+      const toast = document.createElement("div");
+      toast.className = "toast";
+      toast.innerHTML = `<strong>${title}</strong><span>${detail}</span>`;
+      stack.appendChild(toast);
+      setTimeout(() => toast.remove(), 4200);
+    }
+
+    function launchConfetti() {
+      const layer = document.getElementById("confetti-layer");
+      layer.innerHTML = "";
+      if (document.body.classList.contains("reduce-motion")) return;
+      const colors = ["#f2c94c", "#ff6b6b", "#62d2a2", "#70a1ff", "#c56cf0", "#ffffff"];
+      for (let i = 0; i < 42; i++) {
+        const piece = document.createElement("span");
+        piece.className = "confetti-piece";
+        piece.style.left = `${Math.random() * 100}%`;
+        piece.style.setProperty("--confetti-color", colors[i % colors.length]);
+        piece.style.animationDelay = `${Math.random() * 0.35}s`;
+        piece.style.transform = `rotate(${Math.random() * 180}deg)`;
+        layer.appendChild(piece);
+      }
+      setTimeout(() => { layer.innerHTML = ""; }, 2200);
+    }
+
+    function dailyBlessing() {
+      return BLESSINGS[hashString(localDayKey()) % BLESSINGS.length];
+    }
+
+    function updateBlessingUI() {
+      document.getElementById("daily-blessing").textContent = dailyBlessing();
+    }
+
+    function updateBadgeUI() {
+      if (!state.profile) return;
+      const earned = new Set(state.profile.badges || []);
+      document.getElementById("badge-count").textContent =
+        `${earned.size} / ${ACHIEVEMENTS.length}`;
+      const grid = document.getElementById("badge-grid");
+      grid.innerHTML = "";
+      ACHIEVEMENTS.forEach((badge) => {
+        const tile = document.createElement("div");
+        tile.className = `badge-tile${earned.has(badge.id) ? " earned" : ""}`;
+        tile.title = badge.desc;
+        tile.innerHTML = `<span class="icon">${badge.icon}</span><span class="name">${badge.name}</span>`;
+        grid.appendChild(tile);
+      });
+    }
+
+    function unlockReadyAchievements() {
+      if (!state.profile) return [];
+      const earned = new Set(state.profile.badges || []);
+      const vault = (state.profile.memorized || []).length;
+      const streak = state.profile.streakDays || 0;
+      const level = Math.floor((state.profile.journeyXP || 0) / XP_PER_LEVEL) + 1;
+      const checks = {
+        "first-verse": vault >= 1,
+        "three-verses": vault >= 3,
+        "seven-verses": vault >= 7,
+        "twelve-verses": vault >= 12,
+        "streak-3": streak >= 3,
+        "streak-7": streak >= 7,
+        "quest": (state.profile.weeklyQuestRewards || []).length >= 1,
+        "champion": (state.profile.championships || 0) >= 1,
+        "level-3": level >= 3,
+        "level-6": level >= 6
+      };
+      const newly = ACHIEVEMENTS.filter((badge) => checks[badge.id] && !earned.has(badge.id));
+      if (!newly.length) return [];
+      state.profile.badges = [...earned, ...newly.map((badge) => badge.id)];
+      saveProfile({ badges: state.profile.badges });
+      newly.forEach((badge) => {
+        showToast(`${badge.icon} ${badge.name}`, badge.desc);
+      });
+      playChime("badge");
+      updateBadgeUI();
+      return newly;
+    }
+
+    async function shareVerseKeepers() {
+      const payload = {
+        title: "Verse Keepers",
+        text: "Play Verse Keepers with me — memorize Bible verses, keep a streak, and fight for the weekly podium.",
+        url: SHARE_URL
+      };
+      try {
+        if (navigator.share) {
+          await navigator.share(payload);
+          return;
+        }
+      } catch {
+        return;
+      }
+      try {
+        await navigator.clipboard.writeText(SHARE_URL);
+        showToast("Link copied", "Send it to your sister or a friend.");
+      } catch {
+        prompt("Copy this Verse Keepers link:", SHARE_URL);
+      }
+    }
+
+    function continueAfterLogin() {
+      if (maybeShowWeeklyCeremony()) return;
+      if (!state.profile.seenHowTo) {
+        showScreen("howto");
+        return;
+      }
+      showScreen("home");
+    }
+
+    function applyWeeklyResetIfNeeded() {
+      if (!state.profile) return false;
+      const key = weekKey();
+      if (state.profile.weekKey !== key) {
+        state.profile.weekKey = key;
+        state.profile.weekScore = 0;
+        saveProfile({ weekKey: key, weekScore: 0 });
+        return true;
+      }
+      return false;
+    }
+
+    async function loadPartner() {
+      if (!state.user) return;
+      const partnerEntry = Object.entries(localAccounts)
+        .find(([uid]) => uid !== state.user.uid);
+      if (!partnerEntry) {
+        state.partner = null;
+        return;
+      }
+      const data = partnerEntry[1];
+      let weekScore = data.weekScore || 0;
+      if (data.weekKey !== weekKey()) weekScore = 0;
+      state.partner = {
+        ...data,
+        weekScore,
+        memorized: Array.isArray(data.memorized) ? data.memorized : []
+      };
+    }
+
+    function setAvatar(imgEl, fallbackEl, photoURL, name) {
+      if (photoURL) {
+        imgEl.src = photoURL;
+        imgEl.classList.remove("hidden");
+        fallbackEl.classList.add("hidden");
+      } else {
+        imgEl.classList.add("hidden");
+        fallbackEl.classList.remove("hidden");
+        fallbackEl.textContent = (name || "V").trim().charAt(0).toUpperCase();
+      }
+    }
+
+    function makePresetAvatar(emoji, color) {
+      const canvas = document.createElement("canvas");
+      canvas.width = 192;
+      canvas.height = 192;
+      const ctx = canvas.getContext("2d");
+      ctx.fillStyle = color;
+      ctx.fillRect(0, 0, 192, 192);
+      ctx.font = '104px "Apple Color Emoji", "Segoe UI Emoji", sans-serif';
+      ctx.textAlign = "center";
+      ctx.textBaseline = "middle";
+      ctx.fillText(emoji, 96, 103);
+      return canvas.toDataURL("image/png");
+    }
+
+    function renderAvatarOptions(containerId, onChoose) {
+      const container = document.getElementById(containerId);
+      container.innerHTML = "";
+      AVATAR_PRESETS.forEach(({ emoji, color }) => {
+        const button = document.createElement("button");
+        button.type = "button";
+        button.className = "avatar-option";
+        button.textContent = emoji;
+        button.style.background = color;
+        button.setAttribute("aria-label", `Choose ${emoji} avatar`);
+        button.addEventListener("click", () => {
+          container.querySelectorAll(".avatar-option").forEach((item) =>
+            item.classList.remove("selected")
+          );
+          button.classList.add("selected");
+          onChoose(makePresetAvatar(emoji, color));
+        });
+        container.appendChild(button);
+      });
+    }
+
+    function updateSettingsAvatarPreview() {
+      if (!state.profile) return;
+      setAvatar(
+        document.getElementById("settings-avatar-photo"),
+        document.getElementById("settings-avatar-fallback"),
+        state.profile.photoURL,
+        state.profile.displayName
+      );
+    }
+
+    function updateHome() {
+      if (!state.profile) return;
+      applyWeeklyResetIfNeeded();
+      const d = new Date();
+      ensureWeeklyVerseProgress();
+
+      const monday = mondayStart(d);
+      const masteredThisWeek = state.profile.masteryLog.filter(
+        (entry) => entry.verseKey === state.verseKey
+      ).length;
+      document.getElementById("home-month").textContent =
+        `Week of ${MONTH_NAMES[monday.getMonth()]} ${monday.getDate()}, ${monday.getFullYear()} · Verse ${masteredThisWeek + 1}`;
+      document.getElementById("home-ref").textContent = state.verse.ref;
+      document.getElementById("home-verse").textContent = `"${state.verse.text}"`;
+
+      document.getElementById("user-name").textContent = state.profile.displayName;
+      document.getElementById("user-email").textContent = state.profile.email || "";
+      setAvatar(
+        document.getElementById("user-photo"),
+        document.getElementById("user-avatar"),
+        state.profile.photoURL || state.user?.photoURL,
+        state.profile.displayName
+      );
+
+      const mine = state.profile.memorized.includes(state.verse.ref);
+      const partnerMine = state.partner?.memorized?.includes(state.verse.ref);
+      const monthStatus = document.getElementById("month-status");
+      if (mine && partnerMine) {
+        monthStatus.textContent = "This week: both memorized!";
+        monthStatus.className = "status-pill done";
+      } else if (mine) {
+        monthStatus.textContent = "This week: you memorized it";
+        monthStatus.className = "status-pill done";
+      } else if (partnerMine) {
+        monthStatus.textContent = `This week: ${shortName(state.partner.displayName)} memorized it`;
+        monthStatus.className = "status-pill done";
+      } else {
+        monthStatus.textContent = "This week: not memorized yet";
+        monthStatus.className = "status-pill";
+      }
+
+      document.getElementById("week-note").textContent = formatResetCountdown(d);
+      updateScoresUI();
+      updateVaultUI();
+      updateProgressionUI();
+      updateLeaderboardUI();
+      updateRemindersUI();
+      updateBlessingUI();
+      updateBadgeUI();
+    }
+
+    function updateLeaderboardUI() {
+      const list = document.getElementById("leaderboard-list");
+      const currentWeek = weekKey();
+      const currentVerseWeek = verseWeekKey();
+      const ranked = Object.values(localAccounts)
+        .map((profile) => ({
+          ...profile,
+          displayScore: profile.weekKey === currentWeek ? profile.weekScore || 0 : 0,
+          vaultCount: Array.isArray(profile.memorized) ? profile.memorized.length : 0,
+          masteredThisWeek: (profile.masteryLog || []).filter(
+            (entry) => entry.verseKey === currentVerseWeek
+          ).length
+        }))
+        .sort((a, b) =>
+          b.masteredThisWeek - a.masteredThisWeek ||
+          b.displayScore - a.displayScore ||
+          b.vaultCount - a.vaultCount ||
+          a.displayName.localeCompare(b.displayName)
+        );
+
+      list.innerHTML = "";
+      ranked.forEach((profile, index) => {
+        const row = document.createElement("div");
+        row.className = `leaderboard-row${profile.uid === state.user?.uid ? " current" : ""}`;
+
+        const rank = document.createElement("div");
+        rank.className = "leaderboard-rank";
+        rank.textContent = ["🥇", "🥈", "🥉"][index] || `#${index + 1}`;
+
+        let avatar;
+        if (profile.photoURL) {
+          avatar = document.createElement("img");
+          avatar.src = profile.photoURL;
+          avatar.alt = "";
+        } else {
+          avatar = document.createElement("div");
+          avatar.className = "avatar-fallback";
+          avatar.textContent = profile.displayName.charAt(0).toUpperCase();
+        }
+
+        const identity = document.createElement("div");
+        identity.className = "leaderboard-name";
+        identity.textContent = profile.displayName;
+        const vault = document.createElement("span");
+        vault.className = "leaderboard-vault";
+        vault.textContent =
+          `${profile.masteredThisWeek} mastered this week · ${profile.vaultCount} total`;
+        identity.appendChild(vault);
+
+        const points = document.createElement("div");
+        points.className = "leaderboard-points";
+        points.textContent = `${profile.displayScore} pts`;
+
+        row.append(rank, avatar, identity, points);
+        list.appendChild(row);
+      });
+    }
+
+    function previousVerseWeekKey() {
+      const previousMonday = mondayStart();
+      previousMonday.setDate(previousMonday.getDate() - 7);
+      return verseWeekKey(previousMonday);
+    }
+
+    function launchFireworks() {
+      const layer = document.getElementById("fireworks-layer");
+      layer.innerHTML = "";
+      if (document.body.classList.contains("reduce-motion")) return;
+      const colors = ["#f2c94c", "#ff6b6b", "#62d2a2", "#70a1ff", "#c56cf0", "#ffffff"];
+      for (let burst = 0; burst < 6; burst++) {
+        const originX = 12 + Math.random() * 76;
+        const originY = 10 + Math.random() * 55;
+        for (let sparkIndex = 0; sparkIndex < 14; sparkIndex++) {
+          const angle = (Math.PI * 2 * sparkIndex) / 14;
+          const distance = 45 + Math.random() * 65;
+          const spark = document.createElement("span");
+          spark.className = "firework-spark";
+          spark.style.left = `${originX}%`;
+          spark.style.top = `${originY}%`;
+          spark.style.setProperty("--spark-x", `${Math.cos(angle) * distance}px`);
+          spark.style.setProperty("--spark-y", `${Math.sin(angle) * distance}px`);
+          spark.style.setProperty("--spark-delay", `${burst * 0.24 + Math.random() * 0.1}s`);
+          spark.style.setProperty("--spark-color", colors[(sparkIndex + burst) % colors.length]);
+          layer.appendChild(spark);
+        }
+      }
+    }
+
+    function maybeShowWeeklyCeremony() {
+      if (!state.profile) return false;
+      const currentKey = verseWeekKey();
+      if (state.profile.lastCeremonyKey === currentKey) return false;
+
+      const previousKey = previousVerseWeekKey();
+      const standings = Object.values(localAccounts)
+        .map((profile) => ({
+          uid: profile.uid,
+          name: profile.displayName,
+          photoURL: profile.photoURL || "",
+          mastered: (profile.masteryLog || []).filter(
+            (entry) => entry.verseKey === previousKey
+          ).length
+        }))
+        .sort((a, b) => b.mastered - a.mastered || a.name.localeCompare(b.name));
+
+      if (!standings.length || standings[0].mastered === 0) {
+        state.profile.lastCeremonyKey = currentKey;
+        saveProfile({ lastCeremonyKey: currentKey });
+        return false;
+      }
+
+      const topScore = standings[0].mastered;
+      const winners = standings.filter((entry) => entry.mastered === topScore);
+      if (winners.some((entry) => entry.uid === state.user.uid)) {
+        state.profile.championships = (state.profile.championships || 0) + 1;
+      }
+      state.profile.lastCeremonyKey = currentKey;
+      saveProfile({
+        lastCeremonyKey: currentKey,
+        championships: state.profile.championships || 0
+      });
+      unlockReadyAchievements();
+      const winnerNames = winners.map((entry) => shortName(entry.name));
+      const winnerText = winnerNames.length === 1
+        ? winnerNames[0]
+        : winnerNames.length === 2
+          ? winnerNames.join(" & ")
+          : `${winnerNames.slice(0, -1).join(", ")} & ${winnerNames.at(-1)}`;
+      const currentPlayerWon = winners.some((entry) => entry.uid === state.user.uid);
+
+      document.getElementById("ceremony-title").textContent =
+        `Congratulations, ${winnerText}!`;
+      document.getElementById("ceremony-callout").textContent = currentPlayerWon
+        ? "🏆 You won last week’s Verse Championship!"
+        : `🏆 ${winnerText} won last week’s Verse Championship!`;
+      document.getElementById("ceremony-subtitle").textContent =
+        `${topScore} verse${topScore === 1 ? "" : "s"} mastered last week. Your dedication earned a place on the podium!`;
+
+      const podium = document.getElementById("ceremony-podium");
+      podium.innerHTML = "";
+      const podiumOrder = [
+        { entry: standings[1], place: 2, className: "second" },
+        { entry: standings[0], place: 1, className: "first" },
+        { entry: standings[2], place: 3, className: "third" }
+      ];
+      podiumOrder.forEach(({ entry, place, className }) => {
+        const slot = document.createElement("div");
+        slot.className = `podium-slot ${className}`;
+        if (!entry) {
+          slot.setAttribute("aria-hidden", "true");
+          podium.appendChild(slot);
+          return;
+        }
+
+        const person = document.createElement("div");
+        person.className = "podium-person";
+        if (place === 1) {
+          const crown = document.createElement("span");
+          crown.className = "podium-crown";
+          crown.textContent = "👑";
+          person.appendChild(crown);
+        }
+        let avatar;
+        if (entry.photoURL) {
+          avatar = document.createElement("img");
+          avatar.src = entry.photoURL;
+          avatar.alt = "";
+        } else {
+          avatar = document.createElement("div");
+          avatar.className = "avatar-fallback";
+          avatar.textContent = entry.name.charAt(0).toUpperCase();
+        }
+        const name = document.createElement("span");
+        name.className = "podium-name";
+        name.textContent = entry.name;
+        person.append(avatar, name);
+
+        const block = document.createElement("div");
+        block.className = "podium-block";
+        const medal = document.createElement("span");
+        medal.className = "podium-medal";
+        medal.textContent = ["", "🥇", "🥈", "🥉"][place];
+        const score = document.createElement("span");
+        score.className = "podium-score";
+        score.textContent = `${entry.mastered} mastered`;
+        block.append(medal, score);
+        slot.append(person, block);
+        podium.appendChild(slot);
+      });
+
+      showScreen("ceremony");
+      const ceremonyScreen = document.getElementById("screen-ceremony");
+      ceremonyScreen.classList.remove("cutscene-playing");
+      void ceremonyScreen.offsetWidth;
+      ceremonyScreen.classList.add("cutscene-playing");
+      launchFireworks();
+      return true;
+    }
+
+    function updateVaultUI() {
+      const mine = state.profile?.memorized || [];
+      const theirs = state.partner?.memorized || [];
+      const unique = new Set([...mine, ...theirs]);
+      document.getElementById("vault-total").textContent =
+        `${unique.size} verse${unique.size === 1 ? "" : "s"} together`;
+      document.getElementById("vault-name-1").textContent = currentName();
+      document.getElementById("vault-pts-1").textContent = mine.length;
+      document.getElementById("vault-name-2").textContent = state.partner
+        ? state.partner.displayName
+        : "Partner";
+      document.getElementById("vault-pts-2").textContent = state.partner
+        ? theirs.length
+        : "—";
+
+      const list = document.getElementById("memorized-list");
+      if (!mine.length) {
+        list.innerHTML = `<span class="mem-pill">No verses locked in yet — practice to prove it</span>`;
+        return;
+      }
+      list.innerHTML = mine.map((ref) => `<span class="mem-pill">${ref}</span>`).join("");
+    }
+
+    function updateScoresUI() {
+      const me = shortName(currentName());
+      const partnerLabel = state.partner ? shortName(state.partner.displayName) : "Partner";
+      document.getElementById("score-name-1").textContent = me;
+      document.getElementById("score-pts-1").textContent = state.profile?.weekScore || 0;
+      document.getElementById("score-name-2").textContent = partnerLabel;
+      document.getElementById("score-pts-2").textContent = state.partner
+        ? state.partner.weekScore || 0
+        : "—";
+      document.getElementById("result-name-1").textContent = me;
+      document.getElementById("result-pts-1").textContent = state.profile?.weekScore || 0;
+      document.getElementById("result-name-2").textContent = partnerLabel;
+      document.getElementById("result-pts-2").textContent = state.partner
+        ? state.partner.weekScore || 0
+        : "—";
+      document.getElementById("turn-pill").textContent = me;
+      document.getElementById("game-turn").textContent = me;
+      if (state.verse) document.getElementById("mode-ref").textContent = state.verse.ref;
+    }
+
+    function tokenize(text) {
+      return text.match(/[A-Za-z']+|[^A-Za-z'\s]+|\s+/g) || [];
+    }
+
+    function wordsOnly(text) {
+      return text.match(/[A-Za-z']+/g) || [];
+    }
+
+    function normalize(text) {
+      return text
+        .toLowerCase()
+        .replace(/[—–]/g, " ")
+        .replace(/[^a-z0-9\s']/g, "")
+        .replace(/\s+/g, " ")
+        .trim();
+    }
+
+    function shuffle(arr) {
+      const a = [...arr];
+      for (let i = a.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [a[i], a[j]] = [a[j], a[i]];
+      }
+      return a;
+    }
+
+    function setProgress(pct) {
+      document.getElementById("progress-bar").style.width = `${Math.max(0, Math.min(100, pct))}%`;
+    }
+
+    async function awardPoints(earned, detail, perfect) {
+      applyWeeklyResetIfNeeded();
+      state.profile.weekScore = (state.profile.weekScore || 0) + earned;
+      const previousLevel = Math.min(
+        Math.floor((state.profile.journeyXP || 0) / XP_PER_LEVEL),
+        JOURNEY_LEVELS.length - 1
+      );
+      const dailyBonus = recordJourneyActivity(earned);
+      const newLevel = Math.min(
+        Math.floor(state.profile.journeyXP / XP_PER_LEVEL),
+        JOURNEY_LEVELS.length - 1
+      );
+      await saveProfile({
+        weekScore: state.profile.weekScore,
+        weekKey: state.profile.weekKey,
+        journeyXP: state.profile.journeyXP,
+        streakDays: state.profile.streakDays,
+        lastActiveDate: state.profile.lastActiveDate
+      });
+      await loadPartner();
+      updateScoresUI();
+      updateVaultUI();
+      updateProgressionUI();
+      document.getElementById("result-emoji").textContent = perfect ? "🌟" : earned > 0 ? "✨" : "💪";
+      document.getElementById("result-title").textContent = perfect
+        ? `${shortName(currentName())} nailed it!`
+        : earned > 0
+          ? `Great try, ${shortName(currentName())}!`
+          : `Keep going, ${shortName(currentName())}!`;
+      document.getElementById("result-detail").textContent =
+        `${detail} +${earned} journey XP${dailyBonus ? ` · Daily return bonus +${dailyBonus} XP!` : ""}${newLevel > previousLevel ? ` · New title unlocked: ${JOURNEY_LEVELS[newLevel].title}!` : ""}`;
+      document.getElementById("result-streak").textContent = state.partner
+        ? `Week: you ${state.profile.weekScore} · ${shortName(state.partner.displayName)} ${state.partner.weekScore || 0}`
+        : `Week score: ${state.profile.weekScore} · Vault: ${state.profile.memorized.length}`;
+      if (perfect) {
+        launchConfetti();
+        playChime("success");
+      }
+      if (newLevel > previousLevel) {
+        showToast(`${JOURNEY_LEVELS[newLevel].icon} ${JOURNEY_LEVELS[newLevel].title}`, "A new Faith Journey title is yours.");
+      }
+      unlockReadyAchievements();
+      showScreen("result");
+    }
+
+    /* -------- REMINDERS -------- */
+
+    function formatDisplayTime(hhmm) {
+      const [h, m] = hhmm.split(":").map(Number);
+      const d = new Date();
+      d.setHours(h, m, 0, 0);
+      return d.toLocaleTimeString([], { hour: "numeric", minute: "2-digit" });
+    }
+
+    function nextOccurrence(hhmm, from = new Date()) {
+      const [h, m] = hhmm.split(":").map(Number);
+      const d = new Date(from);
+      d.setHours(h, m, 0, 0);
+      if (d <= from) d.setDate(d.getDate() + 1);
+      return d;
+    }
+
+    function permissionLabel() {
+      if (!("Notification" in window)) return "Notifications are not supported in this browser.";
+      if (Notification.permission === "granted") return "Notifications on — reminders will ping at your times.";
+      if (Notification.permission === "denied") return "Notifications blocked — enable them in browser settings.";
+      return "Notifications off — tap Enable to allow reminders.";
+    }
+
+    function updateRemindersUI() {
+      document.getElementById("reminder-for").textContent =
+        `Reminder times for ${currentName()}.`;
+      document.getElementById("notify-status").textContent = permissionLabel();
+      const list = document.getElementById("reminder-list");
+      const times = state.profile?.reminders || [];
+      if (!times.length) {
+        list.innerHTML = `<p class="empty-hint">No reminder times yet. Add one below.</p>`;
+        return;
+      }
+      list.innerHTML = times
+        .map(
+          (t, idx) => `
+          <div class="reminder-row">
+            <span class="time">${formatDisplayTime(t)}</span>
+            <button type="button" class="remove" data-remove-reminder="${idx}">Remove</button>
+          </div>`
+        )
+        .join("");
+      list.querySelectorAll("[data-remove-reminder]").forEach((btn) => {
+        btn.addEventListener("click", async () => {
+          const i = Number(btn.getAttribute("data-remove-reminder"));
+          state.profile.reminders = state.profile.reminders.filter((_, idx) => idx !== i);
+          await saveProfile({ reminders: state.profile.reminders });
+          updateRemindersUI();
+          scheduleAllReminders();
+        });
+      });
+    }
+
+    async function addReminderTime(hhmm) {
+      if (!/^\d{2}:\d{2}$/.test(hhmm)) return false;
+      const set = new Set(state.profile.reminders || []);
+      if (set.has(hhmm)) return false;
+      state.profile.reminders = normalizeTimes([...set, hhmm]);
+      await saveProfile({ reminders: state.profile.reminders });
+      updateRemindersUI();
+      scheduleAllReminders();
+      return true;
+    }
+
+    async function registerSW() {
+      if (!("serviceWorker" in navigator)) return null;
+      try {
+        return await navigator.serviceWorker.register("sw.js");
+      } catch {
+        return null;
+      }
+    }
+
+    async function postReminderToSW(when) {
+      const payload = {
+        type: "schedule-reminder",
+        when,
+        title: "Verse Keepers",
+        body: `${shortName(currentName())} — time to practice ${state.verse.ref}`,
+        tag: `vk-${state.user.uid}-${when}`,
+        icon: VK_ICON,
+        url: "./verse-keepers.html"
+      };
+      if (navigator.serviceWorker?.controller) {
+        navigator.serviceWorker.controller.postMessage(payload);
+        return;
+      }
+      const reg = await navigator.serviceWorker?.ready;
+      reg?.active?.postMessage(payload);
+    }
+
+    function clearLocalNotifyTimers() {
+      while (localNotifyTimers.length) clearTimeout(localNotifyTimers.pop());
+    }
+
+    function showVerseNotify(hhmm) {
+      if (!("Notification" in window) || Notification.permission !== "granted") return;
+      if (!state.profile) return;
+      const key = `${verseWeekKey()}-${new Date().toDateString()}-${hhmm}-${state.user.uid}`;
+      if (state.profile.lastNotifyKey === key) return;
+      state.profile.lastNotifyKey = key;
+      saveProfile({ lastNotifyKey: key });
+
+      const title = "Verse Keepers";
+      const body = `${shortName(currentName())} — time to practice ${state.verse.ref}`;
+      if (navigator.serviceWorker) {
+        navigator.serviceWorker.ready
+          .then((reg) =>
+            reg.showNotification(title, {
+              body,
+              icon: VK_ICON,
+              tag: `vk-${hhmm}`,
+              requireInteraction: true,
+              data: { url: "./verse-keepers.html" }
+            })
+          )
+          .catch(() => new Notification(title, { body, icon: VK_ICON }));
+      } else {
+        new Notification(title, { body, icon: VK_ICON });
+      }
+    }
+
+    async function scheduleAllReminders() {
+      clearLocalNotifyTimers();
+      if (!state.profile || !("Notification" in window) || Notification.permission !== "granted") return;
+      for (const hhmm of state.profile.reminders || []) {
+        const whenDate = nextOccurrence(hhmm);
+        const when = whenDate.getTime();
+        const delay = when - Date.now();
+        if (delay <= 0 || delay > 86400000) continue;
+        await postReminderToSW(when);
+        localNotifyTimers.push(
+          setTimeout(() => {
+            showVerseNotify(hhmm);
+            scheduleAllReminders();
+          }, delay)
+        );
+      }
+    }
+
+    function checkDueReminders() {
+      if (!state.profile || !("Notification" in window) || Notification.permission !== "granted") return;
+      const now = new Date();
+      const hhmm = `${String(now.getHours()).padStart(2, "0")}:${String(now.getMinutes()).padStart(2, "0")}`;
+      if ((state.profile.reminders || []).includes(hhmm)) showVerseNotify(hhmm);
+    }
+
+    async function enableNotifications() {
+      if (!("Notification" in window)) {
+        document.getElementById("notify-status").textContent =
+          "Notifications are not supported here. Try Chrome or Safari on your phone.";
+        return;
+      }
+      await registerSW();
+      const perm = await Notification.requestPermission();
+      updateRemindersUI();
+      if (perm === "granted") await scheduleAllReminders();
+    }
+
+    async function sendTestNotification() {
+      if (!("Notification" in window)) return;
+      if (Notification.permission !== "granted") {
+        await enableNotifications();
+        if (Notification.permission !== "granted") return;
+      }
+      const title = "Verse Keepers";
+      const body = `${currentName()} — test reminder for ${state.verse.ref}`;
+      try {
+        const reg = await navigator.serviceWorker?.ready;
+        if (reg) {
+          await reg.showNotification(title, {
+            body,
+            icon: VK_ICON,
+            tag: "vk-test",
+            data: { url: "./verse-keepers.html" }
+          });
+        } else {
+          new Notification(title, { body, icon: VK_ICON });
+        }
+        document.getElementById("notify-status").textContent = "Test notification sent.";
+      } catch {
+        new Notification(title, { body, icon: VK_ICON });
+      }
+    }
+
+    /* -------- BACKGROUND MUSIC -------- */
+
+    function getSavedVolume() {
+      const raw = localStorage.getItem(MUSIC_VOL_KEY);
+      const n = raw == null ? 40 : Number(raw);
+      return Number.isFinite(n) ? Math.min(100, Math.max(0, n)) : 40;
+    }
+
+    function getSavedTrack() {
+      const raw = Number(localStorage.getItem(MUSIC_TRACK_KEY) || "1");
+      return raw === 2 ? 2 : 1;
+    }
+
+    function setMusicVolumeUI(pct) {
+      document.getElementById("music-volume").value = String(pct);
+      document.getElementById("music-volume").setAttribute("aria-valuenow", String(pct));
+      document.getElementById("music-volume-label").textContent = `Volume ${pct}%`;
+      document.getElementById("settings-volume").value = String(pct);
+      document.getElementById("settings-volume-label").textContent = `Volume ${pct}%`;
+      if (youtubePlayer?.setVolume) youtubePlayer.setVolume(pct);
+    }
+
+    function updateMusicToggleUI() {
+      const btn = document.getElementById("btn-music-toggle");
+      const playing = youtubePlayer?.getPlayerState?.() === window.YT?.PlayerState?.PLAYING;
+      btn.textContent = playing ? "Pause" : "Play";
+      btn.classList.toggle("off", !playing);
+    }
+
+    function updateTrackButtons() {
+      document.querySelectorAll("[data-track]").forEach((btn) => {
+        btn.classList.toggle("active", Number(btn.getAttribute("data-track")) === activeTrack);
+      });
+    }
+
+    function musicStatusForTrack(ok) {
+      const track = MUSIC_TRACKS[activeTrack];
+      if (ok) {
+        document.getElementById("music-status").textContent =
+          `${track.name} ready — press Play.`;
+      } else {
+        document.getElementById("music-status").textContent =
+          "YouTube could not load this track. Check your connection or the video's embed settings.";
+      }
+    }
+
+    function loadTrack(trackId, { autoplay = false } = {}) {
+      activeTrack = trackId === 2 ? 2 : 1;
+      localStorage.setItem(MUSIC_TRACK_KEY, String(activeTrack));
+      updateTrackButtons();
+      const track = MUSIC_TRACKS[activeTrack];
+      const shouldPlay = autoplay || musicWanted;
+      if (shouldPlay) musicWanted = true;
+      if (!youtubePlayer?.loadVideoById) {
+        document.getElementById("music-status").textContent = "Loading YouTube player…";
+        return;
+      }
+      if (shouldPlay) {
+        youtubePlayer.loadVideoById(track.videoId);
+      } else {
+        youtubePlayer.cueVideoById(track.videoId);
+      }
+      youtubePlayer.setVolume(getSavedVolume());
+      musicStatusForTrack(true);
+    }
+
+    function initBackgroundMusic() {
+      const pct = getSavedVolume();
+      setMusicVolumeUI(pct);
+      activeTrack = getSavedTrack();
+      updateTrackButtons();
+      document.getElementById("music-status").textContent = "Loading YouTube player…";
+
+      window.onYouTubeIframeAPIReady = () => {
+        youtubePlayer = new YT.Player("youtube-music-player", {
+          height: "1",
+          width: "1",
+          videoId: MUSIC_TRACKS[activeTrack].videoId,
+          playerVars: { autoplay: 0, controls: 0, playsinline: 1 },
+          events: {
+            onReady: (event) => {
+              musicReady = true;
+              event.target.setVolume(getSavedVolume());
+              if (musicWanted) {
+                event.target.loadVideoById(MUSIC_TRACKS[activeTrack].videoId);
+                document.getElementById("music-status").textContent =
+                  `Playing ${MUSIC_TRACKS[activeTrack].name}.`;
+              } else {
+                musicStatusForTrack(true);
+              }
+              updateMusicToggleUI();
+            },
+            onStateChange: (event) => {
+              if (event.data === YT.PlayerState.ENDED && musicWanted) {
+                event.target.seekTo(0);
+                event.target.playVideo();
+              }
+              if (event.data === YT.PlayerState.PLAYING) {
+                document.getElementById("music-status").textContent =
+                  `Playing ${MUSIC_TRACKS[activeTrack].name}.`;
+              }
+              updateMusicToggleUI();
+            },
+            onError: () => {
+              musicReady = false;
+              musicWanted = false;
+              musicStatusForTrack(false);
+              updateMusicToggleUI();
+            }
+          }
+        });
+      };
+
+      const api = document.createElement("script");
+      api.src = "https://www.youtube.com/iframe_api";
+      document.head.appendChild(api);
+
+      document.getElementById("music-volume").addEventListener("input", (e) => {
+        const v = Number(e.target.value);
+        localStorage.setItem(MUSIC_VOL_KEY, String(v));
+        setMusicVolumeUI(v);
+      });
+      document.getElementById("settings-volume").addEventListener("input", (e) => {
+        const v = Number(e.target.value);
+        localStorage.setItem(MUSIC_VOL_KEY, String(v));
+        setMusicVolumeUI(v);
+      });
+
+      document.querySelectorAll("[data-track]").forEach((btn) => {
+        btn.addEventListener("click", () => {
+          const id = Number(btn.getAttribute("data-track"));
+          if (id === activeTrack) return;
+          loadTrack(id, { autoplay: musicWanted });
+        });
+      });
+
+      document.getElementById("btn-music-toggle").onclick = () => {
+        if (!musicReady || !youtubePlayer) {
+          document.getElementById("music-status").textContent = "YouTube player is still loading…";
+          return;
+        }
+        if (youtubePlayer.getPlayerState() === YT.PlayerState.PLAYING) {
+          musicWanted = false;
+          youtubePlayer.pauseVideo();
+          document.getElementById("music-status").textContent = "Music paused.";
+        } else {
+          musicWanted = true;
+          youtubePlayer.playVideo();
+          document.getElementById("music-status").textContent =
+            `Playing ${MUSIC_TRACKS[activeTrack].name}.`;
+        }
+        updateMusicToggleUI();
+      };
+    }
+
+    function startAccountSoundtrack() {
+      if (!getAutoplayMusic()) return;
+      musicWanted = true;
+      loadTrack(2, { autoplay: true });
+    }
+
+    /* -------- MODES -------- */
+
+function startStudy() {
+      const body = document.getElementById("game-body");
+      const actions = document.getElementById("game-actions");
+      document.getElementById("game-mode-label").textContent = "Study flash";
+      document.getElementById("game-prompt").textContent = "Tap the cover to peek. Hide it again when ready.";
+      document.getElementById("game-feedback").textContent = "";
+      setProgress(20);
+
+      body.innerHTML = `
+        <div class="study-reveal" id="study-box">
+          <div class="study-cover" id="study-cover">Tap to reveal</div>
+          <p class="verse-text">"${state.verse.text}"</p>
+          <div class="translation">${state.verse.ref} · NIV</div>
+        </div>`;
+      actions.innerHTML = `
+        <button class="btn btn-ghost" id="study-hide">Hide again</button>
+        <button class="btn btn-primary" id="study-done">I know it — +5 points</button>`;
+
+      const box = document.getElementById("study-box");
+      document.getElementById("study-cover").onclick = () => {
+        box.classList.add("shown");
+        setProgress(70);
+      };
+      document.getElementById("study-hide").onclick = () => {
+        box.classList.remove("shown");
+        setProgress(40);
+      };
+      document.getElementById("study-done").onclick = () => {
+        setProgress(100);
+        awardPoints(5, "Studied this week's verse and claimed 5 points.", false);
+      };
+    }
+
+    function startBlanks() {
+      const words = wordsOnly(state.verse.text);
+      const blankCount = Math.min(6, Math.max(3, Math.floor(words.length * 0.28)));
+      const indices = shuffle([...Array(words.length).keys()]).slice(0, blankCount).sort((a, b) => a - b);
+      const answers = indices.map((i) => words[i]);
+      const distractors = shuffle(
+        words.filter((w, i) => !indices.includes(i) && w.length > 2)
+      ).slice(0, Math.max(4, blankCount));
+      const options = shuffle([...answers, ...distractors]);
+
+      state.round = { indices, answers, next: 0, wrong: 0, total: blankCount };
+
+      document.getElementById("game-mode-label").textContent = "Fill the blanks";
+      document.getElementById("game-prompt").textContent = "Choose the next missing word.";
+      document.getElementById("game-feedback").textContent = "";
+      setProgress(0);
+
+      const tokens = tokenize(state.verse.text);
+      let wi = 0;
+      const html = tokens.map((tok) => {
+        if (/^[A-Za-z']+$/.test(tok)) {
+          const i = wi++;
+          if (indices.includes(i)) {
+            const bi = indices.indexOf(i);
+            return `<span class="blank" data-bi="${bi}">····</span>`;
+          }
+          return tok;
+        }
+        return tok;
+      }).join("");
+
+      document.getElementById("game-body").innerHTML = `
+        <div class="blank-verse">${html}</div>
+        <div class="choices" id="blank-choices"></div>`;
+      document.getElementById("game-actions").innerHTML = "";
+
+      const choiceBox = document.getElementById("blank-choices");
+      options.forEach((word) => {
+        const btn = document.createElement("button");
+        btn.className = "choice";
+        btn.textContent = word;
+        btn.onclick = () => onBlankChoice(btn, word);
+        choiceBox.appendChild(btn);
+      });
+    }
+
+    function onBlankChoice(btn, word) {
+      const r = state.round;
+      const needed = r.answers[r.next];
+      const blank = document.querySelector(`.blank[data-bi="${r.next}"]`);
+      if (word.toLowerCase() === needed.toLowerCase()) {
+        btn.classList.add("correct");
+        btn.disabled = true;
+        blank.textContent = needed;
+        blank.classList.add("filled");
+        r.next += 1;
+        setProgress((r.next / r.total) * 100);
+        document.getElementById("game-feedback").textContent = "";
+        if (r.next >= r.total) {
+          const perfect = r.wrong === 0;
+          const pts = perfect ? 15 : Math.max(6, 15 - r.wrong * 2);
+          setTimeout(() => {
+            awardPoints(
+              pts,
+              perfect
+                ? `Perfect blanks — +${pts} points`
+                : `Filled all blanks with ${r.wrong} miss${r.wrong === 1 ? "" : "es"} — +${pts} points`,
+              perfect
+            );
+          }, 350);
+        }
+      } else {
+        r.wrong += 1;
+        btn.classList.add("wrong");
+        setTimeout(() => btn.classList.remove("wrong"), 450);
+        document.getElementById("game-feedback").className = "feedback bad";
+        document.getElementById("game-feedback").textContent = "Not that one — try again!";
+      }
+    }
+
+    function startScramble() {
+      const words = wordsOnly(state.verse.text);
+      const use = words.length > 18 ? words.slice(0, 18) : words;
+      state.round = {
+        target: use.map((w) => w.toLowerCase()),
+        placed: [],
+        bank: shuffle(use),
+        full: use.length === words.length
+      };
+
+      document.getElementById("game-mode-label").textContent = "Word scramble";
+      document.getElementById("game-prompt").textContent = state.round.full
+        ? "Tap words in the right order to rebuild the verse."
+        : "Rebuild the start of the verse in order.";
+      document.getElementById("game-feedback").textContent = "";
+      setProgress(0);
+
+      document.getElementById("game-body").innerHTML = `
+        <div class="slot-row" id="slots"></div>
+        <div class="word-bank" id="bank"></div>`;
+      document.getElementById("game-actions").innerHTML = `
+        <button class="btn btn-ghost" id="scramble-undo">Undo</button>
+        <button class="btn btn-primary" id="scramble-check" disabled>Check order</button>`;
+
+      renderScramble();
+      document.getElementById("scramble-undo").onclick = () => {
+        if (!state.round.placed.length) return;
+        state.round.bank.push(state.round.placed.pop());
+        renderScramble();
+      };
+      document.getElementById("scramble-check").onclick = checkScramble;
+    }
+
+    function renderScramble() {
+      const slots = document.getElementById("slots");
+      const bank = document.getElementById("bank");
+      slots.innerHTML = "";
+      bank.innerHTML = "";
+
+      state.round.placed.forEach((word, idx) => {
+        const chip = document.createElement("button");
+        chip.className = "word-chip in-slot";
+        chip.textContent = word;
+        chip.onclick = () => {
+          state.round.placed.splice(idx, 1);
+          state.round.bank.push(word);
+          renderScramble();
+        };
+        slots.appendChild(chip);
+      });
+
+      if (!state.round.placed.length) {
+        slots.innerHTML = `<span class="hint" style="width:100%">Tap words below to place them here</span>`;
+      }
+
+      state.round.bank.forEach((word, idx) => {
+        const chip = document.createElement("button");
+        chip.className = "word-chip";
+        chip.textContent = word;
+        chip.onclick = () => {
+          state.round.bank.splice(idx, 1);
+          state.round.placed.push(word);
+          renderScramble();
+        };
+        bank.appendChild(chip);
+      });
+
+      const ready = state.round.placed.length === state.round.target.length;
+      document.getElementById("scramble-check").disabled = !ready;
+      setProgress((state.round.placed.length / state.round.target.length) * 90);
+    }
+
+    function checkScramble() {
+      const placed = state.round.placed.map((w) => w.toLowerCase());
+      let correct = 0;
+      placed.forEach((w, i) => {
+        if (w === state.round.target[i]) correct += 1;
+      });
+      const pct = Math.round((correct / state.round.target.length) * 100);
+      setProgress(100);
+      if (pct === 100) {
+        awardPoints(20, "Perfect word order — +20 points", true);
+      } else if (pct >= 70) {
+        awardPoints(10, `${pct}% of words in the right spot — +10 points`, false);
+      } else {
+        document.getElementById("game-feedback").className = "feedback bad";
+        document.getElementById("game-feedback").textContent =
+          `${pct}% correct. Undo a few and keep trying!`;
+      }
+    }
+
+    function startType() {
+      document.getElementById("game-mode-label").textContent = "Type from memory";
+      document.getElementById("game-prompt").textContent = "Hide the screen from your sibling and type the verse.";
+      document.getElementById("game-feedback").textContent = "";
+      setProgress(10);
+
+      document.getElementById("game-body").innerHTML = `
+        <div class="type-area">
+          <textarea id="type-input" placeholder="Type the verse here..." spellcheck="true"></textarea>
+        </div>
+        <p class="hint">Punctuation can differ. Matching the words is what matters.</p>`;
+      document.getElementById("game-actions").innerHTML = `
+        <button class="btn btn-ghost" id="type-hint">Peek at first 5 words</button>
+        <button class="btn btn-primary" id="type-check">Check my verse</button>`;
+
+      document.getElementById("type-hint").onclick = () => {
+        const tip = wordsOnly(state.verse.text).slice(0, 5).join(" ");
+        document.getElementById("game-feedback").className = "feedback";
+        document.getElementById("game-feedback").textContent = `Starts with: “${tip}…”`;
+        setProgress(25);
+      };
+      document.getElementById("type-check").onclick = checkType;
+      document.getElementById("type-input").addEventListener("input", () => {
+        const len = document.getElementById("type-input").value.trim().length;
+        setProgress(Math.min(85, 10 + len / 2));
+      });
+    }
+
+    function similarity(a, b) {
+      const wa = normalize(a).split(" ").filter(Boolean);
+      const wb = normalize(b).split(" ").filter(Boolean);
+      if (!wa.length || !wb.length) return 0;
+      const setB = new Set(wb);
+      let hits = 0;
+      wa.forEach((w) => { if (setB.has(w)) hits += 1; });
+      const coverage = hits / wb.length;
+      const lengthRatio = Math.min(wa.length, wb.length) / Math.max(wa.length, wb.length);
+      return coverage * 0.75 + lengthRatio * 0.25;
+    }
+
+    function orderedSimilarity(a, b) {
+      const typed = normalize(a).split(" ").filter(Boolean);
+      const target = normalize(b).split(" ").filter(Boolean);
+      if (!typed.length || !target.length) return 0;
+      const previous = new Array(target.length + 1).fill(0);
+      for (const typedWord of typed) {
+        let diagonal = 0;
+        for (let j = 1; j <= target.length; j++) {
+          const saved = previous[j];
+          if (typedWord === target[j - 1]) {
+            previous[j] = diagonal + 1;
+          } else {
+            previous[j] = Math.max(previous[j], previous[j - 1]);
+          }
+          diagonal = saved;
+        }
+      }
+      const orderedCoverage = previous[target.length] / target.length;
+      const lengthRatio =
+        Math.min(typed.length, target.length) / Math.max(typed.length, target.length);
+      return orderedCoverage * 0.9 + lengthRatio * 0.1;
+    }
+
+    function checkType() {
+      const typed = document.getElementById("type-input").value;
+      if (!typed.trim()) {
+        document.getElementById("game-feedback").className = "feedback bad";
+        document.getElementById("game-feedback").textContent = "Type something first!";
+        return;
+      }
+      const score = similarity(typed, state.verse.text);
+      const pct = Math.round(score * 100);
+      setProgress(100);
+      if (pct >= 92) {
+        awardPoints(25, `Almost word-perfect (${pct}%) — +25 points`, true);
+      } else if (pct >= 75) {
+        awardPoints(15, `${pct}% match — +15 points. Look once more, then try again!`, false);
+      } else if (pct >= 50) {
+        awardPoints(8, `${pct}% match — +8 points. You're getting there.`, false);
+      } else {
+        document.getElementById("game-feedback").className = "feedback bad";
+        document.getElementById("game-feedback").textContent =
+          `${pct}% match. Peek in Study mode, then come back.`;
+        document.getElementById("game-actions").insertAdjacentHTML(
+          "beforeend",
+          `<button class="btn btn-gold" id="type-reveal">Show the verse</button>`
+        );
+        document.getElementById("type-reveal").onclick = () => {
+          document.getElementById("game-feedback").className = "feedback";
+          document.getElementById("game-feedback").textContent = state.verse.text;
+        };
+      }
+    }
+
+    /* -------- VERSE TEST -------- */
+
+    function startVerseTest() {
+      state.round = {
+        test: true,
+        step: 0,
+        passed: 0,
+        results: []
+      };
+      document.getElementById("game-feedback").className = "feedback";
+      document.getElementById("game-feedback").textContent = "";
+      renderVerseTestStep();
+    }
+
+    function renderVerseTestStep() {
+      const test = state.round;
+      document.getElementById("game-actions").innerHTML = "";
+      document.getElementById("game-feedback").className = "feedback";
+      document.getElementById("game-feedback").textContent = "";
+      setProgress((test.step / 3) * 100);
+
+      if (test.step === 0) renderTestBlank();
+      else if (test.step === 1) renderTestOrder();
+      else renderTestTyping();
+    }
+
+    function renderTestBlank() {
+      const words = wordsOnly(state.verse.text);
+      const phraseLength = Math.min(3, words.length);
+      const answerIndex = Math.min(
+        words.length - phraseLength,
+        Math.max(1, Math.floor(words.length / 2) - 1)
+      );
+      const answerWords = words.slice(answerIndex, answerIndex + phraseLength);
+      const answer = answerWords.join(" ");
+      const phraseOptions = new Set();
+      for (let i = 0; i <= words.length - phraseLength; i++) {
+        if (i !== answerIndex) {
+          phraseOptions.add(words.slice(i, i + phraseLength).join(" "));
+        }
+      }
+      const reversed = [...answerWords].reverse().join(" ");
+      const rotated = [...answerWords.slice(1), answerWords[0]].join(" ");
+      if (normalize(reversed) !== normalize(answer)) phraseOptions.add(reversed);
+      if (normalize(rotated) !== normalize(answer)) phraseOptions.add(rotated);
+      phraseOptions.add(["faith", "hope", "love"].slice(0, phraseLength).join(" "));
+      const choices = shuffle([answer, ...shuffle([...phraseOptions]).slice(0, 3)]);
+
+      document.getElementById("game-mode-label").textContent = "Verse Test · 1 of 3";
+      document.getElementById("game-prompt").textContent =
+        `Choose the missing ${phraseLength}-word phrase. You get one try.`;
+      document.getElementById("game-body").innerHTML = `
+        <div class="blank-verse">
+          ${words.map((word, index) => {
+            if (index > answerIndex && index < answerIndex + phraseLength) return "";
+            return (
+            index === answerIndex
+              ? `<span class="blank">${phraseLength} words</span>`
+              : word
+            );
+          }).filter(Boolean).join(" ")}
+        </div>
+        <div class="choices" id="test-blank-choices"></div>`;
+
+      const box = document.getElementById("test-blank-choices");
+      choices.forEach((word) => {
+        const button = document.createElement("button");
+        button.className = "choice";
+        button.textContent = word;
+        button.addEventListener("click", () => {
+          const correct = normalize(word) === normalize(answer);
+          box.querySelectorAll("button").forEach((btn) => { btn.disabled = true; });
+          button.classList.add(correct ? "correct" : "wrong");
+          if (!correct) {
+            [...box.querySelectorAll("button")]
+              .find((btn) => normalize(btn.textContent) === normalize(answer))
+              ?.classList.add("correct");
+          }
+          recordTestStep(correct, "Missing phrase");
+        }, { once: true });
+        box.appendChild(button);
+      });
+    }
+
+    function renderTestOrder() {
+      const target = wordsOnly(state.verse.text).slice(0, 12);
+      let bank = shuffle(target.map((word, id) => ({ word, id })));
+      if (bank.every((item, index) => item.id === index) && bank.length > 1) {
+        [bank[0], bank[1]] = [bank[1], bank[0]];
+      }
+      state.round.testTarget = target;
+      state.round.testBank = bank;
+      state.round.testPlaced = [];
+
+      document.getElementById("game-mode-label").textContent = "Verse Test · 2 of 3";
+      document.getElementById("game-prompt").textContent =
+        "Put the first 12 words in the exact order. You get one check.";
+      document.getElementById("game-body").innerHTML = `
+        <div class="slot-row" id="test-slots"></div>
+        <div class="word-bank" id="test-bank"></div>`;
+      document.getElementById("game-actions").innerHTML = `
+        <button class="btn btn-ghost" id="test-order-undo">Undo</button>
+        <button class="btn btn-primary" id="test-order-check" disabled>Check order</button>`;
+
+      renderTestOrderChips();
+      document.getElementById("test-order-undo").onclick = () => {
+        const item = state.round.testPlaced.pop();
+        if (item) state.round.testBank.push(item);
+        renderTestOrderChips();
+      };
+      document.getElementById("test-order-check").onclick = () => {
+        const placed = state.round.testPlaced.map((item) => item.word.toLowerCase());
+        const correct = placed.every(
+          (word, index) => word === state.round.testTarget[index].toLowerCase()
+        );
+        recordTestStep(correct, "Word order");
+      };
+    }
+
+    function renderTestOrderChips() {
+      const slots = document.getElementById("test-slots");
+      const bank = document.getElementById("test-bank");
+      slots.innerHTML = "";
+      bank.innerHTML = "";
+
+      state.round.testPlaced.forEach((item, index) => {
+        const chip = document.createElement("button");
+        chip.className = "word-chip in-slot";
+        chip.textContent = item.word;
+        chip.onclick = () => {
+          state.round.testPlaced.splice(index, 1);
+          state.round.testBank.push(item);
+          renderTestOrderChips();
+        };
+        slots.appendChild(chip);
+      });
+      if (!state.round.testPlaced.length) {
+        slots.innerHTML = `<span class="hint" style="width:100%">Build the opening here</span>`;
+      }
+
+      state.round.testBank.forEach((item, index) => {
+        const chip = document.createElement("button");
+        chip.className = "word-chip";
+        chip.textContent = item.word;
+        chip.onclick = () => {
+          state.round.testBank.splice(index, 1);
+          state.round.testPlaced.push(item);
+          renderTestOrderChips();
+        };
+        bank.appendChild(chip);
+      });
+      document.getElementById("test-order-check").disabled =
+        state.round.testPlaced.length !== state.round.testTarget.length;
+    }
+
+    function renderTestTyping() {
+      document.getElementById("game-mode-label").textContent = "Verse Test · 3 of 3";
+      document.getElementById("game-prompt").textContent =
+        "Type the whole verse from memory. Punctuation does not matter.";
+      document.getElementById("game-body").innerHTML = `
+        <div class="type-area">
+          <textarea id="test-type-input" placeholder="Type the verse here…" spellcheck="true"></textarea>
+        </div>
+        <p class="hint">Hard mode: you need at least 90% accuracy for this part.</p>`;
+      document.getElementById("game-actions").innerHTML = `
+        <button class="btn btn-primary" id="test-type-check">Finish test</button>`;
+      document.getElementById("test-type-check").onclick = () => {
+        const typed = document.getElementById("test-type-input").value;
+        if (!typed.trim()) {
+          document.getElementById("game-feedback").className = "feedback bad";
+          document.getElementById("game-feedback").textContent = "Type your answer first.";
+          return;
+        }
+        const pct = Math.round(orderedSimilarity(typed, state.verse.text) * 100);
+        recordTestStep(pct >= 90, `Memory typing (${pct}%)`);
+      };
+    }
+
+    function recordTestStep(passed, label) {
+      state.round.results.push({ label, passed });
+      if (passed) state.round.passed += 1;
+      document.getElementById("game-feedback").className =
+        `feedback ${passed ? "good" : "bad"}`;
+      document.getElementById("game-feedback").textContent =
+        passed ? `${label}: passed!` : `${label}: not passed this time.`;
+
+      const isLast = state.round.step === 2;
+      document.getElementById("game-actions").innerHTML = `
+        <button class="btn btn-primary" id="test-next">
+          ${isLast ? "See test result" : "Next challenge"}
+        </button>`;
+      document.getElementById("test-next").onclick = () => {
+        if (isLast) finishVerseTest();
+        else {
+          state.round.step += 1;
+          renderVerseTestStep();
+        }
+      };
+      setProgress(((state.round.step + 1) / 3) * 100);
+    }
+
+    async function finishVerseTest() {
+      const passedCount = state.round.passed;
+      const passedTest = passedCount === 3;
+      const earned = passedTest ? 30 : 5;
+      state.profile.weekScore = (state.profile.weekScore || 0) + earned;
+      const previousLevel = Math.min(
+        Math.floor((state.profile.journeyXP || 0) / XP_PER_LEVEL),
+        JOURNEY_LEVELS.length - 1
+      );
+      const dailyBonus = recordJourneyActivity(earned);
+      let vaultMessage = "";
+      const completedVerse = state.verse;
+
+      if (passedTest) {
+        if (!state.profile.memorized.includes(completedVerse.ref)) {
+          state.profile.memorized = [...state.profile.memorized, completedVerse.ref];
+          vaultMessage = `${completedVerse.ref} is now in your vault!`;
+        } else {
+          vaultMessage = `${completedVerse.ref} was already in your vault.`;
+        }
+        const alreadyLogged = state.profile.masteryLog.some(
+          (entry) => entry.verseKey === state.verseKey && entry.ref === completedVerse.ref
+        );
+        if (!alreadyLogged) {
+          state.profile.masteryLog = [
+            ...state.profile.masteryLog,
+            { ref: completedVerse.ref, verseKey: state.verseKey, masteredAt: Date.now() }
+          ];
+        }
+        state.profile.weeklyVerseIndex = (state.profile.weeklyVerseIndex || 0) + 1;
+      }
+      const questBonus = passedTest ? awardWeeklyQuestIfReady() : 0;
+      const newLevel = Math.min(
+        Math.floor(state.profile.journeyXP / XP_PER_LEVEL),
+        JOURNEY_LEVELS.length - 1
+      );
+      const levelUpMessage = newLevel > previousLevel
+        ? ` · New title: ${JOURNEY_LEVELS[newLevel].title}!`
+        : "";
+
+      await saveProfile({
+        weekScore: state.profile.weekScore,
+        weekKey: state.profile.weekKey,
+        memorized: state.profile.memorized,
+        masteryLog: state.profile.masteryLog,
+        weeklyVerseKey: state.verseKey,
+        weeklyVerseIndex: state.profile.weeklyVerseIndex,
+        journeyXP: state.profile.journeyXP,
+        streakDays: state.profile.streakDays,
+        lastActiveDate: state.profile.lastActiveDate,
+        weeklyQuestRewards: state.profile.weeklyQuestRewards
+      });
+      if (passedTest) {
+        state.verse = verseForWeek(state.verseKey, state.profile.weeklyVerseIndex);
+      }
+      await loadPartner();
+      updateScoresUI();
+      updateVaultUI();
+      updateProgressionUI();
+      updateLeaderboardUI();
+
+      document.getElementById("result-emoji").textContent = passedTest ? "🏆" : "📖";
+      document.getElementById("result-title").textContent = passedTest
+        ? "Verse memorized!"
+        : "Keep practicing";
+      document.getElementById("result-detail").textContent = passedTest
+        ? `You passed ${passedCount} of 3 challenges. ${vaultMessage} Your next verse is ready! +${earned} points and XP${dailyBonus ? ` · Daily bonus +${dailyBonus} XP` : ""}${questBonus ? " · Weekly quest +50 XP!" : ""}${levelUpMessage}`
+        : `You passed ${passedCount} of 3. Pass all 3 next time to unlock the vault. +${earned} points and XP${dailyBonus ? ` · Daily bonus +${dailyBonus} XP` : ""}${levelUpMessage}`;
+      document.getElementById("result-streak").textContent =
+        `Vault: ${state.profile.memorized.length} · Week score: ${state.profile.weekScore}`;
+      if (passedTest) {
+        launchConfetti();
+        playChime("mastery");
+      }
+      if (newLevel > previousLevel) {
+        showToast(`${JOURNEY_LEVELS[newLevel].icon} ${JOURNEY_LEVELS[newLevel].title}`, "A new Faith Journey title is yours.");
+      }
+      unlockReadyAchievements();
+      showScreen("result");
+    }
+
+    function startMode(mode) {
+      state.mode = mode;
+      state.lastMode = mode;
+      document.getElementById("game-ref").textContent = state.verse.ref;
+      document.getElementById("game-feedback").className = "feedback";
+      showScreen("game");
+      if (mode === "study") startStudy();
+      else if (mode === "blanks") startBlanks();
+      else if (mode === "scramble") startScramble();
+      else if (mode === "type") startType();
+      else if (mode === "test") startVerseTest();
+    }
+
+    
+    /* -------- LOCAL ACCOUNTS -------- */
+
+    function renderAccountList() {
+      const list = document.getElementById("account-list");
+      list.innerHTML = "";
+      const accounts = Object.values(localAccounts);
+      if (!accounts.length) {
+        list.innerHTML = `<p class="empty-hint">No accounts yet. Create the first one below.</p>`;
+        return;
+      }
+
+      accounts.forEach((profile) => {
+        const button = document.createElement("button");
+        button.type = "button";
+        button.className = "account-select";
+
+        if (profile.photoURL) {
+          const img = document.createElement("img");
+          img.src = profile.photoURL;
+          img.alt = "";
+          button.appendChild(img);
+        } else {
+          const avatar = document.createElement("span");
+          avatar.className = "avatar-fallback";
+          avatar.textContent = profile.displayName.charAt(0).toUpperCase();
+          button.appendChild(avatar);
+        }
+
+        const info = document.createElement("span");
+        const name = document.createElement("span");
+        name.className = "account-name";
+        name.textContent = profile.displayName;
+        const meta = document.createElement("span");
+        meta.className = "account-meta";
+        meta.textContent = profile.pinHash
+          ? `${profile.weekScore || 0} weekly points · PIN protected`
+          : "Finish setup and create a PIN";
+        info.append(name, meta);
+        button.appendChild(info);
+        button.addEventListener("click", () => openLocalAccount(profile.uid));
+        list.appendChild(button);
+      });
+    }
+
+    function randomHex(bytes = 12) {
+      const values = new Uint8Array(bytes);
+      crypto.getRandomValues(values);
+      return [...values].map((v) => v.toString(16).padStart(2, "0")).join("");
+    }
+
+    async function hashPin(pin, salt) {
+      const value = `${salt}:${pin}`;
+      if (crypto.subtle) {
+        const digest = await crypto.subtle.digest(
+          "SHA-256",
+          new TextEncoder().encode(value)
+        );
+        return [...new Uint8Array(digest)]
+          .map((v) => v.toString(16).padStart(2, "0"))
+          .join("");
+      }
+      let hash = 2166136261;
+      for (let i = 0; i < value.length; i++) {
+        hash ^= value.charCodeAt(i);
+        hash = Math.imul(hash, 16777619);
+      }
+      return String(hash >>> 0);
+    }
+
+    function startAccountSetup(uid = null) {
+      selectedAccountId = uid;
+      const existing = uid ? localAccounts[uid] : null;
+      setupAvatarData = existing?.photoURL || "";
+      document.getElementById("setup-heading").textContent =
+        existing ? "Secure account" : "Create account";
+      document.getElementById("setup-account-title").textContent =
+        existing ? `Secure ${existing.displayName}` : "New account";
+      document.getElementById("display-name").value = existing?.displayName || "";
+      document.getElementById("setup-pin").value = "";
+      document.getElementById("confirm-pin").value = "";
+      document.getElementById("avatar-file").value = "";
+      document.getElementById("setup-error").textContent = "";
+      setAvatar(
+        document.getElementById("setup-photo"),
+        document.getElementById("setup-avatar"),
+        setupAvatarData,
+        existing?.displayName || "V"
+      );
+      document.querySelectorAll("#setup-avatar-options .avatar-option").forEach((item) =>
+        item.classList.remove("selected")
+      );
+      showScreen("setup");
+    }
+
+    function openLocalAccount(uid) {
+      const profile = localAccounts[uid];
+      if (!profile) return;
+      selectedAccountId = uid;
+      if (!profile.pinHash || !profile.pinSalt) {
+        startAccountSetup(uid);
+        return;
+      }
+      document.getElementById("login-name").textContent = profile.displayName;
+      document.getElementById("login-pin").value = "";
+      document.getElementById("login-error").textContent = "";
+      setAvatar(
+        document.getElementById("login-photo"),
+        document.getElementById("login-avatar"),
+        profile.photoURL,
+        profile.displayName
+      );
+      showScreen("login");
+      setTimeout(() => document.getElementById("login-pin").focus(), 50);
+    }
+
+    async function resizeAvatar(file) {
+      const dataUrl = await new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = () => resolve(reader.result);
+        reader.onerror = reject;
+        reader.readAsDataURL(file);
+      });
+      const image = await new Promise((resolve, reject) => {
+        const img = new Image();
+        img.onload = () => resolve(img);
+        img.onerror = reject;
+        img.src = dataUrl;
+      });
+      const size = Math.min(image.naturalWidth, image.naturalHeight);
+      const sx = (image.naturalWidth - size) / 2;
+      const sy = (image.naturalHeight - size) / 2;
+      const canvas = document.createElement("canvas");
+      canvas.width = 192;
+      canvas.height = 192;
+      canvas.getContext("2d").drawImage(image, sx, sy, size, size, 0, 0, 192, 192);
+      return canvas.toDataURL("image/jpeg", 0.8);
+    }
+
+    async function saveAccountSetup() {
+      const name = document.getElementById("display-name").value.trim();
+      const pin = document.getElementById("setup-pin").value;
+      const confirmPin = document.getElementById("confirm-pin").value;
+      const error = document.getElementById("setup-error");
+      error.textContent = "";
+
+      if (name.length < 2) {
+        error.textContent = "Enter a name with at least 2 characters.";
+        return;
+      }
+      if (!/^\d{4,6}$/.test(pin)) {
+        error.textContent = "Your PIN must be 4–6 numbers.";
+        return;
+      }
+      if (pin !== confirmPin) {
+        error.textContent = "The PINs do not match.";
+        return;
+      }
+
+      const uid = selectedAccountId || `account-${Date.now()}-${randomHex(4)}`;
+      const existing = localAccounts[uid] || makeLocalProfile(uid, name);
+      const pinSalt = existing.pinSalt || randomHex();
+      const pinHash = await hashPin(pin, pinSalt);
+      localAccounts[uid] = {
+        ...existing,
+        uid,
+        displayName: name,
+        photoURL: setupAvatarData,
+        pinSalt,
+        pinHash
+      };
+      persistLocalAccounts();
+      await chooseLocalAccount(uid);
+    }
+
+    async function unlockSelectedAccount() {
+      const profile = localAccounts[selectedAccountId];
+      const pin = document.getElementById("login-pin").value;
+      const error = document.getElementById("login-error");
+      if (!profile) {
+        showAccountPicker();
+        return;
+      }
+      const enteredHash = await hashPin(pin, profile.pinSalt);
+      if (enteredHash !== profile.pinHash) {
+        error.textContent = "That PIN is not correct.";
+        document.getElementById("login-pin").select();
+        return;
+      }
+      await chooseLocalAccount(profile.uid);
+    }
+
+    function showAccountPicker() {
+      selectedAccountId = null;
+      loadLocalAccounts();
+      renderAccountList();
+      showScreen("auth");
+    }
+
+    async function chooseLocalAccount(uid) {
+      loadLocalAccounts();
+      state.user = { uid, displayName: localAccounts[uid].displayName, photoURL: "" };
+      state.profile = localAccounts[uid];
+      startAccountSoundtrack();
+      applyWeeklyResetIfNeeded();
+      await loadPartner();
+      updateHome();
+      continueAfterLogin();
+      scheduleAllReminders();
+    }
+
+    function deleteCurrentAccount() {
+      if (!state.user || !state.profile) return;
+      const uid = state.user.uid;
+      const name = state.profile.displayName;
+      const confirmed = confirm(
+        `Delete ${name}'s account permanently? This removes all points, reminders, avatar data, and memorized verses from this device. This cannot be undone.`
+      );
+      if (!confirmed) return;
+
+      delete localAccounts[uid];
+      persistLocalAccounts();
+      clearLocalNotifyTimers();
+      state.user = null;
+      state.profile = null;
+      state.partner = null;
+      showAccountPicker();
+    }
+
+    /* -------- EVENTS -------- */
+
+    document.getElementById("btn-open-settings").onclick = () => {
+      applyPreferences();
+      updateTrackButtons();
+      setMusicVolumeUI(getSavedVolume());
+      updateSettingsAvatarPreview();
+      document.getElementById("avatar-settings-status").textContent = "";
+      showScreen("settings");
+    };
+    document.querySelectorAll("[data-theme-choice]").forEach((button) => {
+      button.addEventListener("click", () => {
+        localStorage.setItem(THEME_KEY, button.dataset.themeChoice);
+        applyPreferences();
+      });
+    });
+    document.getElementById("settings-reduce-motion").addEventListener("change", (event) => {
+      localStorage.setItem(REDUCE_MOTION_KEY, String(event.target.checked));
+      applyPreferences();
+    });
+    document.getElementById("settings-sound").addEventListener("change", (event) => {
+      localStorage.setItem(SOUND_KEY, String(event.target.checked));
+    });
+    document.getElementById("btn-open-howto").onclick = () => showScreen("howto");
+    document.getElementById("btn-howto-done").onclick = () => {
+      if (state.profile && !state.profile.seenHowTo) {
+        saveProfile({ seenHowTo: true });
+      }
+      updateHome();
+      showScreen("home");
+    };
+    document.getElementById("btn-share-game").onclick = () => shareVerseKeepers();
+    document.getElementById("btn-share-home").onclick = () => shareVerseKeepers();
+    document.getElementById("settings-autoplay").addEventListener("change", (event) => {
+      localStorage.setItem(AUTOPLAY_MUSIC_KEY, String(event.target.checked));
+    });
+    document.getElementById("btn-delete-account").onclick = () => deleteCurrentAccount();
+    document.getElementById("btn-ceremony-continue").onclick = () => {
+      document.getElementById("fireworks-layer").innerHTML = "";
+      document.getElementById("screen-ceremony").classList.remove("cutscene-playing");
+      updateHome();
+      showScreen("home");
+    };
+
+    renderAvatarOptions("setup-avatar-options", (avatarData) => {
+      setupAvatarData = avatarData;
+      setAvatar(
+        document.getElementById("setup-photo"),
+        document.getElementById("setup-avatar"),
+        setupAvatarData,
+        document.getElementById("display-name").value || "V"
+      );
+    });
+    renderAvatarOptions("settings-avatar-options", async (avatarData) => {
+      if (!state.profile) return;
+      await saveProfile({ photoURL: avatarData });
+      updateSettingsAvatarPreview();
+      document.getElementById("avatar-settings-status").textContent = "Avatar updated.";
+    });
+    document.getElementById("settings-avatar-file").addEventListener("change", async (event) => {
+      const file = event.target.files?.[0];
+      const status = document.getElementById("avatar-settings-status");
+      if (!file) return;
+      if (!file.type.startsWith("image/") || file.size > 10 * 1024 * 1024) {
+        status.textContent = "Choose an image smaller than 10 MB.";
+        return;
+      }
+      try {
+        const photoURL = await resizeAvatar(file);
+        await saveProfile({ photoURL });
+        updateSettingsAvatarPreview();
+        status.textContent = "Picture updated.";
+      } catch {
+        status.textContent = "That picture could not be loaded.";
+      }
+      event.target.value = "";
+    });
+    document.getElementById("btn-remove-avatar").onclick = async () => {
+      if (!state.profile) return;
+      await saveProfile({ photoURL: "" });
+      updateSettingsAvatarPreview();
+      document.getElementById("avatar-settings-status").textContent =
+        "Using your initial.";
+    };
+
+    document.getElementById("btn-new-account").onclick = () => startAccountSetup();
+    document.getElementById("btn-create-account").onclick = () => saveAccountSetup();
+    document.getElementById("btn-setup-back").onclick = () => showAccountPicker();
+    document.getElementById("btn-unlock-account").onclick = () => unlockSelectedAccount();
+    document.getElementById("btn-login-back").onclick = () => showAccountPicker();
+    document.getElementById("login-pin").addEventListener("keydown", (event) => {
+      if (event.key === "Enter") unlockSelectedAccount();
+    });
+    document.getElementById("avatar-file").addEventListener("change", async (event) => {
+      const file = event.target.files?.[0];
+      if (!file) return;
+      const error = document.getElementById("setup-error");
+      if (!file.type.startsWith("image/")) {
+        error.textContent = "Choose an image file.";
+        return;
+      }
+      if (file.size > 10 * 1024 * 1024) {
+        error.textContent = "Choose a picture smaller than 10 MB.";
+        return;
+      }
+      try {
+        setupAvatarData = await resizeAvatar(file);
+        setAvatar(
+          document.getElementById("setup-photo"),
+          document.getElementById("setup-avatar"),
+          setupAvatarData,
+          document.getElementById("display-name").value || "V"
+        );
+        error.textContent = "";
+      } catch {
+        error.textContent = "That picture could not be loaded.";
+      }
+    });
+    document.getElementById("btn-add-reminder").onclick = async () => {
+      const value = document.getElementById("reminder-time").value;
+      if (!value) return;
+      const added = await addReminderTime(value);
+      document.getElementById("notify-status").textContent = added
+        ? `Added ${formatDisplayTime(value)}.`
+        : "That time is already on your list.";
+      if (added && Notification.permission !== "granted") {
+        document.getElementById("notify-status").textContent += " Enable notifications so it can ping you.";
+      }
+    };
+
+    document.getElementById("btn-enable-notify").onclick = () => enableNotifications();
+    document.getElementById("btn-test-notify").onclick = () => sendTestNotification();
+
+    document.getElementById("btn-play").onclick = () => {
+      updateScoresUI();
+      showScreen("modes");
+    };
+
+    document.getElementById("btn-reset-scores").onclick = async () => {
+      if (!confirm("Reset your week score now?")) return;
+      state.profile.weekScore = 0;
+      state.profile.weekKey = weekKey();
+      await saveProfile({ weekScore: 0, weekKey: state.profile.weekKey });
+      updateScoresUI();
+      updateHome();
+    };
+
+    document.querySelectorAll("[data-goto]").forEach((btn) => {
+      btn.addEventListener("click", () => {
+        const dest = btn.getAttribute("data-goto");
+        if (dest === "home") updateHome();
+        if (dest === "modes") updateScoresUI();
+        showScreen(dest);
+      });
+    });
+
+    document.querySelectorAll("[data-mode]").forEach((btn) => {
+      btn.addEventListener("click", () => startMode(btn.getAttribute("data-mode")));
+    });
+
+    document.getElementById("btn-again").onclick = () => {
+      if (state.lastMode) startMode(state.lastMode);
+      else showScreen("modes");
+    };
+
+    document.addEventListener("visibilitychange", () => {
+      if (document.visibilityState === "visible" && state.profile) {
+        applyWeeklyResetIfNeeded();
+        document.getElementById("week-note").textContent = formatResetCountdown();
+        checkDueReminders();
+        scheduleAllReminders();
+        loadPartner().then(() => updateScoresUI());
+      }
+    });
+
+    setInterval(() => {
+      if (!state.profile) return;
+      const currentVerseKey = verseWeekKey();
+      if (state.verseKey !== currentVerseKey) {
+        ensureWeeklyVerseProgress();
+        updateHome();
+        maybeShowWeeklyCeremony();
+        return;
+      }
+      if (applyWeeklyResetIfNeeded()) updateHome();
+      else if (document.getElementById("screen-home").classList.contains("active")) {
+        document.getElementById("week-note").textContent = formatResetCountdown();
+      }
+      checkDueReminders();
+    }, 30000);
+
+    // boot
+    state.verseKey = verseWeekKey();
+    state.verse = verseForWeek(state.verseKey);
+    loadLocalAccounts();
+    applyPreferences();
+    initBackgroundMusic();
+    showAccountPicker();
+    registerSW();
+  </script>
+</body>
+</html>
