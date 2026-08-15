@@ -2297,7 +2297,7 @@
         </div>
         <ul class="howto-list">
           <li><strong>Study first.</strong> Use flash, blanks, scramble, or typing until the verse feels familiar.</li>
-          <li><strong>Take the Verse Test.</strong> Pass all 3 challenges to lock the verse in your vault and unlock a new one the same week.</li>
+          <li><strong>Take the Verse Test.</strong> Each test mixes 4 different ways to prove the verse. Pass every challenge to lock it in and unlock the next one.</li>
           <li><strong>Grow your Faith Journey.</strong> Practice earns XP, titles, a daily streak bonus, and weekly quest rewards.</li>
           <li><strong>Win the Monday ceremony.</strong> Whoever mastered the most verses last week gets the podium, fireworks, and a champion badge.</li>
         </ul>
@@ -2405,7 +2405,7 @@
         <div class="modes">
           <button class="mode-btn test-mode" data-mode="test">
             <h3>🏆 Take the Verse Test</h3>
-            <p>Hard mode: pass all 3 challenges to master the current verse and unlock the next.</p>
+            <p>Closed-book expert mode. Four different challenges each time — pass them all to master the verse.</p>
           </button>
           <button class="mode-btn" data-mode="study">
             <h3>Study flash</h3>
@@ -2756,6 +2756,7 @@ const VERSES = [
         streakDays: 0,
         lastActiveDate: "",
         weeklyQuestRewards: [],
+        lastTestTypes: [],
         badges: [],
         championships: 0,
         seenHowTo: false,
@@ -2784,6 +2785,7 @@ const VERSES = [
           weeklyQuestRewards: Array.isArray(profile.weeklyQuestRewards)
             ? profile.weeklyQuestRewards
             : [],
+          lastTestTypes: Array.isArray(profile.lastTestTypes) ? profile.lastTestTypes : [],
           badges: Array.isArray(profile.badges) ? profile.badges : [],
           championships: Number.isFinite(profile.championships) ? profile.championships : 0,
           seenHowTo: Boolean(profile.seenHowTo),
@@ -3740,6 +3742,31 @@ const VERSES = [
       }
     }
 
+    function playWantedTrack({ restart = false } = {}) {
+      const track = MUSIC_TRACKS[activeTrack] || MUSIC_TRACKS[2];
+      if (!youtubePlayer) {
+        document.getElementById("music-status").textContent = `Starting ${track.name}…`;
+        return false;
+      }
+      try {
+        const playerState = youtubePlayer.getPlayerState?.();
+        const playing = playerState === window.YT?.PlayerState?.PLAYING;
+        const buffering = playerState === window.YT?.PlayerState?.BUFFERING;
+        if (!restart && (playing || buffering)) return true;
+        youtubePlayer.unMute?.();
+        youtubePlayer.setVolume(getSavedVolume());
+        if (restart || playerState === window.YT?.PlayerState?.UNSTARTED || playerState === window.YT?.PlayerState?.CUED || playerState === -1) {
+          if (youtubePlayer.loadVideoById) youtubePlayer.loadVideoById(track.videoId);
+        }
+        youtubePlayer.playVideo?.();
+        document.getElementById("music-status").textContent = `Playing ${track.name}.`;
+        return true;
+      } catch {
+        document.getElementById("music-status").textContent = `Starting ${track.name}…`;
+        return false;
+      }
+    }
+
     function loadTrack(trackId, { autoplay = false } = {}) {
       activeTrack = trackId === 2 ? 2 : 1;
       localStorage.setItem(MUSIC_TRACK_KEY, String(activeTrack));
@@ -3752,12 +3779,12 @@ const VERSES = [
         return;
       }
       if (shouldPlay) {
-        youtubePlayer.loadVideoById(track.videoId);
+        playWantedTrack({ restart: true });
       } else {
         youtubePlayer.cueVideoById(track.videoId);
+        youtubePlayer.setVolume(getSavedVolume());
+        musicStatusForTrack(true);
       }
-      youtubePlayer.setVolume(getSavedVolume());
-      musicStatusForTrack(true);
     }
 
     function initBackgroundMusic() {
@@ -3777,13 +3804,8 @@ const VERSES = [
             onReady: (event) => {
               musicReady = true;
               event.target.setVolume(getSavedVolume());
-              if (musicWanted) {
-                event.target.loadVideoById(MUSIC_TRACKS[activeTrack].videoId);
-                document.getElementById("music-status").textContent =
-                  `Playing ${MUSIC_TRACKS[activeTrack].name}.`;
-              } else {
-                musicStatusForTrack(true);
-              }
+              if (musicWanted) playWantedTrack();
+              else musicStatusForTrack(true);
               updateMusicToggleUI();
             },
             onStateChange: (event) => {
@@ -3850,9 +3872,12 @@ const VERSES = [
     }
 
     function startAccountSoundtrack() {
-      if (!getAutoplayMusic()) return;
       musicWanted = true;
-      loadTrack(2, { autoplay: true });
+      activeTrack = 2;
+      localStorage.setItem(MUSIC_TRACK_KEY, "2");
+      localStorage.setItem(AUTOPLAY_MUSIC_KEY, "true");
+      updateTrackButtons();
+      playWantedTrack({ restart: true });
     }
 
     /* -------- MODES -------- */
@@ -4158,36 +4183,93 @@ function startStudy() {
     /* -------- VERSE TEST -------- */
 
     function startVerseTest() {
+      const plan = pickTestPlan();
       state.round = {
         test: true,
         step: 0,
         passed: 0,
-        results: []
+        results: [],
+        plan
       };
+      if (state.profile) saveProfile({ lastTestTypes: plan });
       document.getElementById("game-feedback").className = "feedback";
       document.getElementById("game-feedback").textContent = "";
       renderVerseTestStep();
     }
 
+    function pickTestPlan() {
+      const groups = {
+        recognize: ["phrase", "scattered", "spot"],
+        build: ["order", "nextchain"],
+        recall: ["typing", "finish", "opening"]
+      };
+      const last = new Set(state.profile?.lastTestTypes || []);
+      const pickFrom = (list) => {
+        const fresh = list.filter((item) => !last.has(item));
+        return shuffle(fresh.length ? fresh : list)[0];
+      };
+      const plan = [
+        pickFrom(groups.recognize),
+        pickFrom(groups.build),
+        pickFrom(groups.recall)
+      ];
+      const leftover = shuffle(
+        [...groups.recognize, ...groups.build, ...groups.recall].filter((item) => !plan.includes(item))
+      );
+      plan.push(leftover[0]);
+      return shuffle(plan);
+    }
+
+    function setTestHeader(title, prompt) {
+      const total = state.round.plan.length;
+      document.getElementById("game-mode-label").textContent =
+        `Verse Test · ${state.round.step + 1} of ${total} · ${title}`;
+      document.getElementById("game-prompt").textContent = prompt;
+    }
+
+    function verseChunk(kind) {
+      const words = wordsOnly(state.verse.text);
+      if (kind === "opening") return { words, start: 0, slice: words.slice(0, Math.min(10, words.length)) };
+      if (kind === "ending") {
+        const length = Math.min(10, words.length);
+        const start = words.length - length;
+        return { words, start, slice: words.slice(start) };
+      }
+      const length = Math.min(12, Math.max(6, words.length - 4));
+      const start = Math.max(1, Math.floor((words.length - length) / 2));
+      return { words, start, slice: words.slice(start, start + length) };
+    }
+
     function renderVerseTestStep() {
       const test = state.round;
+      const kind = test.plan[test.step];
       document.getElementById("game-actions").innerHTML = "";
       document.getElementById("game-feedback").className = "feedback";
       document.getElementById("game-feedback").textContent = "";
-      setProgress((test.step / 3) * 100);
+      setProgress((test.step / test.plan.length) * 100);
 
-      if (test.step === 0) renderTestBlank();
-      else if (test.step === 1) renderTestOrder();
+      if (kind === "phrase") renderTestBlank();
+      else if (kind === "scattered") renderTestScattered();
+      else if (kind === "spot") renderTestSpot();
+      else if (kind === "order") renderTestOrder();
+      else if (kind === "nextchain") renderTestNextChain();
+      else if (kind === "finish") renderTestFinish();
+      else if (kind === "opening") renderTestOpening();
       else renderTestTyping();
     }
 
     function renderTestBlank() {
       const words = wordsOnly(state.verse.text);
-      const phraseLength = Math.min(3, words.length);
-      const answerIndex = Math.min(
-        words.length - phraseLength,
-        Math.max(1, Math.floor(words.length / 2) - 1)
-      );
+      const phraseLength = Math.min(Math.max(4, Math.min(5, words.length - 2)), words.length);
+      const region = shuffle(["opening", "middle", "ending"])[0];
+      const answerIndex = region === "opening"
+        ? 0
+        : region === "ending"
+          ? Math.max(0, words.length - phraseLength)
+          : Math.min(
+              words.length - phraseLength,
+              Math.max(1, Math.floor(words.length * 0.4))
+            );
       const answerWords = words.slice(answerIndex, answerIndex + phraseLength);
       const answer = answerWords.join(" ");
       const phraseOptions = new Set();
@@ -4196,16 +4278,22 @@ function startStudy() {
           phraseOptions.add(words.slice(i, i + phraseLength).join(" "));
         }
       }
+      const swapped = [...answerWords];
+      if (swapped.length > 2) [swapped[1], swapped[2]] = [swapped[2], swapped[1]];
+      const dropped = answerWords.filter((_, index) => index !== 1);
+      const padded = [...dropped, "Lord"].slice(0, phraseLength);
       const reversed = [...answerWords].reverse().join(" ");
       const rotated = [...answerWords.slice(1), answerWords[0]].join(" ");
-      if (normalize(reversed) !== normalize(answer)) phraseOptions.add(reversed);
-      if (normalize(rotated) !== normalize(answer)) phraseOptions.add(rotated);
-      phraseOptions.add(["faith", "hope", "love"].slice(0, phraseLength).join(" "));
-      const choices = shuffle([answer, ...shuffle([...phraseOptions]).slice(0, 3)]);
+      [swapped.join(" "), padded.join(" "), reversed, rotated].forEach((option) => {
+        if (normalize(option) !== normalize(answer)) phraseOptions.add(option);
+      });
+      phraseOptions.add(["faith", "hope", "love", "truth", "grace"].slice(0, phraseLength).join(" "));
+      const choices = shuffle([answer, ...shuffle([...phraseOptions]).slice(0, 4)]);
 
-      document.getElementById("game-mode-label").textContent = "Verse Test · 1 of 3";
-      document.getElementById("game-prompt").textContent =
-        `Choose the missing ${phraseLength}-word phrase. You get one try.`;
+      setTestHeader(
+        "Missing phrase",
+        `Closed book: choose the missing ${phraseLength}-word phrase. One try, no peeking.`
+      );
       document.getElementById("game-body").innerHTML = `
         <div class="blank-verse">
           ${words.map((word, index) => {
@@ -4240,18 +4328,29 @@ function startStudy() {
     }
 
     function renderTestOrder() {
-      const target = wordsOnly(state.verse.text).slice(0, 12);
-      let bank = shuffle(target.map((word, id) => ({ word, id })));
-      if (bank.every((item, index) => item.id === index) && bank.length > 1) {
+      const region = shuffle(["opening", "middle", "ending"])[0];
+      const chunk = verseChunk(region);
+      const target = chunk.slice;
+      const decoys = ["Lord", "faith", "heart", "truth", "grace", "peace", "spirit", "heaven"]
+        .filter((word) => !target.some((item) => item.toLowerCase() === word.toLowerCase()))
+        .slice(0, 4)
+        .map((word, index) => ({ word, id: `decoy-${index}` }));
+      let bank = shuffle([
+        ...target.map((word, id) => ({ word, id })),
+        ...decoys
+      ]);
+      if (bank.slice(0, target.length).every((item, index) => item.id === index) && bank.length > 1) {
         [bank[0], bank[1]] = [bank[1], bank[0]];
       }
       state.round.testTarget = target;
       state.round.testBank = bank;
       state.round.testPlaced = [];
+      const placeLabel = region === "opening" ? "opening" : region === "ending" ? "ending" : "middle";
 
-      document.getElementById("game-mode-label").textContent = "Verse Test · 2 of 3";
-      document.getElementById("game-prompt").textContent =
-        "Put the first 12 words in the exact order. You get one check.";
+      setTestHeader(
+        "Rebuild",
+        `Rebuild the ${placeLabel} of the verse in exact order. Trap words do not belong. One check.`
+      );
       document.getElementById("game-body").innerHTML = `
         <div class="slot-row" id="test-slots"></div>
         <div class="word-bank" id="test-bank"></div>`;
@@ -4267,9 +4366,9 @@ function startStudy() {
       };
       document.getElementById("test-order-check").onclick = () => {
         const placed = state.round.testPlaced.map((item) => item.word.toLowerCase());
-        const correct = placed.every(
-          (word, index) => word === state.round.testTarget[index].toLowerCase()
-        );
+        const correct =
+          placed.length === state.round.testTarget.length &&
+          placed.every((word, index) => word === state.round.testTarget[index].toLowerCase());
         recordTestStep(correct, "Word order");
       };
     }
@@ -4292,7 +4391,7 @@ function startStudy() {
         slots.appendChild(chip);
       });
       if (!state.round.testPlaced.length) {
-        slots.innerHTML = `<span class="hint" style="width:100%">Build the opening here</span>`;
+        slots.innerHTML = `<span class="hint" style="width:100%">Build this part of the verse here</span>`;
       }
 
       state.round.testBank.forEach((item, index) => {
@@ -4311,16 +4410,54 @@ function startStudy() {
     }
 
     function renderTestTyping() {
-      document.getElementById("game-mode-label").textContent = "Verse Test · 3 of 3";
-      document.getElementById("game-prompt").textContent =
-        "Type the whole verse from memory. Punctuation does not matter.";
+      setTestHeader(
+        "Full recall",
+        "Type the whole verse from memory. Punctuation is ignored, but the words must be almost exact."
+      );
+      renderMemoryTypeBox(state.verse.text, "Memory typing", 97, 1);
+    }
+
+    function renderTestFinish() {
+      const words = wordsOnly(state.verse.text);
+      const cut = Math.max(4, Math.floor(words.length * 0.45));
+      const given = words.slice(0, cut).join(" ");
+      const rest = words.slice(cut).join(" ");
+      setTestHeader("Finish the verse", "The first half is given. Type the rest from memory.");
+      document.getElementById("game-body").innerHTML = `
+        <div class="blank-verse">${given} <span class="blank">…</span></div>
+        <div class="type-area">
+          <textarea id="test-type-input" placeholder="Type the rest of the verse…" spellcheck="false" autocomplete="off" autocapitalize="off"></textarea>
+        </div>
+        <p class="hint">You need 95% accuracy on the missing half.</p>`;
+      document.getElementById("game-actions").innerHTML =
+        `<button class="btn btn-primary" id="test-type-check">Check ending</button>`;
+      document.getElementById("test-type-check").onclick = () => {
+        const typed = document.getElementById("test-type-input").value;
+        if (!typed.trim()) {
+          document.getElementById("game-feedback").className = "feedback bad";
+          document.getElementById("game-feedback").textContent = "Type the missing half first.";
+          return;
+        }
+        const pct = Math.round(orderedSimilarity(typed, rest) * 100);
+        recordTestStep(pct >= 95, `Finish the verse (${pct}%)`);
+      };
+    }
+
+    function renderTestOpening() {
+      const words = wordsOnly(state.verse.text);
+      const target = words.slice(0, Math.min(10, words.length)).join(" ");
+      setTestHeader("Opening line", "Type the first words of the verse from memory. No hints.");
+      renderMemoryTypeBox(target, "Opening line", 96, 0);
+    }
+
+    function renderMemoryTypeBox(target, label, needed, slack) {
       document.getElementById("game-body").innerHTML = `
         <div class="type-area">
-          <textarea id="test-type-input" placeholder="Type the verse here…" spellcheck="true"></textarea>
+          <textarea id="test-type-input" placeholder="Type from memory…" spellcheck="false" autocomplete="off" autocapitalize="off"></textarea>
         </div>
-        <p class="hint">Hard mode: you need at least 90% accuracy for this part.</p>`;
-      document.getElementById("game-actions").innerHTML = `
-        <button class="btn btn-primary" id="test-type-check">Finish test</button>`;
+        <p class="hint">Need ${needed}% word-order accuracy${slack ? `, and you may miss at most ${slack} word` : ""}.</p>`;
+      document.getElementById("game-actions").innerHTML =
+        `<button class="btn btn-primary" id="test-type-check">Check recall</button>`;
       document.getElementById("test-type-check").onclick = () => {
         const typed = document.getElementById("test-type-input").value;
         if (!typed.trim()) {
@@ -4328,9 +4465,153 @@ function startStudy() {
           document.getElementById("game-feedback").textContent = "Type your answer first.";
           return;
         }
-        const pct = Math.round(orderedSimilarity(typed, state.verse.text) * 100);
-        recordTestStep(pct >= 90, `Memory typing (${pct}%)`);
+        const typedWords = normalize(typed).split(" ").filter(Boolean);
+        const targetWords = normalize(target).split(" ").filter(Boolean);
+        const pct = Math.round(orderedSimilarity(typed, target) * 100);
+        const lengthOk = Math.abs(typedWords.length - targetWords.length) <= slack;
+        recordTestStep(pct >= needed && lengthOk, `${label} (${pct}%)`);
       };
+    }
+
+    function renderTestScattered() {
+      const words = wordsOnly(state.verse.text);
+      const blankCount = Math.min(5, Math.max(3, Math.floor(words.length * 0.32)));
+      const contentIndexes = words
+        .map((word, index) => ({ word, index }))
+        .filter((item) => item.word.length > 2)
+        .map((item) => item.index);
+      const pool = contentIndexes.length >= blankCount ? contentIndexes : [...Array(words.length).keys()];
+      const indices = shuffle(pool).slice(0, blankCount).sort((a, b) => a - b);
+      const answers = indices.map((index) => words[index]);
+      const distractors = shuffle(
+        words.filter((word, index) => !indices.includes(index) && word.length > 2)
+      ).slice(0, blankCount);
+      const options = shuffle([...answers, ...distractors]);
+      state.round.scatter = { indices, answers, next: 0, misses: 0 };
+
+      setTestHeader("Scattered blanks", "Fill every missing word in order. One tap per blank.");
+      const tokens = tokenize(state.verse.text);
+      let wordIndex = 0;
+      const html = tokens.map((tok) => {
+        if (/^[A-Za-z']+$/.test(tok)) {
+          const current = wordIndex++;
+          if (indices.includes(current)) {
+            const blankIndex = indices.indexOf(current);
+            return `<span class="blank" data-scatter="${blankIndex}">····</span>`;
+          }
+          return tok;
+        }
+        return tok;
+      }).join("");
+      document.getElementById("game-body").innerHTML = `
+        <div class="blank-verse">${html}</div>
+        <div class="choices" id="test-scatter-choices"></div>`;
+      const box = document.getElementById("test-scatter-choices");
+      options.forEach((word) => {
+        const button = document.createElement("button");
+        button.className = "choice";
+        button.textContent = word;
+        button.onclick = () => {
+          const scatter = state.round.scatter;
+          if (scatter.next >= scatter.answers.length) return;
+          const needed = scatter.answers[scatter.next];
+          const blank = document.querySelector(`[data-scatter="${scatter.next}"]`);
+          const correct = word.toLowerCase() === needed.toLowerCase();
+          if (correct) {
+            button.disabled = true;
+            button.classList.add("correct");
+            if (blank) {
+              blank.textContent = needed;
+              blank.classList.add("filled");
+            }
+            scatter.next += 1;
+            if (scatter.next === scatter.answers.length) {
+              recordTestStep(scatter.misses === 0, "Scattered blanks");
+            }
+          } else {
+            scatter.misses += 1;
+            button.classList.add("wrong");
+            box.querySelectorAll("button").forEach((btn) => { btn.disabled = true; });
+            if (blank) blank.classList.add("miss");
+            recordTestStep(false, "Scattered blanks");
+          }
+        };
+        box.appendChild(button);
+      });
+    }
+
+    function renderTestSpot() {
+      const words = wordsOnly(state.verse.text);
+      const candidates = words
+        .map((word, index) => ({ word, index }))
+        .filter((item) => item.word.length > 3);
+      const target = (candidates.length ? shuffle(candidates) : [{ word: words[0], index: 0 }])[0];
+      const fakes = shuffle(
+        ["faith", "heaven", "mercy", "power", "spirit", "truth", "peace", "glory"]
+          .filter((word) => word.toLowerCase() !== target.word.toLowerCase())
+      );
+      const fake = fakes[0] || "faith";
+      setTestHeader("Spot the change", "One word was swapped. Tap the word that does not belong.");
+      document.getElementById("game-body").innerHTML = `<div class="choices" id="test-spot-words"></div>`;
+      const box = document.getElementById("test-spot-words");
+      words.forEach((word, index) => {
+        const shown = index === target.index ? fake : word;
+        const button = document.createElement("button");
+        button.className = "choice";
+        button.textContent = shown;
+        button.onclick = () => {
+          box.querySelectorAll("button").forEach((btn) => { btn.disabled = true; });
+          const correct = index === target.index;
+          button.classList.add(correct ? "correct" : "wrong");
+          if (!correct) box.children[target.index]?.classList.add("correct");
+          recordTestStep(correct, "Spot the change");
+        };
+        box.appendChild(button);
+      });
+    }
+
+    function renderTestNextChain() {
+      const words = wordsOnly(state.verse.text);
+      const start = Math.max(1, Math.min(words.length - 5, Math.floor(words.length * 0.25)));
+      const needed = words.slice(start, start + 4);
+      const shown = words.slice(0, start).join(" ");
+      const decoys = shuffle(
+        words.filter((word, index) => index < start || index >= start + 4)
+      ).slice(0, 5);
+      const options = shuffle([...needed, ...decoys]);
+      state.round.chain = { needed, next: 0, misses: 0 };
+
+      setTestHeader("What comes next", "Keep the verse going. Tap the next 4 words in order.");
+      document.getElementById("game-body").innerHTML = `
+        <div class="blank-verse">${shown} <span class="blank" id="chain-progress">…</span></div>
+        <div class="choices" id="test-chain-choices"></div>`;
+      const box = document.getElementById("test-chain-choices");
+      options.forEach((word) => {
+        const button = document.createElement("button");
+        button.className = "choice";
+        button.textContent = word;
+        button.onclick = () => {
+          const chain = state.round.chain;
+          if (chain.next >= chain.needed.length) return;
+          const correct = word.toLowerCase() === chain.needed[chain.next].toLowerCase();
+          if (correct) {
+            button.disabled = true;
+            button.classList.add("correct");
+            chain.next += 1;
+            document.getElementById("chain-progress").textContent =
+              chain.needed.slice(0, chain.next).join(" ") + (chain.next < chain.needed.length ? " …" : "");
+            if (chain.next === chain.needed.length) {
+              recordTestStep(chain.misses === 0, "What comes next");
+            }
+          } else {
+            chain.misses += 1;
+            button.classList.add("wrong");
+            box.querySelectorAll("button").forEach((btn) => { btn.disabled = true; });
+            recordTestStep(false, "What comes next");
+          }
+        };
+        box.appendChild(button);
+      });
     }
 
     function recordTestStep(passed, label) {
@@ -4341,7 +4622,8 @@ function startStudy() {
       document.getElementById("game-feedback").textContent =
         passed ? `${label}: passed!` : `${label}: not passed this time.`;
 
-      const isLast = state.round.step === 2;
+      const total = state.round.plan.length;
+      const isLast = state.round.step === total - 1;
       document.getElementById("game-actions").innerHTML = `
         <button class="btn btn-primary" id="test-next">
           ${isLast ? "See test result" : "Next challenge"}
@@ -4353,12 +4635,13 @@ function startStudy() {
           renderVerseTestStep();
         }
       };
-      setProgress(((state.round.step + 1) / 3) * 100);
+      setProgress(((state.round.step + 1) / total) * 100);
     }
 
     async function finishVerseTest() {
       const passedCount = state.round.passed;
-      const passedTest = passedCount === 3;
+      const needed = state.round.plan?.length || 4;
+      const passedTest = passedCount === needed;
       const earned = passedTest ? 30 : 5;
       state.profile.weekScore = (state.profile.weekScore || 0) + earned;
       const previousLevel = Math.min(
@@ -4422,8 +4705,8 @@ function startStudy() {
         ? "Verse memorized!"
         : "Keep practicing";
       document.getElementById("result-detail").textContent = passedTest
-        ? `You passed ${passedCount} of 3 challenges. ${vaultMessage} Your next verse is ready! +${earned} points and XP${dailyBonus ? ` · Daily bonus +${dailyBonus} XP` : ""}${questBonus ? " · Weekly quest +50 XP!" : ""}${levelUpMessage}`
-        : `You passed ${passedCount} of 3. Pass all 3 next time to unlock the vault. +${earned} points and XP${dailyBonus ? ` · Daily bonus +${dailyBonus} XP` : ""}${levelUpMessage}`;
+        ? `You passed ${passedCount} of ${needed} challenges. ${vaultMessage} Your next verse is ready! +${earned} points and XP${dailyBonus ? ` · Daily bonus +${dailyBonus} XP` : ""}${questBonus ? " · Weekly quest +50 XP!" : ""}${levelUpMessage}`
+        : `You passed ${passedCount} of ${needed}. Pass every challenge next time to unlock the vault. +${earned} points and XP${dailyBonus ? ` · Daily bonus +${dailyBonus} XP` : ""}${levelUpMessage}`;
       document.getElementById("result-streak").textContent =
         `Vault: ${state.profile.memorized.length} · Week score: ${state.profile.weekScore}`;
       if (passedTest) {
@@ -4440,7 +4723,8 @@ function startStudy() {
     function startMode(mode) {
       state.mode = mode;
       state.lastMode = mode;
-      document.getElementById("game-ref").textContent = state.verse.ref;
+      document.getElementById("game-ref").textContent =
+        mode === "test" ? "Closed book" : state.verse.ref;
       document.getElementById("game-feedback").className = "feedback";
       showScreen("game");
       if (mode === "study") startStudy();
@@ -4765,13 +5049,27 @@ function startStudy() {
     };
 
     document.getElementById("btn-new-account").onclick = () => startAccountSetup();
-    document.getElementById("btn-create-account").onclick = () => saveAccountSetup();
+    document.getElementById("btn-create-account").onclick = () => {
+      startAccountSoundtrack();
+      saveAccountSetup();
+    };
     document.getElementById("btn-setup-back").onclick = () => showAccountPicker();
-    document.getElementById("btn-unlock-account").onclick = () => unlockSelectedAccount();
+    document.getElementById("btn-unlock-account").onclick = () => {
+      startAccountSoundtrack();
+      unlockSelectedAccount();
+    };
     document.getElementById("btn-login-back").onclick = () => showAccountPicker();
     document.getElementById("login-pin").addEventListener("keydown", (event) => {
-      if (event.key === "Enter") unlockSelectedAccount();
+      if (event.key === "Enter") {
+        startAccountSoundtrack();
+        unlockSelectedAccount();
+      }
     });
+    document.addEventListener("pointerdown", () => {
+      if (!musicWanted || !youtubePlayer?.getPlayerState) return;
+      const playing = youtubePlayer.getPlayerState() === window.YT?.PlayerState?.PLAYING;
+      if (!playing) playWantedTrack();
+    }, true);
     document.getElementById("avatar-file").addEventListener("change", async (event) => {
       const file = event.target.files?.[0];
       if (!file) return;
@@ -4851,6 +5149,7 @@ function startStudy() {
         checkDueReminders();
         scheduleAllReminders();
         loadPartner().then(() => updateScoresUI());
+        if (musicWanted) playWantedTrack();
       }
     });
 
