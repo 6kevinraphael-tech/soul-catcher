@@ -886,6 +886,116 @@
 
     .share-row { display: grid; gap: 8px; margin-top: 14px; }
 
+    .dad-gate {
+      margin-top: 18px;
+      padding-top: 16px;
+      border-top: 1px dashed #c5d9d4;
+    }
+
+    .dad-code-row {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 8px;
+    }
+
+    .dad-code-row input {
+      width: 100%;
+      padding: 12px 14px;
+      border: 2px solid #c5d9d4;
+      border-radius: 14px;
+      background: white;
+      font-family: inherit;
+      font-size: 1rem;
+    }
+
+    .btn-small-inline {
+      border: 0;
+      border-radius: 14px;
+      padding: 0 16px;
+      background: var(--deep);
+      color: white;
+      font-family: inherit;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    .dad-grade-card {
+      display: grid;
+      gap: 10px;
+      margin-top: 12px;
+      padding: 14px;
+      border-radius: 18px;
+      background: rgba(255,255,255,0.88);
+      border: 1px solid #d5e6e2;
+    }
+
+    .dad-person {
+      display: grid;
+      grid-template-columns: 52px minmax(0, 1fr) auto;
+      gap: 10px;
+      align-items: center;
+    }
+
+    .dad-person img,
+    .dad-person .avatar-fallback {
+      width: 52px;
+      height: 52px;
+    }
+
+    .dad-person .name { color: var(--deep); font-weight: 800; }
+    .dad-person .meta { color: #5a746f; font-size: 0.78rem; margin-top: 2px; }
+    .dad-month-pts {
+      color: #7a5f10;
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1.6rem;
+      font-weight: 700;
+    }
+
+    .star-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+    }
+
+    .star-btn {
+      width: 42px;
+      height: 42px;
+      border: 2px solid #d5e6e2;
+      border-radius: 12px;
+      background: white;
+      color: #9aa8a5;
+      font-size: 1.15rem;
+      cursor: pointer;
+    }
+
+    .star-btn.on {
+      border-color: var(--gold);
+      background: #fff6cf;
+      color: #c9a227;
+    }
+
+    .prize-banner {
+      margin-top: 14px;
+      padding: 14px 16px;
+      border-radius: 18px;
+      background: linear-gradient(135deg, rgba(201, 162, 39, 0.2), rgba(26, 77, 74, 0.1));
+      border: 1px solid rgba(201, 162, 39, 0.35);
+    }
+
+    .prize-banner h2 {
+      font-family: 'Cormorant Garamond', serif;
+      color: var(--deep);
+      font-size: 1.45rem;
+    }
+
+    .prize-banner p { color: #456661; margin-top: 4px; line-height: 1.4; }
+
+    body[data-theme="dark"] .dad-grade-card,
+    body[data-theme="dark"] .star-btn {
+      background: rgba(17, 43, 40, 0.94);
+      border-color: #315b55;
+    }
+
     @media (max-width: 420px) {
       .badge-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
     }
@@ -2056,6 +2166,16 @@
         <p class="translation">Choose an account, then enter its PIN</p>
         <div class="account-list" id="account-list"></div>
         <button class="btn btn-primary" id="btn-new-account">Create a new account</button>
+        <div class="dad-gate">
+          <div class="field" style="margin-top:0">
+            <label for="dad-code">Family code</label>
+            <div class="dad-code-row">
+              <input id="dad-code" type="password" inputmode="numeric" pattern="[0-9]*" maxlength="6" placeholder="••••" autocomplete="off">
+              <button type="button" class="btn-small-inline" id="btn-dad-enter">Open</button>
+            </div>
+          </div>
+          <p class="auth-error" id="dad-code-error"></p>
+        </div>
         <p class="footer-note">Accounts and photos stay on this device. A local PIN keeps siblings from accidentally using each other's account.</p>
       </div>
     </section>
@@ -2123,6 +2243,47 @@
         <button class="btn btn-primary" id="btn-unlock-account">Open account</button>
         <button class="btn btn-ghost" id="btn-login-back">Back to accounts</button>
         <p class="auth-error" id="login-error"></p>
+      </div>
+    </section>
+
+    <!-- DAD SCREEN -->
+    <section id="screen-dad" class="screen">
+      <div class="topbar">
+        <button class="back" id="btn-dad-back">← Accounts</button>
+        <div class="turn-pill">Dad</div>
+      </div>
+      <div class="brand">
+        <div class="brand-mark" aria-hidden="true">V</div>
+        <h1>Dad screen</h1>
+        <p>See this week’s verse, grade each person out of 5 today, and race for the monthly prize.</p>
+      </div>
+      <div class="panel">
+        <div class="month-banner">
+          <div class="month-label" id="dad-week-label">This week</div>
+          <div class="ref" id="dad-verse-ref">—</div>
+          <p class="verse-text" id="dad-verse-text"></p>
+          <div class="translation">NIV · a new family verse every Monday</div>
+        </div>
+
+        <div class="prize-banner" id="dad-prize-banner">
+          <h2 id="dad-prize-title">Monthly prize race</h2>
+          <p id="dad-prize-copy">Whoever earns the most Dad points this month wins the prize.</p>
+        </div>
+
+        <div class="status-row">
+          <div class="status-pill" id="dad-today-pill">Today</div>
+          <div class="status-pill warn" id="dad-month-pill">This month</div>
+        </div>
+
+        <div id="dad-grade-list"></div>
+        <div class="leaderboard" style="margin-top:16px">
+          <div class="leaderboard-head">
+            <h2>Monthly prize standings</h2>
+            <span>Resets next month</span>
+          </div>
+          <div class="leaderboard-list" id="dad-month-standings"></div>
+        </div>
+        <p class="footer-note">Kids still use their own pages to practice and take tests. This screen is only for daily grades out of 5.</p>
       </div>
     </section>
 
@@ -2730,9 +2891,12 @@ const VERSES = [
       document.querySelectorAll("[data-theme-choice]").forEach((button) => {
         button.classList.toggle("active", button.dataset.themeChoice === theme);
       });
-      document.getElementById("settings-reduce-motion").checked = reduceMotion;
-      document.getElementById("settings-autoplay").checked = getAutoplayMusic();
-      document.getElementById("settings-sound").checked = localStorage.getItem(SOUND_KEY) !== "false";
+      const reduceBox = document.getElementById("settings-reduce-motion");
+      const autoplayBox = document.getElementById("settings-autoplay");
+      const soundBox = document.getElementById("settings-sound");
+      if (reduceBox) reduceBox.checked = reduceMotion;
+      if (autoplayBox) autoplayBox.checked = getAutoplayMusic();
+      if (soundBox) soundBox.checked = localStorage.getItem(SOUND_KEY) !== "false";
     }
 
     const LOCAL_ACCOUNTS_KEY = "verse-keepers-local-accounts-v1";
@@ -2796,6 +2960,224 @@ const VERSES = [
 
     function persistLocalAccounts() {
       localStorage.setItem(LOCAL_ACCOUNTS_KEY, JSON.stringify(localAccounts));
+    }
+
+    const DAD_CODE = "2013";
+    const DAD_GRADES_KEY = "verse-keepers-dad-grades-v1";
+    let dadGrades = { days: {}, prizeLog: {} };
+
+    function calendarMonthKey(date = new Date()) {
+      return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}`;
+    }
+
+    function previousCalendarMonthKey(date = new Date()) {
+      const previous = new Date(date.getFullYear(), date.getMonth() - 1, 1);
+      return calendarMonthKey(previous);
+    }
+
+    function loadDadGrades() {
+      try {
+        const saved = JSON.parse(localStorage.getItem(DAD_GRADES_KEY)) || {};
+        dadGrades = {
+          days: saved.days && typeof saved.days === "object" ? saved.days : {},
+          prizeLog: saved.prizeLog && typeof saved.prizeLog === "object" ? saved.prizeLog : {}
+        };
+      } catch {
+        dadGrades = { days: {}, prizeLog: {} };
+      }
+    }
+
+    function persistDadGrades() {
+      localStorage.setItem(DAD_GRADES_KEY, JSON.stringify(dadGrades));
+    }
+
+    function dadDayScore(uid, dayKey = localDayKey()) {
+      const value = dadGrades.days[dayKey]?.[uid];
+      return Number.isFinite(value) ? value : 0;
+    }
+
+    function dadMonthScore(uid, monthKey = calendarMonthKey()) {
+      return Object.entries(dadGrades.days).reduce((total, [day, scores]) => {
+        if (!day.startsWith(monthKey)) return total;
+        return total + (Number.isFinite(scores[uid]) ? scores[uid] : 0);
+      }, 0);
+    }
+
+    function dadMonthStandings(monthKey = calendarMonthKey()) {
+      return Object.values(localAccounts)
+        .map((profile) => ({
+          ...profile,
+          monthScore: dadMonthScore(profile.uid, monthKey),
+          todayScore: dadDayScore(profile.uid)
+        }))
+        .sort((a, b) =>
+          b.monthScore - a.monthScore ||
+          a.displayName.localeCompare(b.displayName)
+        );
+    }
+
+    function lockLastMonthPrize() {
+      const lastMonth = previousCalendarMonthKey();
+      if (dadGrades.prizeLog[lastMonth]) return dadGrades.prizeLog[lastMonth];
+      const standings = dadMonthStandings(lastMonth);
+      if (!standings.length || standings[0].monthScore <= 0) return null;
+      const top = standings[0].monthScore;
+      const winners = standings.filter((entry) => entry.monthScore === top);
+      dadGrades.prizeLog[lastMonth] = {
+        monthKey: lastMonth,
+        points: top,
+        names: winners.map((entry) => entry.displayName),
+        uids: winners.map((entry) => entry.uid)
+      };
+      persistDadGrades();
+      return dadGrades.prizeLog[lastMonth];
+    }
+
+    function setDadGrade(uid, stars) {
+      const day = localDayKey();
+      dadGrades.days[day] = { ...(dadGrades.days[day] || {}), [uid]: stars };
+      persistDadGrades();
+      updateDadScreen();
+    }
+
+    function openDadScreen() {
+      const code = document.getElementById("dad-code").value.trim();
+      const error = document.getElementById("dad-code-error");
+      if (code !== DAD_CODE) {
+        error.textContent = "That family code is not correct.";
+        document.getElementById("dad-code").select();
+        return;
+      }
+      error.textContent = "";
+      document.getElementById("dad-code").value = "";
+      loadLocalAccounts();
+      loadDadGrades();
+      updateDadScreen();
+      showScreen("dad");
+    }
+
+    function updateDadScreen() {
+      loadDadGrades();
+      const today = new Date();
+      const monday = mondayStart(today);
+      const weekKeyValue = verseWeekKey(today);
+      const verse = verseForWeek(weekKeyValue);
+      const monthKey = calendarMonthKey(today);
+      const lastPrize = lockLastMonthPrize();
+
+      document.getElementById("dad-week-label").textContent =
+        `Week of ${MONTH_NAMES[monday.getMonth()]} ${monday.getDate()} · new verse Monday`;
+      document.getElementById("dad-verse-ref").textContent = verse.ref;
+      document.getElementById("dad-verse-text").textContent = `"${verse.text}"`;
+      document.getElementById("dad-today-pill").textContent =
+        today.toLocaleDateString(undefined, { weekday: "long", month: "short", day: "numeric" });
+      document.getElementById("dad-month-pill").textContent =
+        `${MONTH_NAMES[today.getMonth()]} prize race`;
+
+      if (lastPrize) {
+        const winnerText = lastPrize.names.length === 1
+          ? lastPrize.names[0]
+          : lastPrize.names.join(" & ");
+        const [year, month] = lastPrize.monthKey.split("-");
+        document.getElementById("dad-prize-title").textContent =
+          `${winnerText} won last month’s prize!`;
+        document.getElementById("dad-prize-copy").textContent =
+          `${winnerText} had ${lastPrize.points} Dad points in ${MONTH_NAMES[Number(month) - 1]} ${year}. This month’s race is open.`;
+      } else {
+        document.getElementById("dad-prize-title").textContent = "Monthly prize race";
+        document.getElementById("dad-prize-copy").textContent =
+          "Grade each person out of 5 every day. At the end of the month, the highest total wins a prize.";
+      }
+
+      const list = document.getElementById("dad-grade-list");
+      const accounts = Object.values(localAccounts);
+      if (!accounts.length) {
+        list.innerHTML = `<p class="empty-hint">No kid accounts yet. Have them create accounts on the sign-in page first.</p>`;
+        document.getElementById("dad-month-standings").innerHTML = "";
+        return;
+      }
+
+      list.innerHTML = "";
+      accounts.forEach((profile) => {
+        const todayScore = dadDayScore(profile.uid);
+        const monthScore = dadMonthScore(profile.uid, monthKey);
+        const currentVerse = verseForWeek(
+          profile.weeklyVerseKey || weekKeyValue,
+          profile.weeklyVerseIndex || 0
+        );
+        const card = document.createElement("div");
+        card.className = "dad-grade-card";
+
+        const person = document.createElement("div");
+        person.className = "dad-person";
+        let avatar;
+        if (profile.photoURL) {
+          avatar = document.createElement("img");
+          avatar.src = profile.photoURL;
+          avatar.alt = "";
+        } else {
+          avatar = document.createElement("div");
+          avatar.className = "avatar-fallback";
+          avatar.textContent = (profile.displayName || "?").charAt(0).toUpperCase();
+        }
+        const info = document.createElement("div");
+        info.innerHTML = `<div class="name">${profile.displayName}</div>
+          <div class="meta">Working on ${currentVerse.ref} · Today ${todayScore}/5</div>`;
+        const monthPts = document.createElement("div");
+        monthPts.className = "dad-month-pts";
+        monthPts.textContent = monthScore;
+        person.append(avatar, info, monthPts);
+
+        const stars = document.createElement("div");
+        stars.className = "star-row";
+        stars.setAttribute("aria-label", `Grade ${profile.displayName} out of 5`);
+        for (let star = 1; star <= 5; star++) {
+          const button = document.createElement("button");
+          button.type = "button";
+          button.className = `star-btn${star <= todayScore ? " on" : ""}`;
+          button.textContent = "★";
+          button.setAttribute("aria-label", `${star} out of 5`);
+          button.onclick = () => setDadGrade(profile.uid, star === todayScore ? 0 : star);
+          stars.appendChild(button);
+        }
+
+        card.append(person, stars);
+        list.appendChild(card);
+      });
+
+      const standings = document.getElementById("dad-month-standings");
+      standings.innerHTML = "";
+      dadMonthStandings(monthKey).forEach((profile, index) => {
+        const row = document.createElement("div");
+        row.className = "leaderboard-row";
+        const rank = document.createElement("div");
+        rank.className = "leaderboard-rank";
+        rank.textContent = ["🥇", "🥈", "🥉"][index] || `#${index + 1}`;
+        let avatar;
+        if (profile.photoURL) {
+          avatar = document.createElement("img");
+          avatar.src = profile.photoURL;
+          avatar.alt = "";
+        } else {
+          avatar = document.createElement("div");
+          avatar.className = "avatar-fallback";
+          avatar.textContent = profile.displayName.charAt(0).toUpperCase();
+        }
+        const identity = document.createElement("div");
+        identity.className = "leaderboard-name";
+        identity.textContent = profile.displayName;
+        const vault = document.createElement("span");
+        vault.className = "leaderboard-vault";
+        vault.textContent = profile.todayScore
+          ? `Today ${profile.todayScore}/5`
+          : "Not graded yet today";
+        identity.appendChild(vault);
+        const points = document.createElement("div");
+        points.className = "leaderboard-points";
+        points.textContent = `${profile.monthScore} pts`;
+        row.append(rank, avatar, identity, points);
+        standings.appendChild(row);
+      });
     }
 
     async function saveProfile(patch = {}) {
@@ -4930,6 +5312,8 @@ function startStudy() {
       selectedAccountId = null;
       loadLocalAccounts();
       renderAccountList();
+      const dadError = document.getElementById("dad-code-error");
+      if (dadError) dadError.textContent = "";
       showScreen("auth");
     }
 
@@ -5048,6 +5432,11 @@ function startStudy() {
         "Using your initial.";
     };
 
+    document.getElementById("btn-dad-enter").onclick = () => openDadScreen();
+    document.getElementById("btn-dad-back").onclick = () => showAccountPicker();
+    document.getElementById("dad-code").addEventListener("keydown", (event) => {
+      if (event.key === "Enter") openDadScreen();
+    });
     document.getElementById("btn-new-account").onclick = () => startAccountSetup();
     document.getElementById("btn-create-account").onclick = () => {
       startAccountSoundtrack();
@@ -5170,13 +5559,18 @@ function startStudy() {
     }, 30000);
 
     // boot
-    state.verseKey = verseWeekKey();
-    state.verse = verseForWeek(state.verseKey);
-    loadLocalAccounts();
-    applyPreferences();
-    initBackgroundMusic();
-    showAccountPicker();
-    registerSW();
+    try {
+      state.verseKey = verseWeekKey();
+      state.verse = verseForWeek(state.verseKey);
+      loadLocalAccounts();
+      applyPreferences();
+      initBackgroundMusic();
+      showAccountPicker();
+      registerSW();
+    } catch (error) {
+      console.error(error);
+      showAccountPicker();
+    }
   </script>
 </body>
 </html>
