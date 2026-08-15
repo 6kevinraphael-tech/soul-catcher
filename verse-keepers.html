@@ -2938,10 +2938,13 @@ const VERSES = [
       const id = String(uid || "").trim().toLowerCase();
       return (
         id === "kevin" ||
+        id === "rachel" ||
         id === "test" ||
         id.startsWith("test-") ||
         name === "kevin" ||
-        name === "test"
+        name === "test" ||
+        name === "rachel" ||
+        name === "rachel booth"
       );
     }
 
@@ -3035,7 +3038,14 @@ const VERSES = [
       let changed = false;
       const remoteAccounts = data.accounts && typeof data.accounts === "object" ? data.accounts : {};
       Object.entries(remoteAccounts).forEach(([uid, remote]) => {
-        if (!remote || shouldRemoveAccount(uid, remote)) return;
+        if (!remote || shouldRemoveAccount(uid, remote)) {
+          if (localAccounts[uid]) {
+            delete localAccounts[uid];
+            changed = true;
+          }
+          if (remote && shouldRemoveAccount(uid, remote)) deleteFamilyAccount(uid);
+          return;
+        }
         const local = localAccounts[uid];
         const remoteTime = remote.updatedAt || 0;
         const localTime = local?.updatedAt || 0;
