@@ -2929,12 +2929,32 @@ const VERSES = [
       };
     }
 
+    function shouldRemoveAccount(uid, profile) {
+      const name = (profile?.displayName || "").trim().toLowerCase();
+      const id = String(uid || "").trim().toLowerCase();
+      return (
+        id === "kevin" ||
+        id === "test" ||
+        id.startsWith("test-") ||
+        name === "kevin" ||
+        name === "test"
+      );
+    }
+
     function loadLocalAccounts() {
       try {
         localAccounts = JSON.parse(localStorage.getItem(LOCAL_ACCOUNTS_KEY)) || {};
       } catch {
         localAccounts = {};
       }
+      let removed = false;
+      for (const uid of Object.keys(localAccounts)) {
+        if (shouldRemoveAccount(uid, localAccounts[uid])) {
+          delete localAccounts[uid];
+          removed = true;
+        }
+      }
+      if (removed) persistLocalAccounts();
       for (const [uid, profile] of Object.entries(localAccounts)) {
         localAccounts[uid] = {
           ...makeLocalProfile(uid, profile.displayName || "Verse Keeper"),
@@ -2984,6 +3004,11 @@ const VERSES = [
         };
       } catch {
         dadGrades = { days: {}, prizeLog: {} };
+      }
+      for (const scores of Object.values(dadGrades.days)) {
+        for (const uid of Object.keys(scores)) {
+          if (shouldRemoveAccount(uid, { displayName: uid })) delete scores[uid];
+        }
       }
     }
 
