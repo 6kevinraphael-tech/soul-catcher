@@ -2176,7 +2176,8 @@
           </div>
           <p class="auth-error" id="dad-code-error"></p>
         </div>
-        <p class="footer-note">Accounts and photos stay on this device. A local PIN keeps siblings from accidentally using each other's account.</p>
+        <p class="notify-status" id="family-sync-status">Connecting family sync…</p>
+        <p class="footer-note">Your account syncs to the family so siblings show up on the leaderboard from any iPad or phone. A PIN still keeps people out of each other's page.</p>
       </div>
     </section>
 
@@ -2656,6 +2657,9 @@
     </section>
   </div>
 
+  <script src="firebase-config.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js"></script>
   <script>
 const VERSES = [
       { ref: "John 3:16", text: "For God so loved the world that he gave his one and only Son, that whoever believes in him shall not perish but have eternal life." },
@@ -2978,8 +2982,141 @@ const VERSES = [
       }
     }
 
-    function persistLocalAccounts() {
+    function persistLocalAccounts(options = {}) {
       localStorage.setItem(LOCAL_ACCOUNTS_KEY, JSON.stringify(localAccounts));
+      if (options.sync !== false) queueFamilySync();
+    }
+
+    const FAMILY_ID = "verse-keepers-family-2013";
+    const FALLBACK_FIREBASE = {
+      apiKey: "AIzaSyBukyZceQ8EeDL9j7QJNQahEm3zqKPxj6c",
+      authDomain: "united-to-serve-prayer.firebaseapp.com",
+      projectId: "united-to-serve-prayer",
+      storageBucket: "united-to-serve-prayer.firebasestorage.app",
+      messagingSenderId: "989477297340",
+      appId: "1:989477297340:web:ce88c3c98c435a83a6c4b9"
+    };
+    let familyDoc = null;
+    let familySyncTimer = null;
+    let applyingFamilyRemote = false;
+
+    function setFamilySyncStatus(text) {
+      const status = document.getElementById("family-sync-status");
+      if (status) status.textContent = text;
+    }
+
+    function cleanForCloud(value) {
+      return JSON.parse(JSON.stringify(value));
+    }
+
+    function initFamilySync() {
+      if (!window.firebase) {
+        setFamilySyncStatus("Family sync needs an internet connection.");
+        return;
+      }
+      try {
+        const config = window.FIREBASE_CONFIG || FALLBACK_FIREBASE;
+        if (!firebase.apps.length) firebase.initializeApp(config);
+        familyDoc = firebase.firestore().collection("prayerChains").doc(FAMILY_ID);
+        familyDoc.onSnapshot((snap) => {
+          applyFamilyRemote(snap.data() || {});
+          setFamilySyncStatus("Family sync is on. Accounts from every device show up here.");
+        }, () => {
+          setFamilySyncStatus("Family sync could not connect. Check the internet and try again.");
+        });
+        queueFamilySync();
+      } catch {
+        setFamilySyncStatus("Family sync could not start.");
+      }
+    }
+
+    function applyFamilyRemote(data) {
+      applyingFamilyRemote = true;
+      let changed = false;
+      const remoteAccounts = data.accounts && typeof data.accounts === "object" ? data.accounts : {};
+      Object.entries(remoteAccounts).forEach(([uid, remote]) => {
+        if (!remote || shouldRemoveAccount(uid, remote)) return;
+        const local = localAccounts[uid];
+        const remoteTime = remote.updatedAt || 0;
+        const localTime = local?.updatedAt || 0;
+        if (local && localTime > remoteTime) return;
+        localAccounts[uid] = {
+          ...makeLocalProfile(uid, remote.displayName || "Verse Keeper"),
+          ...remote,
+          uid
+        };
+        if (state.user?.uid === uid) state.profile = localAccounts[uid];
+        changed = true;
+      });
+
+      if (data.dadGrades && typeof data.dadGrades === "object") {
+        const remoteDays = data.dadGrades.days && typeof data.dadGrades.days === "object"
+          ? data.dadGrades.days
+          : {};
+        dadGrades.days = { ...remoteDays, ...dadGrades.days };
+        Object.entries(remoteDays).forEach(([day, scores]) => {
+          dadGrades.days[day] = { ...(dadGrades.days[day] || {}), ...scores };
+        });
+        if (data.dadGrades.prizeLog && typeof data.dadGrades.prizeLog === "object") {
+          dadGrades.prizeLog = { ...data.dadGrades.prizeLog, ...dadGrades.prizeLog };
+        }
+        persistDadGrades({ sync: false });
+      }
+
+      if (changed) {
+        persistLocalAccounts({ sync: false });
+        renderAccountList();
+        if (state.profile) {
+          loadPartner().then(() => {
+            if (document.getElementById("screen-home")?.classList.contains("active")) updateHome();
+            else {
+              updateLeaderboardUI();
+              updateScoresUI();
+              updateVaultUI();
+            }
+          });
+        }
+        if (document.getElementById("screen-dad")?.classList.contains("active")) updateDadScreen();
+      }
+      applyingFamilyRemote = false;
+    }
+
+    function queueFamilySync() {
+      if (applyingFamilyRemote || !familyDoc) return;
+      clearTimeout(familySyncTimer);
+      familySyncTimer = setTimeout(pushFamilyState, 250);
+    }
+
+    async function pushFamilyState() {
+      if (!familyDoc || applyingFamilyRemote) return;
+      const accounts = {};
+      Object.values(localAccounts).forEach((profile) => {
+        if (!profile?.uid || !profile.pinHash || shouldRemoveAccount(profile.uid, profile)) return;
+        accounts[profile.uid] = cleanForCloud({
+          ...profile,
+          updatedAt: profile.updatedAt || Date.now()
+        });
+      });
+      try {
+        await familyDoc.set({
+          accounts,
+          dadGrades: cleanForCloud(dadGrades),
+          updatedAt: Date.now()
+        }, { merge: true });
+      } catch {
+        setFamilySyncStatus("Family sync could not save. Check the internet.");
+      }
+    }
+
+    async function deleteFamilyAccount(uid) {
+      if (!familyDoc || !uid) return;
+      try {
+        await familyDoc.update({
+          [`accounts.${uid}`]: firebase.firestore.FieldValue.delete()
+        });
+      } catch {
+        /* keep local delete even if the cloud delete fails */
+      }
     }
 
     const DAD_CODE = "2013";
@@ -3012,8 +3149,9 @@ const VERSES = [
       }
     }
 
-    function persistDadGrades() {
+    function persistDadGrades(options = {}) {
       localStorage.setItem(DAD_GRADES_KEY, JSON.stringify(dadGrades));
+      if (options.sync !== false) queueFamilySync();
     }
 
     function dadDayScore(uid, dayKey = localDayKey()) {
@@ -3207,7 +3345,7 @@ const VERSES = [
 
     async function saveProfile(patch = {}) {
       if (!state.user || !state.profile) return;
-      state.profile = { ...state.profile, ...patch };
+      state.profile = { ...state.profile, ...patch, updatedAt: Date.now() };
       localAccounts[state.user.uid] = state.profile;
       persistLocalAccounts();
     }
@@ -3476,13 +3614,14 @@ const VERSES = [
 
     async function loadPartner() {
       if (!state.user) return;
-      const partnerEntry = Object.entries(localAccounts)
-        .find(([uid]) => uid !== state.user.uid);
-      if (!partnerEntry) {
+      const others = Object.values(localAccounts).filter((profile) =>
+        profile.uid !== state.user.uid && !shouldRemoveAccount(profile.uid, profile)
+      );
+      const data = others.find((profile) => profile.pinHash) || others[0];
+      if (!data) {
         state.partner = null;
         return;
       }
-      const data = partnerEntry[1];
       let weekScore = data.weekScore || 0;
       if (data.weekKey !== weekKey()) weekScore = 0;
       state.partner = {
@@ -5307,6 +5446,7 @@ function startStudy() {
       localAccounts[uid] = {
         ...existing,
         uid,
+        updatedAt: Date.now(),
         displayName: name,
         photoURL: setupAvatarData,
         pinSalt,
@@ -5364,7 +5504,8 @@ function startStudy() {
       if (!confirmed) return;
 
       delete localAccounts[uid];
-      persistLocalAccounts();
+      persistLocalAccounts({ sync: false });
+      deleteFamilyAccount(uid);
       clearLocalNotifyTimers();
       state.user = null;
       state.profile = null;
@@ -5591,6 +5732,7 @@ function startStudy() {
       applyPreferences();
       initBackgroundMusic();
       showAccountPicker();
+      initFamilySync();
       registerSW();
     } catch (error) {
       console.error(error);
