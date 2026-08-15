@@ -2409,7 +2409,7 @@
 
         <div class="music-box">
           <h2>Background music</h2>
-          <p class="sub">Pick a YouTube track and set the volume. Playback stays inside YouTube's official player.</p>
+          <p class="sub">Pick a soundtrack and set the volume. These tracks are ad-free.</p>
           <div class="track-row" role="group" aria-label="Choose a track">
             <button type="button" class="track-btn active" data-track="1" id="track-btn-1">
               <span class="label">Track 1</span>
@@ -2420,7 +2420,7 @@
               Background track 2
             </button>
           </div>
-          <div id="youtube-music-player" aria-hidden="true" style="position:absolute;width:1px;height:1px;overflow:hidden;opacity:0;pointer-events:none"></div>
+          <audio id="local-music-player" loop playsinline preload="none"></audio>
           <div class="music-controls">
             <button type="button" class="music-toggle off" id="btn-music-toggle">Play</button>
             <div class="volume-wrap">
@@ -2508,7 +2508,7 @@
 
         <div class="settings-section">
           <h2>Background music</h2>
-          <p>Choose the default soundtrack and adjust its volume.</p>
+          <p>Choose the default soundtrack and adjust its volume. No ads.</p>
           <div class="track-row">
             <button type="button" class="track-btn" data-track="1">
               <span class="label">Track 1</span>
@@ -2731,8 +2731,8 @@ const VERSES = [
 
     const localNotifyTimers = [];
     const MUSIC_TRACKS = {
-      1: { videoId: "3G3vzexbf64", name: "Track 1" },
-      2: { videoId: "NH8uI4EJ0bo", name: "Track 2" }
+      1: { file: "music/verse-keepers-track1.mp3", name: "Track 1", notes: [196, 247, 294, 330] },
+      2: { file: "music/verse-keepers-track2.mp3", name: "Track 2", notes: [220, 277, 330, 370] }
     };
     const MUSIC_VOL_KEY = "vk-music-volume";
     const MUSIC_TRACK_KEY = "vk-music-track";
@@ -2787,7 +2787,11 @@ const VERSES = [
       { title: "Crown of Wisdom", icon: "👑" }
     ];
     const XP_PER_LEVEL = 120;
-    let youtubePlayer = null;
+    let localMusic = null;
+    let generatedCtx = null;
+    let generatedNodes = [];
+    let generatedTimer = null;
+    let usingGenerated = false;
     let musicReady = false;
     let musicWanted = false;
     let activeTrack = 1;
@@ -2934,18 +2938,13 @@ const VERSES = [
     }
 
     function shouldRemoveAccount(uid, profile) {
-      const name = (profile?.displayName || "").trim().toLowerCase();
       const id = String(uid || "").trim().toLowerCase();
-      return (
+      const isLegacyStub =
         id === "kevin" ||
         id === "rachel" ||
         id === "test" ||
-        id.startsWith("test-") ||
-        name === "kevin" ||
-        name === "test" ||
-        name === "rachel" ||
-        name === "rachel booth"
-      );
+        id.startsWith("test-");
+      return isLegacyStub && !profile?.pinHash;
     }
 
     function loadLocalAccounts() {
@@ -4271,12 +4270,18 @@ const VERSES = [
       document.getElementById("music-volume-label").textContent = `Volume ${pct}%`;
       document.getElementById("settings-volume").value = String(pct);
       document.getElementById("settings-volume-label").textContent = `Volume ${pct}%`;
-      if (youtubePlayer?.setVolume) youtubePlayer.setVolume(pct);
+      if (localMusic) localMusic.volume = pct / 100;
+      if (generatedCtx?.gain) generatedCtx.gain.gain.value = (pct / 100) * 0.12;
+    }
+
+    function isMusicPlaying() {
+      if (usingGenerated && generatedCtx) return musicWanted;
+      return Boolean(localMusic && !localMusic.paused && !localMusic.ended);
     }
 
     function updateMusicToggleUI() {
       const btn = document.getElementById("btn-music-toggle");
-      const playing = youtubePlayer?.getPlayerState?.() === window.YT?.PlayerState?.PLAYING;
+      const playing = isMusicPlaying();
       btn.textContent = playing ? "Pause" : "Play";
       btn.classList.toggle("off", !playing);
     }
@@ -4287,107 +4292,125 @@ const VERSES = [
       });
     }
 
-    function musicStatusForTrack(ok) {
-      const track = MUSIC_TRACKS[activeTrack];
-      if (ok) {
-        document.getElementById("music-status").textContent =
-          `${track.name} ready — press Play.`;
-      } else {
-        document.getElementById("music-status").textContent =
-          "YouTube could not load this track. Check your connection or the video's embed settings.";
+    function stopGeneratedMusic() {
+      if (generatedTimer) {
+        clearInterval(generatedTimer);
+        generatedTimer = null;
       }
+      generatedNodes.forEach((node) => {
+        try { node.stop(); } catch { /* already stopped */ }
+        try { node.disconnect(); } catch { /* already disconnected */ }
+      });
+      generatedNodes = [];
+      usingGenerated = false;
+    }
+
+    function startGeneratedMusic(trackId) {
+      stopGeneratedMusic();
+      const AudioCtx = window.AudioContext || window.webkitAudioContext;
+      if (!AudioCtx) return false;
+      if (!generatedCtx?.ctx) {
+        const ctx = new AudioCtx();
+        const gain = ctx.createGain();
+        const filter = ctx.createBiquadFilter();
+        filter.type = "lowpass";
+        filter.frequency.value = 900;
+        gain.connect(filter);
+        filter.connect(ctx.destination);
+        generatedCtx = { ctx, gain, filter };
+      }
+      generatedCtx.gain.gain.value = (getSavedVolume() / 100) * 0.12;
+      generatedCtx.ctx.resume?.();
+      const notes = MUSIC_TRACKS[trackId].notes;
+      const playChord = () => {
+        if (!musicWanted || !generatedCtx) return;
+        const now = generatedCtx.ctx.currentTime;
+        notes.forEach((freq, index) => {
+          const osc = generatedCtx.ctx.createOscillator();
+          const env = generatedCtx.ctx.createGain();
+          osc.type = index % 2 ? "triangle" : "sine";
+          osc.frequency.value = freq;
+          env.gain.setValueAtTime(0.0001, now);
+          env.gain.exponentialRampToValueAtTime(0.18, now + 0.4);
+          env.gain.exponentialRampToValueAtTime(0.0001, now + 5.5);
+          osc.connect(env);
+          env.connect(generatedCtx.gain);
+          osc.start(now);
+          osc.stop(now + 6);
+          generatedNodes.push(osc, env);
+        });
+      };
+      playChord();
+      generatedTimer = setInterval(playChord, 4800);
+      usingGenerated = true;
+      musicReady = true;
+      return true;
     }
 
     function playWantedTrack({ restart = false } = {}) {
       const track = MUSIC_TRACKS[activeTrack] || MUSIC_TRACKS[2];
-      if (!youtubePlayer) {
-        document.getElementById("music-status").textContent = `Starting ${track.name}…`;
-        return false;
-      }
-      try {
-        const playerState = youtubePlayer.getPlayerState?.();
-        const playing = playerState === window.YT?.PlayerState?.PLAYING;
-        const buffering = playerState === window.YT?.PlayerState?.BUFFERING;
-        if (!restart && (playing || buffering)) return true;
-        youtubePlayer.unMute?.();
-        youtubePlayer.setVolume(getSavedVolume());
-        if (restart || playerState === window.YT?.PlayerState?.UNSTARTED || playerState === window.YT?.PlayerState?.CUED || playerState === -1) {
-          if (youtubePlayer.loadVideoById) youtubePlayer.loadVideoById(track.videoId);
+      if (!musicWanted) return false;
+      if (!restart && isMusicPlaying()) return true;
+      if (!localMusic) localMusic = document.getElementById("local-music-player");
+      stopGeneratedMusic();
+      if (localMusic) {
+        localMusic.loop = true;
+        localMusic.volume = getSavedVolume() / 100;
+        if (restart || localMusic.getAttribute("data-track") !== String(activeTrack)) {
+          localMusic.src = track.file;
+          localMusic.setAttribute("data-track", String(activeTrack));
         }
-        youtubePlayer.playVideo?.();
-        document.getElementById("music-status").textContent = `Playing ${track.name}.`;
-        return true;
-      } catch {
-        document.getElementById("music-status").textContent = `Starting ${track.name}…`;
-        return false;
+        const playLocal = localMusic.play();
+        if (playLocal && typeof playLocal.then === "function") {
+          playLocal.then(() => {
+            musicReady = true;
+            usingGenerated = false;
+            document.getElementById("music-status").textContent = `Playing ${track.name}.`;
+            updateMusicToggleUI();
+          }).catch(() => {
+            startGeneratedMusic(activeTrack);
+            document.getElementById("music-status").textContent = `Playing ${track.name}.`;
+            updateMusicToggleUI();
+          });
+          return true;
+        }
       }
+      startGeneratedMusic(activeTrack);
+      document.getElementById("music-status").textContent = `Playing ${track.name}.`;
+      updateMusicToggleUI();
+      return true;
+    }
+
+    function pauseWantedTrack() {
+      musicWanted = false;
+      if (localMusic) localMusic.pause();
+      stopGeneratedMusic();
+      document.getElementById("music-status").textContent = "Music paused.";
+      updateMusicToggleUI();
     }
 
     function loadTrack(trackId, { autoplay = false } = {}) {
       activeTrack = trackId === 2 ? 2 : 1;
       localStorage.setItem(MUSIC_TRACK_KEY, String(activeTrack));
       updateTrackButtons();
-      const track = MUSIC_TRACKS[activeTrack];
-      const shouldPlay = autoplay || musicWanted;
-      if (shouldPlay) musicWanted = true;
-      if (!youtubePlayer?.loadVideoById) {
-        document.getElementById("music-status").textContent = "Loading YouTube player…";
-        return;
-      }
-      if (shouldPlay) {
+      if (autoplay || musicWanted) {
+        musicWanted = true;
         playWantedTrack({ restart: true });
       } else {
-        youtubePlayer.cueVideoById(track.videoId);
-        youtubePlayer.setVolume(getSavedVolume());
-        musicStatusForTrack(true);
+        document.getElementById("music-status").textContent =
+          `${MUSIC_TRACKS[activeTrack].name} ready — press Play.`;
       }
     }
 
     function initBackgroundMusic() {
       const pct = getSavedVolume();
+      localMusic = document.getElementById("local-music-player");
       setMusicVolumeUI(pct);
       activeTrack = getSavedTrack();
       updateTrackButtons();
-      document.getElementById("music-status").textContent = "Loading YouTube player…";
-
-      window.onYouTubeIframeAPIReady = () => {
-        youtubePlayer = new YT.Player("youtube-music-player", {
-          height: "1",
-          width: "1",
-          videoId: MUSIC_TRACKS[activeTrack].videoId,
-          playerVars: { autoplay: 0, controls: 0, playsinline: 1 },
-          events: {
-            onReady: (event) => {
-              musicReady = true;
-              event.target.setVolume(getSavedVolume());
-              if (musicWanted) playWantedTrack();
-              else musicStatusForTrack(true);
-              updateMusicToggleUI();
-            },
-            onStateChange: (event) => {
-              if (event.data === YT.PlayerState.ENDED && musicWanted) {
-                event.target.seekTo(0);
-                event.target.playVideo();
-              }
-              if (event.data === YT.PlayerState.PLAYING) {
-                document.getElementById("music-status").textContent =
-                  `Playing ${MUSIC_TRACKS[activeTrack].name}.`;
-              }
-              updateMusicToggleUI();
-            },
-            onError: () => {
-              musicReady = false;
-              musicWanted = false;
-              musicStatusForTrack(false);
-              updateMusicToggleUI();
-            }
-          }
-        });
-      };
-
-      const api = document.createElement("script");
-      api.src = "https://www.youtube.com/iframe_api";
-      document.head.appendChild(api);
+      musicReady = true;
+      document.getElementById("music-status").textContent =
+        `${MUSIC_TRACKS[activeTrack].name} ready — press Play.`;
 
       document.getElementById("music-volume").addEventListener("input", (e) => {
         const v = Number(e.target.value);
@@ -4403,27 +4426,17 @@ const VERSES = [
       document.querySelectorAll("[data-track]").forEach((btn) => {
         btn.addEventListener("click", () => {
           const id = Number(btn.getAttribute("data-track"));
-          if (id === activeTrack) return;
+          if (id === activeTrack && isMusicPlaying()) return;
           loadTrack(id, { autoplay: musicWanted });
         });
       });
 
       document.getElementById("btn-music-toggle").onclick = () => {
-        if (!musicReady || !youtubePlayer) {
-          document.getElementById("music-status").textContent = "YouTube player is still loading…";
-          return;
-        }
-        if (youtubePlayer.getPlayerState() === YT.PlayerState.PLAYING) {
-          musicWanted = false;
-          youtubePlayer.pauseVideo();
-          document.getElementById("music-status").textContent = "Music paused.";
-        } else {
+        if (isMusicPlaying()) pauseWantedTrack();
+        else {
           musicWanted = true;
-          youtubePlayer.playVideo();
-          document.getElementById("music-status").textContent =
-            `Playing ${MUSIC_TRACKS[activeTrack].name}.`;
+          playWantedTrack({ restart: true });
         }
-        updateMusicToggleUI();
       };
     }
 
@@ -5449,21 +5462,26 @@ function startStudy() {
         return;
       }
 
-      const uid = selectedAccountId || `account-${Date.now()}-${randomHex(4)}`;
-      const existing = localAccounts[uid] || makeLocalProfile(uid, name);
-      const pinSalt = existing.pinSalt || randomHex();
-      const pinHash = await hashPin(pin, pinSalt);
-      localAccounts[uid] = {
-        ...existing,
-        uid,
-        updatedAt: Date.now(),
-        displayName: name,
-        photoURL: setupAvatarData,
-        pinSalt,
-        pinHash
-      };
-      persistLocalAccounts();
-      await chooseLocalAccount(uid);
+      try {
+        const uid = selectedAccountId || `account-${Date.now()}-${randomHex(4)}`;
+        const existing = localAccounts[uid] || makeLocalProfile(uid, name);
+        const pinSalt = existing.pinSalt || randomHex();
+        const pinHash = await hashPin(pin, pinSalt);
+        localAccounts[uid] = {
+          ...existing,
+          uid,
+          updatedAt: Date.now(),
+          displayName: name,
+          photoURL: setupAvatarData || existing.photoURL || "",
+          pinSalt,
+          pinHash
+        };
+        persistLocalAccounts();
+        await chooseLocalAccount(uid);
+      } catch (err) {
+        console.error(err);
+        error.textContent = "The account could not be saved. Try again.";
+      }
     }
 
     async function unlockSelectedAccount() {
@@ -5493,9 +5511,14 @@ function startStudy() {
     }
 
     async function chooseLocalAccount(uid) {
-      loadLocalAccounts();
-      state.user = { uid, displayName: localAccounts[uid].displayName, photoURL: "" };
-      state.profile = localAccounts[uid];
+      if (!localAccounts[uid]) loadLocalAccounts();
+      const profile = localAccounts[uid];
+      if (!profile) {
+        showAccountPicker();
+        return;
+      }
+      state.user = { uid, displayName: profile.displayName, photoURL: "" };
+      state.profile = profile;
       startAccountSoundtrack();
       applyWeeklyResetIfNeeded();
       await loadPartner();
@@ -5614,10 +5637,7 @@ function startStudy() {
       if (event.key === "Enter") openDadScreen();
     });
     document.getElementById("btn-new-account").onclick = () => startAccountSetup();
-    document.getElementById("btn-create-account").onclick = () => {
-      startAccountSoundtrack();
-      saveAccountSetup();
-    };
+    document.getElementById("btn-create-account").onclick = () => saveAccountSetup();
     document.getElementById("btn-setup-back").onclick = () => showAccountPicker();
     document.getElementById("btn-unlock-account").onclick = () => {
       startAccountSoundtrack();
@@ -5631,9 +5651,7 @@ function startStudy() {
       }
     });
     document.addEventListener("pointerdown", () => {
-      if (!musicWanted || !youtubePlayer?.getPlayerState) return;
-      const playing = youtubePlayer.getPlayerState() === window.YT?.PlayerState?.PLAYING;
-      if (!playing) playWantedTrack();
+      if (musicWanted && !isMusicPlaying()) playWantedTrack();
     }, true);
     document.getElementById("avatar-file").addEventListener("change", async (event) => {
       const file = event.target.files?.[0];
