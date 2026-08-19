@@ -516,12 +516,60 @@
   }
   .scene-lights i:nth-child(even) { animation-delay: -1.6s; background: #ffd7e0; box-shadow: 0 0 9px 3px rgba(255, 200, 214, 0.8); }
   @keyframes twinkle { 0%, 100% { opacity: 0.45; } 50% { opacity: 1; } }
-  .scene.rain::after {
-    content: ''; position: absolute; inset: 0; pointer-events: none; z-index: 8;
-    background-image: repeating-linear-gradient(110deg, transparent 0 10px, rgba(255,255,255,0.18) 10px 11px);
-    animation: rain 0.7s linear infinite; opacity: 0.35;
+  .win-rain {
+    display: none; position: absolute; inset: 0; pointer-events: none; z-index: 2;
+    background-image: repeating-linear-gradient(105deg, transparent 0 7px, rgba(255,255,255,0.45) 7px 8px);
+    animation: rain 0.55s linear infinite; opacity: 0.55;
   }
-  @keyframes rain { to { background-position: 18px 28px; } }
+  .scene.rain .win-rain { display: block; }
+  .scene.rain .win-cloud { opacity: 0.35; }
+  @keyframes rain { to { background-position: 12px 22px; } }
+  .sunbeam {
+    position: absolute; left: 18px; bottom: 22px; width: 110px; height: 170px; z-index: 3;
+    pointer-events: none; display: none;
+    background: linear-gradient(180deg, rgba(255, 236, 176, 0.38), rgba(255, 236, 176, 0.08) 55%, transparent);
+    clip-path: polygon(28% 0, 72% 0, 100% 100%, 0 100%);
+    mix-blend-mode: soft-light;
+  }
+  .scene.morning .sunbeam, .scene.day .sunbeam { display: block; animation: dust 6s ease-in-out infinite; }
+  @keyframes dust { 0%, 100% { opacity: 0.7; } 50% { opacity: 1; } }
+  .wall-clock {
+    position: absolute; right: 112px; top: 14px; width: 26px; height: 26px; z-index: 3;
+    border-radius: 50%; background: #f7efe4; border: 3px solid #a97a52;
+    box-shadow: inset 0 0 0 1px #d8b089, 1px 2px 4px rgba(80,50,30,0.2);
+  }
+  .wall-clock::before, .wall-clock::after {
+    content: ''; position: absolute; background: #6a5344; border-radius: 1px; left: 50%; top: 50%;
+    transform-origin: 50% 90%;
+  }
+  .wall-clock::before { width: 2px; height: 7px; transform: translate(-50%, -90%) rotate(40deg); }
+  .wall-clock::after { width: 2px; height: 5px; transform: translate(-50%, -90%) rotate(-70deg); }
+  .wall-art {
+    position: absolute; left: 132px; top: 158px; width: 34px; height: 40px; z-index: 2;
+    background: linear-gradient(#f7e6d2, #efd2bc); border: 3px solid #c9a078;
+    box-shadow: 2px 4px 8px rgba(80,50,30,0.18), inset 0 0 0 3px #f4eee4;
+    border-radius: 2px;
+  }
+  .wall-art::after {
+    content: '🌸'; position: absolute; inset: 0; display: grid; place-items: center; font-size: 1rem;
+  }
+  .sill-plant {
+    position: absolute; left: 22px; bottom: -2px; z-index: 5; width: 14px; height: 20px;
+    background: radial-gradient(circle at 50% 30%, #7da85a 4px, transparent 5px),
+      linear-gradient(#c56b58, #a24e3e);
+    background-size: 14px 12px, 10px 8px; background-repeat: no-repeat;
+    background-position: 0 0, 2px 12px; border-radius: 2px;
+  }
+  .yarn {
+    position: absolute; bottom: 30px; left: 58%; width: 16px; height: 16px; z-index: 5;
+    border-radius: 50%; background: radial-gradient(circle at 35% 30%, #f4c4cc, #c56d7c);
+    box-shadow: 1px 2px 2px rgba(80,50,30,0.25), inset -3px -2px 0 rgba(255,255,255,0.25);
+    pointer-events: none;
+  }
+  .yarn::after {
+    content: ''; position: absolute; left: 14px; top: 8px; width: 18px; height: 2px;
+    background: #d78d9b; border-radius: 2px; transform: rotate(12deg);
+  }
   .cat-hud {
     position: absolute; left: 10px; bottom: 84px; z-index: 7;
     display: flex; align-items: center; gap: 6px;
@@ -529,8 +577,14 @@
     border-radius: 999px; padding: 3px 8px 3px 6px; font-size: 0.72rem; font-weight: 700;
   }
   .scene.night .cat-hud { background: rgba(40,32,38,0.72); color: #f4e7d8; }
+  .cat-hud .treat-btn {
+    width: 22px; height: 22px; border-radius: 50%; font-size: 0.72rem; padding: 0;
+    background: rgba(255,255,255,0.7); border: 1px solid rgba(150,120,90,0.25);
+  }
   .cat-happy { width: 54px; height: 7px; border-radius: 99px; background: rgba(120,90,70,0.18); overflow: hidden; }
   .cat-happy i { display: block; height: 100%; border-radius: 99px; background: linear-gradient(90deg, #e9a3ae, #d78d9b); }
+  .cat-happy.high i { background: linear-gradient(90deg, #b5d09a, #7a9a6a); }
+  .cat-happy.low i { background: linear-gradient(90deg, #d8c4b8, #b89a8c); }
   .shop-cat-wrap {
     position: absolute; bottom: 28px; z-index: 8;
     width: 104px; height: 90px; border: 0; padding: 0; background: none;
@@ -563,6 +617,26 @@
     font-size: 1.05rem; transform: translateX(-50%);
   }
   .shop-cat-wrap.loot .cat-loot { animation: heartPop 2s ease-out forwards; }
+  .shop-cat-wrap .cat-bubble {
+    position: absolute; left: 50%; bottom: 92px; transform: translateX(-50%);
+    background: #fffdf8; border: 1.5px solid rgba(150,120,90,0.3); border-radius: 10px;
+    padding: 4px 8px; font-size: 0.68rem; font-weight: 700; white-space: nowrap;
+    opacity: 0; pointer-events: none; box-shadow: 0 4px 10px rgba(80,50,30,0.15); z-index: 10;
+  }
+  .shop-cat-wrap.loot .cat-bubble { animation: bubbleIn 2.4s ease-out forwards; }
+  @keyframes bubbleIn {
+    0% { opacity: 0; transform: translate(-50%, 8px) scale(0.8); }
+    14% { opacity: 1; transform: translate(-50%, 0) scale(1); }
+    80% { opacity: 1; }
+    100% { opacity: 0; transform: translate(-50%, -10px) scale(1); }
+  }
+  .shop-cat-wrap.perch { bottom: 138px; width: 78px; height: 68px; z-index: 9; }
+  .shop-cat-wrap.perch .cat-art { width: 78px; height: 68px; }
+  .shop-cat-wrap.climb { bottom: 112px; width: 86px; height: 74px; z-index: 5; }
+  .shop-cat-wrap.climb .cat-art { width: 86px; height: 74px; }
+  .shop-cat-wrap.hide { bottom: 32px; width: 72px; height: 58px; z-index: 6; }
+  .shop-cat-wrap.hide .cat-art { width: 72px; height: 70px; clip-path: inset(42% 8% 0 8% round 8px); }
+  .shop-cat-wrap.sleep.cushioned { bottom: 38px; }
   @keyframes catBob { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-5px); } }
   .shop-cat-wrap.flip.walk .cat-art { animation-name: catBobFlip; }
   @keyframes catBobFlip { 0%, 100% { transform: scaleX(-1) translateY(0); } 50% { transform: scaleX(-1) translateY(-5px); } }
@@ -1187,7 +1261,7 @@
             <li>Hearts raise your <b>shop rank</b>. 3-star streaks and daily chalkboard wishes pay extra.</li>
             <li>Share a piece from your <b>shelf</b> — friends can open the link and see it.</li>
             <li>In the <b>town square</b>, visit other shops, send them an order, or ask to be partner stores.</li>
-            <li>On day one, pick a <b>shop cat</b>. Pet them, buy cat furniture, and they may wander back with rare beads and coins. Write a motto on the window.</li>
+            <li>On day one, pick a <b>shop cat</b>. Pet them, buy furniture, and feed fish treats. Happier cats nap on the cushion, sit in the window, and bring back rare beads and coins.</li>
             <li>No timers, ever. Leftover orders wait for tomorrow.</li>
           </ul>
         </div>
@@ -1586,6 +1660,7 @@
     { id: 'tower', n: 'Carpeted cat tree', d: 'The deluxe condo. Best rare luck.', cost: 190, happy: 16, rare: 0.08, e: '🏠' }
   ];
   let catPickId = '';
+  let catPickFocus = true;
 
   const GOOD_DESC = {
     colors: 'A new bead, ribbon and paper colour.',
@@ -1758,19 +1833,20 @@
     if ((S.play.catAt || 0) + 12000 > now) {
       toast(name + (napping ? ' blinks at you' : ' is already purring'));
       save();
-      renderScene();
+      updateCatHud();
       return;
     }
     S.play.catAt = now;
     S.hearts += 1;
     if (Math.random() < 0.18) {
       const g = gainCoins(3);
+      if (S.today) S.today.coins = (S.today.coins || 0) + g.got;
       toast(name + ' nosed a coin across the counter · +' + g.got);
     } else toast(napping ? name + ' yawns and keeps napping' : name + ' purrs');
     save();
-    Sound.pop();
+    Sound.meow();
     renderVisit();
-    renderScene();
+    updateCatHud();
     if ($('#statCoins')) $('#statCoins').textContent = S.coins;
     if ($('#statHearts')) $('#statHearts').textContent = S.hearts;
   }
@@ -1783,14 +1859,28 @@
     if (S.catHappy == null) S.catHappy = 36;
     if (S.play && S.play.catPets == null) S.play.catPets = 0;
   }
+  function hasFurn(id) {
+    return !!(S && S.catFurn && S.catFurn.indexOf(id) >= 0);
+  }
   function catFurnBonus(key) {
-    return CAT_FURN.filter(f => (S.catFurn || []).indexOf(f.id) >= 0)
-      .reduce((a, f) => a + (f[key] || 0), 0);
+    return CAT_FURN.filter(f => hasFurn(f.id)).reduce((a, f) => a + (f[key] || 0), 0);
   }
   function catHappyScore() {
     ensureCat();
     const pets = Math.min(16, (S.play && S.play.catPets || 0) * 3);
     return Math.max(0, Math.min(100, (S.catHappy || 0) + catFurnBonus('happy') + pets));
+  }
+  function happyClass(h) {
+    return h >= 70 ? ' high' : h < 40 ? ' low' : '';
+  }
+  function updateCatHud() {
+    const hud = document.querySelector('#shopScene .cat-hud');
+    if (!hud || !S || !S.catId) return;
+    const h = catHappyScore();
+    const bar = hud.querySelector('.cat-happy');
+    const fill = hud.querySelector('.cat-happy i');
+    if (bar) bar.className = 'cat-happy' + happyClass(h);
+    if (fill) fill.style.width = h + '%';
   }
   function catRarePool() {
     const pool = [];
@@ -1809,38 +1899,71 @@
     ensurePlay();
     ensureCat();
     const now = Date.now();
-    if (reason !== 'day' && (S.play.catGiftAt || 0) + 85000 > now) return null;
+    const treat = reason === 'treat';
+    if (reason !== 'day' && !treat && (S.play.catGiftAt || 0) + 85000 > now) return null;
     const happy = catHappyScore();
-    const chance = (reason === 'day' ? 0.45 : 0.2) + happy / 280 + catFurnBonus('rare');
+    const chance = (reason === 'day' ? 0.45 : treat ? 0.5 : 0.2) + happy / 280 + catFurnBonus('rare');
     if (Math.random() > Math.min(0.84, chance)) return null;
     S.play.catGiftAt = now;
     const name = S.catName || shopCatMeta().name;
     const pool = catRarePool();
     const wantRare = pool.length && Math.random() < (0.3 + happy / 220 + catFurnBonus('rare') * 1.8);
     let gift;
+    let bubble = '🪙';
     if (wantRare) {
       pool.sort((a, b) => b.cost - a.cost);
-      const pick = pool[Math.floor(Math.random() * Math.min(6, pool.length))];
-      if (!S.unlocked[pick.cat]) S.unlocked[pick.cat] = [];
-      S.unlocked[pick.cat].push(pick.id);
-      gift = { kind: 'rare', icon: '🐾', text: name + ' trotted in with ' + goodName(pick.cat, pick.id), amt: 0 };
-      toast('🐾 ' + name + ' brought ' + goodName(pick.cat, pick.id));
+      const pickIt = pool[Math.floor(Math.random() * Math.min(6, pool.length))];
+      if (!S.unlocked[pickIt.cat]) S.unlocked[pickIt.cat] = [];
+      S.unlocked[pickIt.cat].push(pickIt.id);
+      const label = goodName(pickIt.cat, pickIt.id);
+      gift = { kind: 'rare', icon: '🐾', text: name + ' trotted in with ' + label, amt: 0 };
+      bubble = label;
+      toast('🐾 ' + name + ' brought ' + label);
+      Sound.chime(1);
     } else {
       const g = gainCoins(rand(8, 22) + Math.floor(happy / 10));
       gift = { kind: 'coins', icon: '🐾', text: name + ' dropped coins from the alley', amt: g.got };
+      bubble = '🪙 ' + g.got;
       toast('🐾 ' + name + ' brought 🪙 ' + g.got);
+      Sound.meow();
     }
     S.hearts += 1;
+    if (!S.today) S.today = { log: [], coins: 0 };
+    if (gift.amt) S.today.coins = (S.today.coins || 0) + gift.amt;
+    if (reason !== 'day') S.today.log.push({ icon: gift.icon, text: gift.text, amt: gift.amt || 0 });
     save();
-    Cat.showLoot();
+    Cat.showLoot(bubble);
+    updateCatHud();
     if ($('#statCoins')) $('#statCoins').textContent = S.coins;
     if ($('#statHearts')) $('#statHearts').textContent = S.hearts;
     return gift;
+  }
+  function feedCat() {
+    if (!S || !S.catId) { showCatPicker(); return; }
+    ensureCat();
+    ensurePlay();
+    if (!S.today) S.today = { log: [], coins: 0 };
+    S.today.treats = S.today.treats || 0;
+    const name = S.catName || shopCatMeta().name;
+    if (S.today.treats >= 3) { toast(name + ' is full of treats for today'); return; }
+    if (S.coins < 12) { toast('not quite enough coins yet'); return; }
+    S.coins -= 12;
+    S.today.treats++;
+    S.catHappy = Math.min(100, (S.catHappy || 36) + 10);
+    Cat.pet();
+    Sound.meow();
+    const loot = tryCatGift('treat');
+    if (!loot) toast(name + ' crunches a treat · so happy');
+    save();
+    updateCatHud();
+    if ($('#statCoins')) $('#statCoins').textContent = S.coins;
+    if ($('#screen-restock') && $('#screen-restock').classList.contains('active')) renderRestock();
   }
   function showCatPicker() {
     const modal = $('#catModal');
     if (!modal) return;
     if (!catPickId) catPickId = SHOP_CATS[0].id;
+    catPickFocus = true;
     modal.classList.remove('hidden');
     renderCatPicker();
   }
@@ -1865,7 +1988,10 @@
       '<input id="catNameIn" maxlength="14" placeholder="a good shop-cat name" value="' + esc(nameVal) + '"></div>' +
       '<button class="btn primary" data-act="adoptcat" style="margin-top:14px">This one lives here</button></div>';
     const next = $('#catNameIn');
-    if (next) setTimeout(() => next.focus(), 40);
+    if (next && catPickFocus) {
+      catPickFocus = false;
+      setTimeout(() => next.focus(), 40);
+    }
   }
   function adoptCat() {
     const meta = SHOP_CATS.find(c => c.id === catPickId) || SHOP_CATS[0];
@@ -1880,7 +2006,7 @@
     $('#catModal').classList.add('hidden');
     renderHome();
     toast(S.catName + ' has a new home');
-    Sound.pop();
+    Sound.meow();
   }
   const Cat = {
     mood: 'sit',
@@ -1892,6 +2018,7 @@
       const name = S.catName || shopCatMeta().name;
       return '<button type="button" class="shop-cat-wrap" id="shopCat" data-act="petcat" title="' + esc(name) + ' — tap to pet">' +
         '<span class="cat-heart">💗</span><span class="cat-zzz">z</span><span class="cat-loot">🎁</span>' +
+        '<span class="cat-bubble"></span>' +
         '<img class="cat-art" src="assets/craft-shop/cat-' + S.catId + '.png" alt="' + esc(name) + '">' +
         '</button>';
     },
@@ -1903,26 +2030,50 @@
       el.classList.toggle('sleep', this.mood === 'sleep');
       el.classList.toggle('walk', this.mood === 'walk');
       el.classList.toggle('purr', this.mood === 'purr');
+      el.classList.toggle('perch', this.mood === 'perch');
+      el.classList.toggle('hide', this.mood === 'hide');
+      el.classList.toggle('climb', this.mood === 'climb');
+      el.classList.toggle('cushioned', this.mood === 'sleep' && hasFurn('cushion'));
       el.title = ((S && S.catName) || 'shop cat') + ' — tap to pet';
     },
-    showLoot() {
+    showLoot(label) {
       const el = $('#shopCat');
       if (!el) return;
+      const bubble = el.querySelector('.cat-bubble');
+      if (bubble) bubble.textContent = label || '🎁';
       el.classList.add('loot');
-      setTimeout(() => { const n = $('#shopCat'); if (n) n.classList.remove('loot'); }, 2000);
+      setTimeout(() => { const n = $('#shopCat'); if (n) n.classList.remove('loot'); }, 2400);
+    },
+    goSleep() {
+      this.mood = 'sleep';
+      if (hasFurn('cushion')) { this.x = 28; this.dir = 1; }
+      else if (hasFurn('tower')) { this.mood = 'climb'; this.x = 18; }
     },
     tick() {
       const home = $('#screen-home');
       if (!home || !home.classList.contains('active') || this.mood === 'purr' || !S || !S.catId) return;
       const hour = shopHour();
       const roll = Math.random();
-      if (hour.id === 'night' && roll < 0.6) this.mood = 'sleep';
-      else if (roll < 0.4) {
+      if (hour.id === 'night' && roll < 0.62) this.goSleep();
+      else if (hasFurn('perch') && (hour.id === 'morning' || hour.id === 'day') && roll < 0.2) {
+        this.mood = 'perch'; this.x = 22; this.dir = 1;
+      } else if (hasFurn('tunnel') && roll < 0.16) {
+        this.mood = 'hide'; this.x = 78; this.dir = -1;
+      } else if (hasFurn('tower') && roll < 0.14) {
+        this.mood = 'climb'; this.x = 18; this.dir = 1;
+      } else if (roll < 0.42) {
         this.mood = 'walk';
         this.dir = Math.random() < 0.5 ? -1 : 1;
-        this.x = Math.max(18, Math.min(78, this.x + this.dir * (10 + Math.random() * 26)));
-      } else if (roll < 0.62) this.mood = 'sleep';
-      else this.mood = 'sit';
+        if ((hour.id === 'morning' || hour.id === 'day') && Math.random() < 0.45) {
+          this.x = 32; this.dir = 1;
+        } else {
+          this.x = Math.max(18, Math.min(78, this.x + this.dir * (10 + Math.random() * 26)));
+        }
+      } else if (roll < 0.64) this.goSleep();
+      else {
+        this.mood = 'sit';
+        if (hasFurn('fountain') && Math.random() < 0.4) this.x = 58;
+      }
       this.mount();
       tryCatGift('wander');
     },
@@ -2593,6 +2744,10 @@
     bead(i) { this.fx(520 + (i % SLOTS) * 45, 'triangle', 0.3, 0.09); },
     tap() { this.fx(360, 'sine', 0.14, 0.07); },
     pop() { this.fx(240, 'triangle', 0.2, 0.08); },
+    meow() {
+      this.fx(520, 'sine', 0.12, 0.07);
+      setTimeout(() => this.fx(340, 'sine', 0.18, 0.06), 90);
+    },
     paper() {
       if (!S || !S.settings.sfx || !this.init()) return;
       this.resume();
@@ -3622,18 +3777,25 @@
       ? '<div class="scene-plant" title="Big monstera"><i class="leaf" style="left:2px;bottom:22px;transform:rotate(-18deg)"></i><i class="leaf" style="left:16px;bottom:28px;transform:rotate(22deg) scaleX(-1)"></i><i class="leaf" style="left:8px;bottom:38px;transform:rotate(4deg)"></i><i class="pot"></i></div>'
       : '';
     const happy = S.catId ? catHappyScore() : 0;
+    const treatsLeft = 3 - ((S.today && S.today.treats) || 0);
     const hud = S.catId
-      ? '<div class="cat-hud" title="happiness — furniture and pets help"><span>🐾 ' + esc(S.catName || shopCatMeta().name) + '</span><div class="cat-happy"><i style="width:' + happy + '%"></i></div></div>'
+      ? '<div class="cat-hud" title="happiness — furniture, pets and treats help"><span>🐾 ' + esc(S.catName || shopCatMeta().name) + '</span>' +
+        '<div class="cat-happy' + happyClass(happy) + '"><i style="width:' + happy + '%"></i></div>' +
+        '<button type="button" class="treat-btn" data-act="feedcat" title="' + (treatsLeft > 0 ? 'treat · 🪙 12 · ' + treatsLeft + ' left today' : 'full of treats today') + '">🐟</button></div>'
       : '';
+    const yarn = S.catId ? '<div class="yarn" title="yarn"></div>' : '';
     const el = $('#shopScene');
     el.className = 'scene ' + hour.id + ((S.today && S.today.rain) ? ' rain' : '');
     el.innerHTML =
       '<div class="scene-wall"></div>' +
       '<div class="picture-rail"></div>' +
+      '<div class="sunbeam"></div>' +
       '<div class="hang-lamp a"></div><div class="hang-lamp b"></div>' +
       lights +
-      '<div class="win"><div class="win-sky"><i class="win-cloud"></i><i class="win-star"></i></div>' +
-      '<div class="curtain l"></div><div class="curtain r"></div><div class="win-sill"></div></div>' +
+      '<div class="wall-clock" title="shop clock"></div>' +
+      '<div class="wall-art"></div>' +
+      '<div class="win"><div class="win-sky"><i class="win-cloud"></i><i class="win-star"></i><i class="win-rain"></i></div>' +
+      '<div class="curtain l"></div><div class="curtain r"></div><div class="win-sill"></div><div class="sill-plant"></div></div>' +
       '<div class="pegboard"><span class="peg-tool" style="left:8px;top:10px">✂️</span>' +
       '<span class="peg-tool" style="left:34px;top:28px">🎀</span>' +
       '<span class="peg-tool" style="left:58px;top:12px">📏</span></div>' +
@@ -3641,7 +3803,7 @@
       plant +
       '<div class="wainscot"></div>' +
       '<div class="scene-floor"></div>' +
-      furnHtml +
+      furnHtml + yarn +
       '<div class="counter"><div class="register" title="till"></div>' +
       (props || '<span style="font-size:.85rem;color:#8a6f58;font-family:Caveat,cursive;opacity:.8">a quiet counter</span>') +
       '</div>' +
@@ -4663,7 +4825,8 @@
             '</span><span class="amt">🪙 ' + l.amt + '</span></div>').join('')
         : '<div class="empty-note">nothing sold today — that is allowed ♡</div>') + '</div>' +
       '<div class="day-total">Today<span class="amt">🪙 ' + S.today.coins + '</span></div>' +
-      '<p class="hand" style="font-size:1.35rem;margin-top:14px;color:var(--ink-soft)">you sweep up, water the plants, and turn off the lights.</p>' +
+      '<p class="hand" style="font-size:1.35rem;margin-top:14px;color:var(--ink-soft)">you sweep up' +
+      (S.catName ? ', tuck ' + esc(S.catName) + ' in' : '') + ', and turn off the lights.</p>' +
       ((S.visit && S.visit.streak)
         ? '<p style="color:var(--ink-soft);font-size:.88rem">come back tomorrow in real life to keep your 🔥 ' + S.visit.streak + '-day streak.</p>'
         : '') +
@@ -4789,10 +4952,17 @@
       ensureCat();
       const happy = catHappyScore();
       const who = S.catId ? esc(S.catName || shopCatMeta().name) : 'your shop cat';
+      const treatN = (S.today && S.today.treats) || 0;
+      const treatMax = treatN >= 3;
       body = '<div class="shop-cat"><div class="ctrl-title">Cat corner</div>' +
-        '<p class="shop-keep">' + who + ' is ' + happy + '% happy. Furniture makes finds more likely.</p>' +
-        '<div class="cat-happy" style="width:100%;height:10px;margin:8px 0 14px"><i style="width:' + happy + '%"></i></div>' +
-        '<div class="goods">' + CAT_FURN.map(f => {
+        '<p class="shop-keep">' + who + ' is ' + happy + '% happy. Furniture and treats make rare finds more likely.</p>' +
+        '<div class="cat-happy' + happyClass(happy) + '" style="width:100%;height:10px;margin:8px 0 14px"><i style="width:' + happy + '%"></i></div>' +
+        '<div class="goods">' +
+        '<button class="good' + (treatMax ? ' owned' : '') + '" data-act="feedcat"' + ((treatMax || S.coins < 12 || !S.catId) ? ' disabled' : '') + '>' +
+        '<div class="vis">🐟</div><div class="gname">Fish treats</div>' +
+        '<div class="gdesc">A snack. +10 happy, sometimes a find. ' + treatN + '/3 today</div>' +
+        '<div class="price">' + (treatMax ? 'full today ✓' : '🪙 12') + '</div></button>' +
+        CAT_FURN.map(f => {
           const owned = (S.catFurn || []).indexOf(f.id) >= 0;
           const afford = S.coins >= f.cost;
           return '<button class="good' + (owned ? ' owned' : '') + '" data-act="buyfurn" data-id="' + f.id + '"' +
@@ -5013,6 +5183,7 @@
         break;
       case 'adoptcat': adoptCat(); break;
       case 'buyfurn': buyFurn(id); break;
+      case 'feedcat': feedCat(); break;
       case 'savemotto': {
         const inp = $('#mottoIn');
         S.motto = ((inp && inp.value) || '').trim().slice(0, 28);
