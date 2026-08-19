@@ -163,6 +163,15 @@
     display: inline-block; background: #f3d6dc; color: var(--rose-deep);
     padding: 2px 8px; border-radius: 10px; font-size: 0.75rem; letter-spacing: 0.08em; font-weight: 700;
   }
+  .room-roster { margin-top: 10px; text-align: left; }
+  .room-roster .ctrl-title { margin-bottom: 8px; }
+  .roster-card {
+    display: flex; align-items: center; gap: 10px; width: 100%; text-align: left;
+    padding: 10px 12px; margin-bottom: 6px; border-radius: 14px;
+    background: rgba(255,255,255,0.72); border: 2px solid rgba(150,124,98,0.18);
+  }
+  .roster-card .who { font-weight: 700; }
+  .roster-card .meta { font-size: 0.78rem; color: var(--ink-soft); }
   .lb-list, .shop-list, .mail-list { display: flex; flex-direction: column; gap: 8px; margin: 12px 0; text-align: left; }
   .lb-row, .shop-card, .mail-card {
     display: grid; grid-template-columns: 40px 1fr auto; gap: 10px; align-items: center;
@@ -1262,8 +1271,9 @@
           <div class="field">
             <label for="roomIn">Friend room code</label>
             <input id="roomIn" maxlength="10" placeholder="FRIENDS" autocomplete="off" style="text-transform:uppercase;letter-spacing:0.18em;text-align:center;font-family:Quicksand,sans-serif;font-weight:700">
-            <p class="hint">Same code = same town, leaderboard, and partner shops. Share it with your sister!</p>
+            <p class="hint">Same code = same town on every phone. Shops in the room show up below so you can log in anywhere.</p>
           </div>
+          <div id="roomRoster" class="room-roster"></div>
           <div class="field" id="shopNameField">
             <label for="shopNameIn">Name your shop</label>
             <input id="shopNameIn" maxlength="22" placeholder="Petal &amp; Paper" autocomplete="off">
@@ -2977,7 +2987,10 @@
   let reqKind = 'bracelet';
   let reqTarget = null;
 
+  const RESET_EPOCH = 20260819;
+  const RESET_MARK = 'petalPaper_resetEpoch';
   function shopSaveKey(id) { return SAVE_KEY + '_' + id; }
+  function saveDocId(id) { return 'pp-save-' + id; }
   function sanitizeRoom(code) {
     return String(code || DEFAULT_ROOM).toUpperCase().replace(/[^A-Z0-9]/g, '').slice(0, 10) || DEFAULT_ROOM;
   }
@@ -2995,8 +3008,59 @@
   }
   function lsSet(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch (e) {} }
 
+  function wipeLocalAccounts() {
+    try {
+      const keys = [];
+      for (let i = 0; i < localStorage.length; i++) {
+        const k = localStorage.key(i);
+        if (k && k.indexOf('petalPaper') === 0 && k !== RESET_MARK) keys.push(k);
+      }
+      keys.forEach(k => localStorage.removeItem(k));
+    } catch (e) {}
+  }
+  async function wipeCloudShops() {
+    if (!Net.db && !Net.initFirebase()) return;
+    if (!Net.db) return;
+    try {
+      const metaRef = Net.db.collection('prayerChains').doc('pp-meta');
+      const meta = await metaRef.get();
+      const epoch = meta.exists ? Number((meta.data() || {}).epoch || 0) : 0;
+      if (epoch >= RESET_EPOCH) return;
+      const snap = await Net.db.collection('prayerChains').get();
+      const jobs = [];
+      snap.forEach(doc => {
+        const id = doc.id;
+        if (id === 'pp-meta') return;
+        if (id.indexOf('pp-save-') === 0) jobs.push(doc.ref.delete());
+        else if (id.indexOf('pp-') === 0) {
+          jobs.push(doc.ref.set({
+            players: {},
+            orders: {},
+            partners: {},
+            room: (doc.data() || {}).room || '',
+            updatedAt: Date.now(),
+            wipedAt: Date.now()
+          }, { merge: true }));
+        }
+      });
+      await Promise.all(jobs);
+      await metaRef.set({ epoch: RESET_EPOCH, wipedAt: Date.now() }, { merge: true });
+    } catch (e) { console.warn('cloud wipe', e); }
+  }
+  async function maybeResetTests() {
+    const seen = Number(lsGet(RESET_MARK, 0));
+    if (seen < RESET_EPOCH) {
+      wipeLocalAccounts();
+      lsSet(RESET_MARK, RESET_EPOCH);
+      Net.acc = null;
+      S = null;
+    }
+    await wipeCloudShops();
+  }
+
   function save() {
     try {
+      if (S) S.savedAt = Date.now();
       localStorage.setItem(SAVE_KEY, JSON.stringify(S));
       if (Net.acc && Net.acc.playerId) localStorage.setItem(shopSaveKey(Net.acc.playerId), JSON.stringify(S));
     } catch (e) {}
@@ -3084,7 +3148,42 @@
           room: c.room,
           updatedAt: Date.now()
         }, { merge: true });
+        if (S) {
+          const packed = JSON.parse(JSON.stringify(S));
+          packed.savedAt = packed.savedAt || Date.now();
+          await this.db.collection('prayerChains').doc(saveDocId(this.acc.playerId)).set({
+            kind: 'save',
+            playerId: this.acc.playerId,
+            room: c.room,
+            name: this.acc.name,
+            shop: p.shop,
+            save: packed,
+            updatedAt: Date.now()
+          });
+        }
       } catch (e) { console.warn('upload', e); }
+    },
+    async loadCloudShop(playerId) {
+      if (!playerId) return null;
+      if (!this.db) this.initFirebase();
+      if (!this.db) return null;
+      try {
+        const snap = await this.db.collection('prayerChains').doc(saveDocId(playerId)).get();
+        if (!snap.exists) return null;
+        const d = snap.data() || {};
+        return d.save || null;
+      } catch (e) { return null; }
+    },
+    async fetchRoomPlayers(room) {
+      const code = sanitizeRoom(room);
+      if (!this.db) this.initFirebase();
+      if (!this.db) return [];
+      try {
+        const snap = await this.db.collection('prayerChains').doc(roomDocId(code)).get();
+        if (!snap.exists) return [];
+        const players = (snap.data() || {}).players || {};
+        return Object.keys(players).map(id => Object.assign({ id: id }, players[id]));
+      } catch (e) { return []; }
     },
     async merge(obj) {
       if (!this.acc) return;
@@ -4046,13 +4145,22 @@
       if (!S.avatar) S.avatar = '🧵';
     }
     const accs = lsGet(ACCS_KEY, {});
-    const accList = Object.keys(accs).map(id => {
-      const a = accs[id];
-      const me = Net.acc && Net.acc.playerId === id;
+    const seen = {};
+    const rows = [];
+    Object.keys(accs).forEach(id => {
+      seen[id] = true;
+      rows.push({ id: id, name: accs[id].name, shop: accs[id].shop });
+    });
+    Net.players().forEach(p => {
+      if (seen[p.id]) return;
+      rows.push({ id: p.id, name: p.name, shop: p.shop });
+    });
+    const accList = rows.map(a => {
+      const me = Net.acc && Net.acc.playerId === a.id;
       return '<div class="acc-row"><span class="grow">' + esc(a.name) + ' · ' + esc(a.shop || 'shop') +
         (me ? ' (open)' : '') + '</span>' +
-        '<button class="btn small danger" data-act="delaccount" data-id="' + id + '">Delete</button></div>';
-    }).join('') || '<p class="hint">No saved accounts on this phone.</p>';
+        '<button class="btn small danger" data-act="delaccount" data-id="' + a.id + '">Delete</button></div>';
+    }).join('') || '<p class="hint">No shops in this room yet.</p>';
     modal.innerHTML = '<div class="card">' +
       '<h2 class="hand" style="font-size:2.1rem;color:var(--rose-deep);margin-bottom:4px">Settings</h2>' +
       '<div class="set-sec">Sound</div>' +
@@ -4075,8 +4183,8 @@
         AVATARS.map(a => '<button type="button" class="' + (S.avatar === a ? 'on' : '') + '" data-act="setavatar" data-id="' + a + '">' + a + '</button>').join('') +
         '</div></div>'
       ) : '') +
-      '<div class="set-sec">Accounts on this phone</div>' +
-      '<p class="hint">Deleting removes the shop save here and from the town room if you\'re online. Enter that account\'s PIN.</p>' +
+      '<div class="set-sec">Shops in this room</div>' +
+      '<p class="hint">Deleting removes the shop here and on other phones. Enter that account\'s PIN.</p>' +
       accList +
       '<div class="field" style="margin-top:8px"><label for="delPinIn">PIN to confirm delete</label>' +
       '<input id="delPinIn" class="pin-input" type="password" inputmode="numeric" maxlength="4" placeholder="••••"></div>' +
@@ -4097,7 +4205,11 @@
   }
   async function deleteAccount(targetId) {
     const accs = lsGet(ACCS_KEY, {});
-    const rec = accs[targetId];
+    let rec = accs[targetId];
+    if (!rec) {
+      const cloudP = ((Net.room && Net.room.players) || {})[targetId];
+      if (cloudP) rec = Object.assign({ room: (Net.acc && Net.acc.room) || DEFAULT_ROOM }, cloudP);
+    }
     const pin = String(($('#delPinIn') && $('#delPinIn').value) || '').replace(/\D/g, '');
     if (!rec) { toast('that account is already gone'); return; }
     if (pin !== String(rec.pin || '')) { toast('PIN does not match'); return; }
@@ -4119,6 +4231,7 @@
           ['players.' + targetId]: firebase.firestore.FieldValue.delete()
         });
       }
+      if (Net.db) await Net.db.collection('prayerChains').doc(saveDocId(targetId)).delete();
     } catch (e) { console.warn('delete town player', e); }
     if (isMe) {
       Net.logout();
@@ -4218,7 +4331,30 @@
       if ($('#accBadgeShop')) $('#accBadgeShop').textContent = (S && S.shop) || Net.acc.shop || 'Petal & Paper';
       if ($('#continueBtn')) $('#continueBtn').textContent = S && S.day ? '↩︎ Continue day ' + S.day : '↩︎ Open the shop';
       if ($('#roomIn')) $('#roomIn').value = Net.acc.room || DEFAULT_ROOM;
+    } else {
+      renderRoomRoster();
     }
+  }
+
+  let rosterTimer = 0;
+  async function renderRoomRoster() {
+    const box = $('#roomRoster');
+    if (!box) return;
+    if (Net.acc) { box.innerHTML = ''; return; }
+    const room = sanitizeRoom($('#roomIn') && $('#roomIn').value);
+    box.innerHTML = '<p class="hint">Looking for shops in ' + esc(room) + '…</p>';
+    const players = await Net.fetchRoomPlayers(room);
+    if (sanitizeRoom($('#roomIn') && $('#roomIn').value) !== room) return;
+    if (!players.length) {
+      box.innerHTML = '<p class="hint">No shops in ' + esc(room) + ' yet. Create one, then you can log in from any phone.</p>';
+      return;
+    }
+    box.innerHTML = '<div class="ctrl-title">Shops in ' + esc(room) + '</div>' +
+      players.map(p =>
+        '<button type="button" class="roster-card" data-act="pickshop" data-name="' + esc(p.name || '') + '">' +
+        '<span>' + (p.avatar || '🧵') + '</span><span class="grow"><span class="who">' + esc(p.shop || 'shop') +
+        '</span><div class="meta">' + esc(p.name || 'keeper') + ' · day ' + (p.day || 1) + '</div></span></button>'
+      ).join('');
   }
 
   function setAccountTab(mode) {
@@ -4232,25 +4368,36 @@
     if ($('#shopNameField')) $('#shopNameField').classList.toggle('hidden', mode === 'login');
   }
 
-  function loadShopFor(acc, forceFresh, shopName) {
+  async function loadShopFor(acc, forceFresh, shopName) {
+    let local = null;
     if (!forceFresh) {
       try {
         const keyed = localStorage.getItem(shopSaveKey(acc.playerId));
-        if (keyed) {
-          S = JSON.parse(keyed);
-          S.owner = acc.name;
-          if (shopName) S.shop = shopName;
-          return 'saved';
-        }
+        if (keyed) local = JSON.parse(keyed);
       } catch (e) {}
-      const legacy = load();
-      if (legacy && legacy.shop && (!legacy.boundTo || legacy.boundTo === acc.playerId)) {
-        S = legacy;
-        S.boundTo = acc.playerId;
-        S.owner = acc.name;
-        if (shopName) S.shop = shopName;
-        return 'legacy';
+      if (!local) {
+        const legacy = load();
+        if (legacy && legacy.shop && (!legacy.boundTo || legacy.boundTo === acc.playerId)) {
+          local = legacy;
+          local.boundTo = acc.playerId;
+        }
       }
+    }
+    let cloud = null;
+    if (!forceFresh) cloud = await Net.loadCloudShop(acc.playerId);
+    let picked = null;
+    if (local && cloud) picked = ((cloud.savedAt || 0) >= (local.savedAt || 0)) ? cloud : local;
+    else picked = cloud || local;
+    if (picked) {
+      S = picked;
+      S.owner = acc.name;
+      S.boundTo = acc.playerId;
+      if (shopName) S.shop = S.shop || shopName;
+      try {
+        localStorage.setItem(SAVE_KEY, JSON.stringify(S));
+        localStorage.setItem(shopSaveKey(acc.playerId), JSON.stringify(S));
+      } catch (e) {}
+      return cloud && picked === cloud ? 'cloud' : 'saved';
     }
     S = freshState(shopName || acc.shop || 'Petal & Paper', acc.name);
     S.boundTo = acc.playerId;
@@ -4267,16 +4414,16 @@
     const playerId = makePlayerId(name, pin);
     const localAccounts = lsGet(ACCS_KEY, {});
     Net.initFirebase();
+    let remote = null;
+    if (Net.db) {
+      try {
+        const snap = await Net.db.collection('prayerChains').doc(roomDocId(room)).get();
+        const players = snap.exists ? (snap.data().players || {}) : {};
+        if (players[playerId] && players[playerId].pin === pin) remote = players[playerId];
+      } catch (e) {}
+    }
     if (accountMode === 'login') {
-      let found = localAccounts[playerId];
-      if (!found && Net.db) {
-        try {
-          const snap = await Net.db.collection('prayerChains').doc(roomDocId(room)).get();
-          const players = snap.exists ? (snap.data().players || {}) : {};
-          const remote = players[playerId];
-          if (remote && remote.pin === pin) found = Object.assign({ name: name, pin: pin, room: room }, remote);
-        } catch (e) {}
-      }
+      let found = localAccounts[playerId] || remote;
       if (!found || found.pin !== pin) {
         toast('hmm, that name or PIN is wrong');
         return;
@@ -4284,17 +4431,17 @@
       localAccounts[playerId] = { name: name, pin: pin, room: room, shop: found.shop || shop, createdAt: found.createdAt || Date.now() };
       lsSet(ACCS_KEY, localAccounts);
       Net.saveAcc({ playerId: playerId, name: name, pin: pin, room: room, shop: found.shop || shop });
-      loadShopFor(Net.acc, false, found.shop);
+      await loadShopFor(Net.acc, false, found.shop);
       if (found.hearts != null) S.hearts = Math.max(S.hearts || 0, found.hearts || 0);
       if (found.day) S.day = Math.max(S.day || 1, found.day);
       if (found.coins != null) S.coins = Math.max(S.coins || 0, found.coins || 0);
       toast('welcome back, ' + name + ' ♡');
     } else {
-      localAccounts[playerId] = { name: name, pin: pin, room: room, shop: shop, createdAt: Date.now() };
+      localAccounts[playerId] = { name: name, pin: pin, room: room, shop: (remote && remote.shop) || shop, createdAt: Date.now() };
       lsSet(ACCS_KEY, localAccounts);
-      Net.saveAcc({ playerId: playerId, name: name, pin: pin, room: room, shop: shop });
-      loadShopFor(Net.acc, false, shop);
-      toast('account made — welcome to ' + S.shop);
+      Net.saveAcc({ playerId: playerId, name: name, pin: pin, room: room, shop: (remote && remote.shop) || shop });
+      await loadShopFor(Net.acc, !remote, (remote && remote.shop) || shop);
+      toast(remote ? 'welcome back, ' + name + ' ♡' : 'account made — welcome to ' + S.shop);
     }
     if ($('#pinIn')) $('#pinIn').value = '';
     updateAccountUI();
@@ -4304,7 +4451,7 @@
 
   async function openTown() {
     if (!Net.acc) { toast('make an account first'); show('intro'); return; }
-    if (!S) loadShopFor(Net.acc, false);
+    if (!S) await loadShopFor(Net.acc, false);
     if ($('#screen-intro') && $('#screen-intro').classList.contains('active')) {
       Radio.play();
       boot();
@@ -5506,6 +5653,12 @@
         S.avatar = id; save(); renderSettings();
         break;
       case 'delaccount': deleteAccount(id); break;
+      case 'pickshop':
+        if ($('#ownerNameIn')) $('#ownerNameIn').value = t.dataset.name || '';
+        setAccountTab('login');
+        if ($('#pinIn')) $('#pinIn').focus();
+        toast('enter your PIN to open this shop');
+        break;
       case 'togglesfx':
         if (!S) break;
         S.settings.sfx = !S.settings.sfx;
@@ -5739,32 +5892,33 @@
     }
   }
 
-  function init() {
+  async function init() {
     Net.initFirebase();
+    await maybeResetTests();
     const params = new URLSearchParams(location.search);
     const urlRoom = params.get('room');
     if ($('#roomIn')) $('#roomIn').value = urlRoom ? sanitizeRoom(urlRoom) : DEFAULT_ROOM;
 
     Net.loadAcc();
     if (Net.acc) {
-      loadShopFor(Net.acc, false);
+      await loadShopFor(Net.acc, false);
       if ($('#shopNameIn') && S) $('#shopNameIn').value = S.shop;
       if ($('#ownerNameIn')) $('#ownerNameIn').value = Net.acc.name;
       if ($('#roomIn')) $('#roomIn').value = Net.acc.room || DEFAULT_ROOM;
-    } else {
-      const saved = load();
-      if (saved && saved.shop) {
-        S = saved;
-        if ($('#shopNameIn')) $('#shopNameIn').value = saved.shop;
-        if ($('#ownerNameIn')) $('#ownerNameIn').value = saved.owner || '';
-      }
     }
     updateAccountUI();
+    renderRoomRoster();
+    if ($('#roomIn')) {
+      $('#roomIn').addEventListener('input', () => {
+        clearTimeout(rosterTimer);
+        rosterTimer = setTimeout(renderRoomRoster, 400);
+      });
+    }
 
     $('#accountBtn').addEventListener('click', () => { submitAccount(); });
-    $('#continueBtn').addEventListener('click', () => {
+    $('#continueBtn').addEventListener('click', async () => {
       if (!Net.acc) { toast('log in first'); return; }
-      if (!S) loadShopFor(Net.acc, false);
+      if (!S) await loadShopFor(Net.acc, false);
       Radio.play();
       boot();
     });
