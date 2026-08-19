@@ -57,7 +57,7 @@
 
   .hidden { display: none !important; }
 
-  .app { position: relative; z-index: 1; max-width: 1080px; margin: 0 auto; padding: 18px 16px 200px; }
+  .app { position: relative; z-index: 1; max-width: 1080px; margin: 0 auto; padding: 18px 16px 110px; }
 
   .screen { display: none; animation: rise 0.45s cubic-bezier(0.22, 1, 0.36, 1); }
   .screen.active { display: block; }
@@ -985,29 +985,31 @@
 
   /* ---------- radio ---------- */
   .radio-bar {
-    position: fixed; left: 50%; bottom: 14px; transform: translateX(-50%);
-    z-index: 40; display: flex; align-items: center; gap: 10px; flex-wrap: wrap; justify-content: center;
-    max-width: calc(100vw - 24px); padding: 8px 10px 8px 8px; border-radius: 22px;
-    background: rgba(255, 252, 246, 0.94); border: 2px solid rgba(150, 124, 98, 0.28);
-    box-shadow: 0 10px 28px var(--shadow-deep); backdrop-filter: blur(8px);
+    position: fixed; left: 50%; bottom: 10px; transform: translateX(-50%);
+    z-index: 40; display: flex; align-items: center; gap: 8px; flex-wrap: nowrap;
+    max-width: calc(100vw - 16px); padding: 6px 8px 6px 6px; border-radius: 18px;
+    background: rgba(255, 252, 246, 0.95); border: 2px solid rgba(150, 124, 98, 0.28);
+    box-shadow: 0 8px 22px var(--shadow-deep); backdrop-filter: blur(8px);
   }
   #ytScreen {
-    position: relative; width: 240px; height: 135px; flex: 0 0 240px;
-    border-radius: 14px; overflow: hidden; background: #21181c;
+    position: relative; width: 72px; height: 40px; flex: 0 0 72px;
+    border-radius: 8px; overflow: hidden; background: #21181c;
     box-shadow: inset 0 0 0 1px rgba(255,255,255,0.08);
   }
   #ytScreen iframe {
-    width: 240px; height: 135px; border: 0; display: block;
+    width: 72px; height: 40px; border: 0; display: block; pointer-events: none;
   }
+  .radio-bar.wide #ytScreen { width: 128px; height: 72px; flex-basis: 128px; }
+  .radio-bar.wide #ytScreen iframe { width: 128px; height: 72px; }
   #ytPlayHit {
     position: absolute; inset: 0; z-index: 2;
     display: grid; place-items: center;
     background: rgba(24, 16, 20, 0.58); color: #fff;
-    font-family: inherit; font-weight: 700; font-size: 1rem;
-    border: 0; cursor: pointer;
+    font-family: inherit; font-weight: 700; font-size: 0.62rem;
+    border: 0; cursor: pointer; padding: 0 4px;
   }
   .radio-bar:not(.paused) #ytPlayHit { display: none; }
-  .radio-eq { display: flex; align-items: flex-end; gap: 2px; height: 16px; width: 14px; flex: 0 0 14px; }
+  .radio-eq { display: flex; align-items: flex-end; gap: 2px; height: 14px; width: 12px; flex: 0 0 12px; }
   .radio-eq i {
     display: block; width: 3px; height: 6px; border-radius: 2px; background: var(--rose-deep);
     animation: eq 0.85s ease-in-out infinite;
@@ -1017,11 +1019,12 @@
   .radio-bar.paused .radio-eq i { animation: none; height: 4px; opacity: 0.4; }
   @keyframes eq {
     0%, 100% { height: 4px; }
-    50% { height: 16px; }
+    50% { height: 14px; }
   }
-  .radio-bar .now { font-size: 0.78rem; font-weight: 700; max-width: 240px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-  .radio-bar .now small { display: block; font-size: 0.64rem; letter-spacing: 0.08em; text-transform: uppercase; color: var(--ink-soft); }
-  #radioMeta { display: flex; align-items: center; gap: 8px; }
+  .radio-bar .now { font-size: 0.74rem; font-weight: 700; max-width: min(160px, 32vw); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .radio-bar .now small { display: block; font-size: 0.6rem; letter-spacing: 0.08em; text-transform: uppercase; color: var(--ink-soft); }
+  #radioMeta { display: flex; align-items: center; gap: 8px; min-width: 0; }
+  .radio-bar .icon-btn { width: 34px; height: 34px; font-size: 0.95rem; }
 
   /* ---------- stationery ---------- */
   .paper-item {
@@ -1135,6 +1138,89 @@
   }
   .overlay .card { width: min(420px, 100%); max-height: calc(100vh - 32px); overflow: auto; text-align: center; }
   #catModal .card { width: min(560px, 100%); }
+  #settingsModal .card { width: min(500px, 100%); text-align: left; }
+  .set-sec { margin: 14px 0 6px; font-size: 0.72rem; letter-spacing: 0.12em; text-transform: uppercase; color: var(--ink-soft); font-weight: 700; }
+  .set-row {
+    display: flex; align-items: center; justify-content: space-between; gap: 10px; flex-wrap: wrap;
+    padding: 10px 0; border-bottom: 1px solid rgba(150,124,98,0.14);
+  }
+  .set-row .hint { font-size: 0.78rem; color: var(--ink-soft); font-weight: 500; }
+  .swatch-pick, .avatar-pick { display: flex; flex-wrap: wrap; gap: 7px; }
+  .swatch-pick button, .look-chip, .avatar-pick button {
+    width: 30px; height: 30px; border-radius: 50%; border: 2px solid rgba(255,255,255,0.8);
+    box-shadow: 0 2px 0 rgba(150,124,98,0.18); cursor: pointer;
+  }
+  .look-chip { width: auto; padding: 6px 10px; border-radius: 999px; font-size: 0.75rem; font-weight: 700; background: rgba(255,255,255,0.7); }
+  .swatch-pick button.on, .look-chip.on, .avatar-pick button.on {
+    box-shadow: 0 0 0 3px rgba(189,111,127,0.45);
+  }
+  .avatar-pick button { font-size: 1.05rem; background: #fff; width: 36px; height: 36px; border-radius: 12px; }
+  .acc-row {
+    display: flex; align-items: center; gap: 8px; flex-wrap: wrap;
+    padding: 8px 0; font-size: 0.88rem;
+  }
+  .acc-row .grow { flex: 1; }
+  .btn.danger {
+    background: linear-gradient(170deg, #f8d4d0, #e8b4b0); border-color: rgba(160,70,80,0.35); color: #7a303c;
+    box-shadow: 0 3px 0 #c48a86;
+  }
+  .chore-list { display: grid; gap: 8px; margin-top: 8px; }
+  .chore {
+    display: flex; align-items: center; gap: 10px; width: 100%; text-align: left;
+    padding: 10px 12px; border-radius: 14px;
+    background: rgba(255,255,255,0.72); border: 2px solid rgba(150,124,98,0.2);
+  }
+  .chore.done { opacity: 0.55; text-decoration: line-through; }
+  .chore .em { font-size: 1.2rem; }
+  .chore .hint { margin-left: auto; }
+  .journal-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(92px, 1fr)); gap: 8px; }
+  .journal-pip {
+    text-align: center; padding: 10px 6px; border-radius: 12px; font-size: 0.75rem;
+    background: rgba(255,255,255,0.7); border: 1.5px solid rgba(150,124,98,0.18);
+  }
+  .journal-pip.off { opacity: 0.38; }
+  .polaroid {
+    position: absolute; z-index: 4; width: 26px; height: 32px; padding: 3px 3px 8px;
+    background: #fffdf8; box-shadow: 1px 2px 4px rgba(80,50,30,0.22); transform: rotate(-6deg);
+    font-size: 0.85rem; display: grid; place-items: start center; pointer-events: none;
+  }
+  .polaroid:nth-child(2) { transform: rotate(5deg); }
+  .scene-bunting {
+    position: absolute; left: 8px; right: 8px; top: 38px; z-index: 4; height: 16px;
+    background: repeating-linear-gradient(90deg, #e9a3ae 0 12px, transparent 12px 18px, #b4c7a4 18px 30px, transparent 30px 36px, #f2c79a 36px 48px, transparent 48px 54px);
+    clip-path: polygon(0 0, 100% 0, 100% 40%, 0 40%);
+    pointer-events: none; opacity: 0.9;
+  }
+  .scene-rug {
+    position: absolute; left: 28%; right: 22%; bottom: 26px; height: 18px; z-index: 3;
+    border-radius: 40%; background: radial-gradient(ellipse at 50% 50%, #d78d9b, #bd6f7f);
+    box-shadow: 0 2px 0 rgba(120,60,70,0.25); pointer-events: none; opacity: 0.85;
+  }
+  .sill-plant, .scene-plant { cursor: pointer; }
+  body.look-blush {
+    background:
+      radial-gradient(1200px 700px at 12% -10%, #fdf0ec 0%, transparent 60%),
+      radial-gradient(900px 600px at 100% 0%, #f6dce1 0%, transparent 55%),
+      linear-gradient(170deg, #f8ebe6 0%, #f3ddd6 60%, #ead0c8 100%);
+  }
+  body.look-sage {
+    background:
+      radial-gradient(1200px 700px at 12% -10%, #f4f7ee 0%, transparent 60%),
+      radial-gradient(900px 600px at 100% 0%, #e4eee0 0%, transparent 55%),
+      linear-gradient(170deg, #eef3e6 0%, #e2ead8 60%, #d4e0cc 100%);
+  }
+  body.look-sky {
+    background:
+      radial-gradient(1200px 700px at 12% -10%, #eef4fa 0%, transparent 60%),
+      radial-gradient(900px 600px at 100% 0%, #e4eaf6 0%, transparent 55%),
+      linear-gradient(170deg, #eef3f8 0%, #e2e8f0 60%, #d5dde8 100%);
+  }
+  body.look-cocoa {
+    background:
+      radial-gradient(1200px 700px at 12% -10%, #f6eee4 0%, transparent 60%),
+      radial-gradient(900px 600px at 100% 0%, #eadcc8 0%, transparent 55%),
+      linear-gradient(170deg, #f3e6d4 0%, #e6d3bb 60%, #d9c4a8 100%);
+  }
   .share-art {
     margin: 8px auto 12px; padding: 16px 12px 14px; border-radius: 18px;
     background: linear-gradient(175deg, #fffdf8, #f3e6d4);
@@ -1195,6 +1281,7 @@
             <button class="btn primary" id="continueBtn">↩︎ Open the shop</button>
             <button class="btn" type="button" data-act="town">🏘 Town square</button>
             <button class="btn ghost" type="button" data-act="sharegame">💌 Invite friends</button>
+            <button class="btn ghost" type="button" data-act="settings">⚙️ Settings</button>
             <button class="btn ghost" id="logoutBtn" type="button">Switch account</button>
           </div>
         </div>
@@ -1217,7 +1304,8 @@
       </div>
       <div class="row">
         <button class="icon-btn" id="shareGameBtn" data-act="sharegame" title="Share the game">💌</button>
-        <button class="icon-btn" id="musicBtn" title="Lo-fi radio">📻</button>
+        <button class="icon-btn" data-act="settings" title="Settings">⚙️</button>
+        <button class="icon-btn" id="musicBtn" title="Shop radio">📻</button>
         <button class="icon-btn" id="sfxBtn" title="Sound effects">🔔</button>
       </div>
     </div>
@@ -1245,9 +1333,11 @@
           <button class="btn" data-act="studio"><span class="em">🎨</span> Free-craft studio <span class="hint">no orders, just play</span></button>
           <button class="btn" data-act="restock"><span class="em">📦</span> Restock supplies <span class="hint">spend coins</span></button>
           <button class="btn" data-act="shelf"><span class="em">🪞</span> Shelf &amp; display <span class="hint" id="shelfHint"></span></button>
+          <button class="btn" data-act="journal"><span class="em">📔</span> Collection journal <span class="hint" id="journalHint">colors · charms</span></button>
           <button class="btn" data-act="town"><span class="em">🏘</span> Town square <span class="hint" id="townHint">friends · orders · partners</span></button>
           <button class="btn primary hidden" data-act="closeDay" id="closeDayBtn"><span class="em">🌙</span> Close up shop</button>
         </div>
+        <div class="card chore-card" id="choreCard"></div>
         <div class="card visit-card" id="visitCard"></div>
         <div class="card" style="margin-top:14px">
           <div class="ctrl-title">how it works</div>
@@ -1261,7 +1351,8 @@
             <li>Hearts raise your <b>shop rank</b>. 3-star streaks and daily chalkboard wishes pay extra.</li>
             <li>Share a piece from your <b>shelf</b> — friends can open the link and see it.</li>
             <li>In the <b>town square</b>, visit other shops, send them an order, or ask to be partner stores.</li>
-            <li>On day one, pick a <b>shop cat</b>. Pet them, buy furniture, and feed fish treats. Happier cats nap on the cushion, sit in the window, and bring back rare beads and coins.</li>
+            <li>On day one, pick a <b>shop cat</b>. Pet them, buy furniture, and feed fish treats.</li>
+            <li>Do the day’s <b>shopkeeping</b> jobs, paint the shop in Settings, and fill your collection journal.</li>
             <li>No timers, ever. Leftover orders wait for tomorrow.</li>
           </ul>
         </div>
@@ -1344,22 +1435,30 @@
     </div>
   </section>
 
+  <!-- ============ JOURNAL ============ -->
+  <section class="screen" id="screen-journal">
+    <div class="bench-bar">
+      <button class="btn ghost small" data-act="home">← Shop</button>
+    </div>
+    <div id="journalWrap"></div>
+  </section>
+
 </div>
 
 <div class="overlay hidden" id="shareModal"></div>
 <div class="overlay hidden" id="townModal"></div>
 <div class="overlay hidden" id="catModal"></div>
+<div class="overlay hidden" id="settingsModal"></div>
 <div class="toast-wrap" id="toastWrap"></div>
 <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js"></script>
 <div class="radio-bar hidden paused" id="radioBar">
   <div id="ytScreen">
-    <iframe id="ytFrame" title="Shop radio" width="240" height="135"
+    <iframe id="ytFrame" title="Shop radio" width="72" height="40"
       allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
       referrerpolicy="strict-origin-when-cross-origin"
-      allowfullscreen
       src="about:blank"></iframe>
-    <button type="button" id="ytPlayHit" data-act="radioplay">▶ Play music</button>
+    <button type="button" id="ytPlayHit" data-act="radioplay">▶</button>
   </div>
   <div class="radio-eq" aria-hidden="true"><i></i><i></i><i></i></div>
   <div id="radioMeta">
@@ -1367,6 +1466,7 @@
   </div>
   <button class="icon-btn" type="button" id="radioToggle" data-act="radiotoggle" title="play / pause">▶</button>
   <button class="icon-btn" type="button" data-act="radionext" title="next song">⏭</button>
+  <button class="icon-btn" type="button" data-act="radiosize" title="video size">⤡</button>
 </div>
 <script>
 (() => {
@@ -1539,7 +1639,10 @@
     tea:     { n: 'Tea station',  e: '🍵' },
     candle:  { n: 'Candle',       e: '🕯️' },
     vinyl:   { n: 'Record player',e: '💿' },
-    fish:    { n: 'Little fishbowl', e: '🐠' }
+    incense: { n: 'Incense',      e: '🪔' },
+    fish:    { n: 'Little fishbowl', e: '🐠' },
+    bunting: { n: 'Paper bunting', e: '🎏' },
+    rug:     { n: 'Rose rug',     e: '🟥' }
   };
 
   const SHOP = [
@@ -1575,7 +1678,7 @@
     ]},
     { cat: 'cosmetics', title: 'Shop decorations', items: [
       ['plant', 70], ['lights', 90], ['flowers', 80], ['tea', 100], ['candle', 60],
-      ['radio', 120], ['vinyl', 130], ['fish', 150], ['cat', 90]
+      ['radio', 120], ['vinyl', 130], ['fish', 150], ['cat', 90], ['bunting', 75], ['rug', 85], ['incense', 55]
     ]}
   ];
 
@@ -1661,6 +1764,33 @@
   ];
   let catPickId = '';
   let catPickFocus = true;
+  const LOOKS = [
+    { id: 'cream', n: 'Cream paper' },
+    { id: 'blush', n: 'Rose shop' },
+    { id: 'sage', n: 'Garden sage' },
+    { id: 'sky', n: 'Blue linen' },
+    { id: 'cocoa', n: 'Cocoa nook' }
+  ];
+  const SIGN_PAINT = [
+    { id: 'rose', h: '#bd6f7f' },
+    { id: 'cocoa', h: '#6a5344' },
+    { id: 'moss', h: '#5d7a4a' },
+    { id: 'denim', h: '#4d6a8a' },
+    { id: 'plum', h: '#7a5588' },
+    { id: 'honey', h: '#b8893a' }
+  ];
+  const AVATARS = ['🧵', '🌸', '🎨', '🌿', '🌙', '🍓', '☕', '📖', '🦋', '🌻'];
+  const KIND_E = { bracelet: '🧵', earrings: '💫', keychain: '🔑', clip: '📎', stationery: '✉️' };
+  const CHORES = [
+    { id: 'water', n: 'Water the plants', e: '💧', coins: 6, hearts: 1 },
+    { id: 'sweep', n: 'Sweep the floorboards', e: '🧹', coins: 7, hearts: 1 },
+    { id: 'polish', n: 'Polish the till', e: '✨', coins: 8, hearts: 1 },
+    { id: 'window', n: 'Wipe the shop window', e: '🪟', coins: 7, hearts: 1 },
+    { id: 'yarn', n: 'Wind a yarn ball', e: '🧶', coins: 6, hearts: 1 },
+    { id: 'jars', n: 'Straighten the bead jars', e: '🫙', coins: 8, hearts: 1 },
+    { id: 'letters', n: 'Sort the letter beads', e: '🔤', coins: 7, hearts: 1 },
+    { id: 'cat', n: 'Brush the shop cat', e: '🐾', coins: 6, hearts: 1 }
+  ];
 
   const GOOD_DESC = {
     colors: 'A new bead, ribbon and paper colour.',
@@ -2815,6 +2945,7 @@
       if (!bar) return;
       bar.classList.remove('hidden');
       bar.classList.toggle('paused', !this.want);
+      bar.classList.toggle('wide', !!(S && S.settings && S.settings.radioWide));
       const t = this.track();
       if (song) song.textContent = t.n;
       if (tog) {
@@ -2931,6 +3062,7 @@
         stars: (S && S.stats && S.stats.stars) || 0,
         rank: rank.n,
         rankE: rank.e,
+        avatar: (S && S.avatar) || '🧵',
         updatedAt: Date.now()
       };
     },
@@ -3161,13 +3293,14 @@
       shop: shop, owner: owner, day: 1, coins: 45, hearts: 0,
       orders: [], unlocked: clone(BASE), shelf: [], display: [],
       customers: {}, today: { log: [], coins: 0, special: null },
-      settings: { music: true, sfx: true, track: 0 },
+      settings: { music: true, sfx: true, track: 0, radioWide: false },
       stats: { made: 0, stars: 0, streak: 0, perfect: 0, bestPerfect: 0 },
       visit: { last: '', streak: 0, best: 0, stamps: 0, week: '', bonus: '', mail: null, news: null },
       play: { acc: 0, flowUntil: 0, last: 0, wasFlow: false, saved: 0 },
       mastery: {}, wish: null,
       upgrades: { board: 0, window: 0, tips: 0, regulars: 0, kettle: 0 },
-      motto: '', catId: '', catName: '', catHappy: 36, catFurn: [], lastCraft: null, collect: null
+      motto: '', catId: '', catName: '', catHappy: 36, catFurn: [], lastCraft: null, collect: null,
+      look: 'cream', signPaint: 'rose', avatar: '🧵'
     };
   }
 
@@ -3727,10 +3860,18 @@
 
     renderScene();
     renderVisit();
+    renderChores();
     renderFlowBar();
+    applyLook();
     $('#musicBtn').classList.toggle('off', !S.settings.music);
     $('#sfxBtn').classList.toggle('off', !S.settings.sfx);
     updateTownHint();
+    const jh = $('#journalHint');
+    if (jh) {
+      const cols = (S.unlocked.colors || []).length;
+      const ch = (S.unlocked.charms || []).length;
+      jh.textContent = cols + ' colors · ' + ch + ' charms';
+    }
   }
 
   function updateTownHint() {
@@ -3766,7 +3907,7 @@
     if (cos.indexOf('lights') >= 0) {
       lights = '<div class="scene-lights">' + new Array(11).fill('<i></i>').join('') + '</div>';
     }
-    const props = ['plant', 'flowers', 'tea', 'candle', 'radio', 'vinyl', 'fish']
+    const props = ['plant', 'flowers', 'tea', 'candle', 'radio', 'vinyl', 'fish', 'incense']
       .filter(c => cos.indexOf(c) >= 0)
       .map(c => '<span class="prop" title="' + COSMETICS[c].n + '">' + COSMETICS[c].e + '</span>').join('');
     const note = (S.motto && S.motto.trim()) ? S.motto.trim() : (S.today && S.today.rain ? 'rainy & cozy' : hour.note);
@@ -3774,8 +3915,15 @@
     const furnHtml = CAT_FURN.filter(f => ownedFurn.indexOf(f.id) >= 0)
       .map(f => '<div class="furn-' + f.id + '" title="' + esc(f.n) + '"></div>').join('');
     const plant = cos.indexOf('plant') >= 0
-      ? '<div class="scene-plant" title="Big monstera"><i class="leaf" style="left:2px;bottom:22px;transform:rotate(-18deg)"></i><i class="leaf" style="left:16px;bottom:28px;transform:rotate(22deg) scaleX(-1)"></i><i class="leaf" style="left:8px;bottom:38px;transform:rotate(4deg)"></i><i class="pot"></i></div>'
+      ? '<div class="scene-plant" data-act="waterplant" title="tap to water"><i class="leaf" style="left:2px;bottom:22px;transform:rotate(-18deg)"></i><i class="leaf" style="left:16px;bottom:28px;transform:rotate(22deg) scaleX(-1)"></i><i class="leaf" style="left:8px;bottom:38px;transform:rotate(4deg)"></i><i class="pot"></i></div>'
       : '';
+    const bunting = cos.indexOf('bunting') >= 0 ? '<div class="scene-bunting"></div>' : '';
+    const rug = cos.indexOf('rug') >= 0 ? '<div class="scene-rug"></div>' : '';
+    const polaroids = (S.display || []).slice(0, 3).map((id, i) => {
+      const it = (S.shelf || []).find(s => s.id === id);
+      if (!it) return '';
+      return '<div class="polaroid" style="left:' + (148 + i * 22) + 'px;top:' + (158 + (i % 2) * 6) + 'px" title="' + esc(it.name) + '">' + (KIND_E[it.kind] || '🎀') + '</div>';
+    }).join('');
     const happy = S.catId ? catHappyScore() : 0;
     const treatsLeft = 3 - ((S.today && S.today.treats) || 0);
     const hud = S.catId
@@ -3793,23 +3941,226 @@
       '<div class="hang-lamp a"></div><div class="hang-lamp b"></div>' +
       lights +
       '<div class="wall-clock" title="shop clock"></div>' +
-      '<div class="wall-art"></div>' +
+      (polaroids || '<div class="wall-art"></div>') +
       '<div class="win"><div class="win-sky"><i class="win-cloud"></i><i class="win-star"></i><i class="win-rain"></i></div>' +
-      '<div class="curtain l"></div><div class="curtain r"></div><div class="win-sill"></div><div class="sill-plant"></div></div>' +
+      '<div class="curtain l"></div><div class="curtain r"></div><div class="win-sill"></div>' +
+      '<div class="sill-plant" data-act="waterplant" title="tap to water"></div></div>' +
       '<div class="pegboard"><span class="peg-tool" style="left:8px;top:10px">✂️</span>' +
       '<span class="peg-tool" style="left:34px;top:28px">🎀</span>' +
       '<span class="peg-tool" style="left:58px;top:12px">📏</span></div>' +
+      bunting +
       '<div class="shelf-unit">' + jarRow(5) + jarRow(5) + '</div>' +
       plant +
       '<div class="wainscot"></div>' +
       '<div class="scene-floor"></div>' +
-      furnHtml + yarn +
+      rug + furnHtml + yarn +
       '<div class="counter"><div class="register" title="till"></div>' +
       (props || '<span style="font-size:.85rem;color:#8a6f58;font-family:Caveat,cursive;opacity:.8">a quiet counter</span>') +
       '</div>' +
       hud + Cat.html() +
       '<div class="scene-note">' + esc(note) + '</div>';
     Cat.mount();
+  }
+
+  function applyLook() {
+    if (!S) return;
+    LOOKS.forEach(l => document.body.classList.remove('look-' + l.id));
+    document.body.classList.add('look-' + (S.look || 'cream'));
+    const paint = SIGN_PAINT.find(p => p.id === S.signPaint) || SIGN_PAINT[0];
+    const el = $('#shopSign');
+    if (el) el.style.color = paint.h;
+  }
+  function todaysChores() {
+    const list = CHORES.filter(c => c.id !== 'cat' || S.catId);
+    const i = ((S.day || 1) * 5) % list.length;
+    const a = list[i];
+    const b = list[(i + 3) % list.length];
+    return a.id === b.id ? [a, list[(i + 1) % list.length]] : [a, b];
+  }
+  function choreDone(id) {
+    return !!(S.today && S.today.chores && S.today.chores[id]);
+  }
+  function renderChores() {
+    const box = $('#choreCard');
+    if (!box || !S) return;
+    const jobs = todaysChores();
+    const n = jobs.filter(c => choreDone(c.id)).length;
+    box.innerHTML = '<div class="ctrl-title">today\'s shopkeeping · ' + n + '/' + jobs.length + '</div>' +
+      '<div class="chore-list">' + jobs.map(c =>
+        '<button type="button" class="chore' + (choreDone(c.id) ? ' done' : '') + '" data-act="chore" data-id="' + c.id + '"' +
+        (choreDone(c.id) ? ' disabled' : '') + '>' +
+        '<span class="em">' + c.e + '</span><span>' + c.n + '</span>' +
+        '<span class="hint">' + (choreDone(c.id) ? 'done' : '🪙 ' + c.coins) + '</span></button>'
+      ).join('') + '</div>';
+  }
+  function doChore(id) {
+    if (!S || choreDone(id)) return;
+    const c = CHORES.find(x => x.id === id);
+    if (!c) return;
+    if (!S.today) S.today = { log: [], coins: 0 };
+    if (!S.today.chores) S.today.chores = {};
+    S.today.chores[id] = true;
+    const g = gainCoins(c.coins);
+    S.today.coins = (S.today.coins || 0) + g.got;
+    S.hearts += c.hearts;
+    if (id === 'cat' && S.catId) { S.catHappy = Math.min(100, (S.catHappy || 36) + 5); Cat.pet(); }
+    if (id === 'water') S.today.watered = true;
+    const jobs = todaysChores();
+    if (jobs.every(j => choreDone(j.id)) && !S.today.choreBonus) {
+      S.today.choreBonus = true;
+      const extra = gainCoins(8);
+      S.today.coins += extra.got;
+      toast('shopkeeping done · bonus 🪙 ' + extra.got);
+    } else toast(c.n + ' · +' + g.got);
+    save();
+    Sound.coin();
+    renderHome();
+  }
+  function waterPlant() {
+    if (!S) return;
+    if (!S.today) S.today = { log: [], coins: 0 };
+    if (S.today.watered) { toast('already watered today'); return; }
+    S.today.watered = true;
+    S.hearts += 1;
+    if (todaysChores().some(c => c.id === 'water') && !choreDone('water')) {
+      doChore('water');
+      return;
+    }
+    toast('the plants perk up');
+    save();
+    renderHome();
+  }
+  function openSettings() {
+    const modal = $('#settingsModal');
+    if (!modal) return;
+    modal.classList.remove('hidden');
+    renderSettings();
+  }
+  function renderSettings() {
+    const modal = $('#settingsModal');
+    if (!modal) return;
+    if (S) {
+      if (!S.settings) S.settings = { music: true, sfx: true, track: 0, radioWide: false };
+      if (!S.look) S.look = 'cream';
+      if (!S.signPaint) S.signPaint = 'rose';
+      if (!S.avatar) S.avatar = '🧵';
+    }
+    const accs = lsGet(ACCS_KEY, {});
+    const accList = Object.keys(accs).map(id => {
+      const a = accs[id];
+      const me = Net.acc && Net.acc.playerId === id;
+      return '<div class="acc-row"><span class="grow">' + esc(a.name) + ' · ' + esc(a.shop || 'shop') +
+        (me ? ' (open)' : '') + '</span>' +
+        '<button class="btn small danger" data-act="delaccount" data-id="' + id + '">Delete</button></div>';
+    }).join('') || '<p class="hint">No saved accounts on this phone.</p>';
+    modal.innerHTML = '<div class="card">' +
+      '<h2 class="hand" style="font-size:2.1rem;color:var(--rose-deep);margin-bottom:4px">Settings</h2>' +
+      '<div class="set-sec">Sound</div>' +
+      '<div class="set-row"><div>Shop radio</div><button class="btn small" data-act="radiotoggle">' + (Radio.want ? 'On' : 'Off') + '</button></div>' +
+      '<div class="set-row"><div>Video size<div class="hint">tiny keeps the board clear</div></div>' +
+      '<button class="btn small" data-act="radiosize">' + (S && S.settings.radioWide ? 'Bigger' : 'Tiny') + '</button></div>' +
+      '<div class="set-row"><div>Sound effects</div><button class="btn small" data-act="togglesfx">' + (S && S.settings.sfx ? 'On' : 'Off') + '</button></div>' +
+      (S ? (
+        '<div class="set-sec">Your shop</div>' +
+        '<div class="field"><label>Shop name</label><input id="setShopIn" maxlength="22" value="' + esc(S.shop || '') + '"></div>' +
+        '<div class="field"><label>Window motto</label><input id="setMottoIn" maxlength="28" value="' + esc(S.motto || '') + '"></div>' +
+        '<button class="btn small" data-act="saveshop" style="margin:6px 0 10px">Save name &amp; motto</button>' +
+        '<div class="set-row"><div>Wallpaper</div><div class="swatch-pick">' +
+        LOOKS.map(l => '<button type="button" class="look-chip' + (S.look === l.id ? ' on' : '') + '" data-act="setlook" data-id="' + l.id + '">' + l.n + '</button>').join('') +
+        '</div></div>' +
+        '<div class="set-row"><div>Sign paint</div><div class="swatch-pick">' +
+        SIGN_PAINT.map(p => '<button type="button" class="' + (S.signPaint === p.id ? 'on' : '') + '" data-act="setsign" data-id="' + p.id + '" style="background:' + p.h + '" title="' + p.id + '"></button>').join('') +
+        '</div></div>' +
+        '<div class="set-row"><div>Your mark</div><div class="avatar-pick">' +
+        AVATARS.map(a => '<button type="button" class="' + (S.avatar === a ? 'on' : '') + '" data-act="setavatar" data-id="' + a + '">' + a + '</button>').join('') +
+        '</div></div>'
+      ) : '') +
+      '<div class="set-sec">Accounts on this phone</div>' +
+      '<p class="hint">Deleting removes the shop save here and from the town room if you\'re online. Enter that account\'s PIN.</p>' +
+      accList +
+      '<div class="field" style="margin-top:8px"><label for="delPinIn">PIN to confirm delete</label>' +
+      '<input id="delPinIn" class="pin-input" type="password" inputmode="numeric" maxlength="4" placeholder="••••"></div>' +
+      '<div class="bench-actions" style="margin-top:14px"><button class="btn ghost" data-act="settingsclose">Close</button></div></div>';
+  }
+  function saveShopMeta() {
+    if (!S) return;
+    const shop = (($('#setShopIn') && $('#setShopIn').value) || S.shop).trim().slice(0, 22);
+    const motto = (($('#setMottoIn') && $('#setMottoIn').value) || '').trim().slice(0, 28);
+    S.shop = shop || S.shop;
+    S.motto = motto;
+    if (Net.acc) Net.acc.shop = S.shop;
+    save();
+    applyLook();
+    renderHome();
+    renderSettings();
+    toast('shop details saved');
+  }
+  async function deleteAccount(targetId) {
+    const accs = lsGet(ACCS_KEY, {});
+    const rec = accs[targetId];
+    const pin = String(($('#delPinIn') && $('#delPinIn').value) || '').replace(/\D/g, '');
+    if (!rec) { toast('that account is already gone'); return; }
+    if (pin !== String(rec.pin || '')) { toast('PIN does not match'); return; }
+    if (!confirm('Delete ' + rec.name + '\'s shop forever? This cannot be undone.')) return;
+    const isMe = Net.acc && Net.acc.playerId === targetId;
+    const room = rec.room || (Net.acc && Net.acc.room) || DEFAULT_ROOM;
+    try { localStorage.removeItem(shopSaveKey(targetId)); } catch (e) {}
+    if (isMe) {
+      try { localStorage.removeItem(SAVE_KEY); } catch (e) {}
+      Radio.pause();
+      Net.stop();
+    }
+    delete accs[targetId];
+    lsSet(ACCS_KEY, accs);
+    try {
+      if (!Net.db) Net.initFirebase();
+      if (Net.db && window.firebase && firebase.firestore.FieldValue) {
+        await Net.db.collection('prayerChains').doc(roomDocId(room)).update({
+          ['players.' + targetId]: firebase.firestore.FieldValue.delete()
+        });
+      }
+    } catch (e) { console.warn('delete town player', e); }
+    if (isMe) {
+      Net.logout();
+      S = null;
+      $('#settingsModal').classList.add('hidden');
+      updateAccountUI();
+      show('intro');
+      toast('account deleted');
+      return;
+    }
+    toast(rec.name + '\'s shop was deleted');
+    renderSettings();
+  }
+  function renderJournal() {
+    const box = $('#journalWrap');
+    if (!box || !S) return;
+    const charmItems = Object.keys(CHARMS).filter(id => id !== 'none');
+    const colorItems = Object.keys(COLORS);
+    const charmHave = charmItems.filter(id => (S.unlocked.charms || []).indexOf(id) >= 0).length;
+    const colorHave = colorItems.filter(id => (S.unlocked.colors || []).indexOf(id) >= 0).length;
+    const furnHave = (S.catFurn || []).length;
+    box.innerHTML = '<div class="card"><h2 class="hand" style="font-size:2rem;color:var(--rose-deep)">Collection journal</h2>' +
+      '<p style="color:var(--ink-soft);font-size:.9rem;margin-bottom:12px">' + esc(S.shop) + ' · ' + shopRank().e + ' ' + shopRank().n +
+      ' · ' + ((S.stats && S.stats.made) || 0) + ' pieces made</p>' +
+      '<div class="ctrl-title">crafts practiced</div><div class="rank-pips" style="margin-bottom:14px">' +
+      KINDS.map(k => '<span>' + (KIND_E[k] || '') + ' ' + (KIND_N[k] || k) + ' ' + ((S.mastery && S.mastery[k]) || 0) + '</span>').join('') +
+      '</div>' +
+      '<div class="ctrl-title">bead colours · ' + colorHave + '/' + colorItems.length + '</div>' +
+      '<div class="journal-grid" style="margin-bottom:14px">' + colorItems.map(id =>
+        '<div class="journal-pip' + ((S.unlocked.colors || []).indexOf(id) >= 0 ? '' : ' off') + '">' +
+        '<span style="display:block;width:18px;height:18px;border-radius:50%;margin:0 auto 4px;background:' + hex(id) + ';border:2px solid #fff;box-shadow:0 1px 3px rgba(0,0,0,.2)"></span>' +
+        esc(cname(id)) + '</div>').join('') + '</div>' +
+      '<div class="ctrl-title">charms · ' + charmHave + '/' + charmItems.length + '</div>' +
+      '<div class="journal-grid" style="margin-bottom:14px">' + charmItems.map(id =>
+        '<div class="journal-pip' + ((S.unlocked.charms || []).indexOf(id) >= 0 ? '' : ' off') + '">' +
+        (CHARMS[id].e || '·') + '<div>' + esc(CHARMS[id].n) + '</div></div>').join('') + '</div>' +
+      '<div class="ctrl-title">cat corner · ' + furnHave + '/' + CAT_FURN.length + ' furniture</div>' +
+      '<div class="journal-grid">' + CAT_FURN.map(f =>
+        '<div class="journal-pip' + (hasFurn(f.id) ? '' : ' off') + '">' + f.e + '<div>' + esc(f.n) + '</div></div>').join('') +
+      '</div>' +
+      (S.catId ? '<p class="shop-keep" style="margin-top:12px">' + esc(S.catName) + ' is ' + catHappyScore() + '% happy</p>' : '') +
+      '</div>';
   }
 
   function renderVisit() {
@@ -4051,7 +4402,7 @@
       const mine = p.id === me;
       const partnered = palIds[p.id];
       return '<div class="shop-card' + (mine ? ' me' : '') + '">' +
-        '<div class="who">' + (p.rankE || '🌱') + ' ' + esc(p.shop || 'a shop') + (mine ? ' (you)' : '') + '</div>' +
+        '<div class="who">' + (p.avatar || p.rankE || '🌱') + ' ' + esc(p.shop || 'a shop') + (mine ? ' (you)' : '') + '</div>' +
         '<div class="meta">' + esc(p.name || '') + ' · ' + esc(p.rank || 'seedling shop') +
         ' · 💗 ' + (p.hearts || 0) + ' · day ' + (p.day || 1) +
         (p.streak ? ' · 🔥 ' + p.streak : '') + '</div>' +
@@ -5136,6 +5487,33 @@
       case 'home':
         if (!S) { show('intro'); break; }
         renderHome(); show('home'); break;
+      case 'settings': openSettings(); break;
+      case 'settingsclose': $('#settingsModal').classList.add('hidden'); break;
+      case 'journal': renderJournal(); show('journal'); break;
+      case 'chore': doChore(id); break;
+      case 'waterplant': waterPlant(); break;
+      case 'saveshop': saveShopMeta(); break;
+      case 'setlook':
+        if (!S) break;
+        S.look = id; save(); applyLook(); renderSettings();
+        break;
+      case 'setsign':
+        if (!S) break;
+        S.signPaint = id; save(); applyLook(); renderSettings();
+        break;
+      case 'setavatar':
+        if (!S) break;
+        S.avatar = id; save(); renderSettings();
+        break;
+      case 'delaccount': deleteAccount(id); break;
+      case 'togglesfx':
+        if (!S) break;
+        S.settings.sfx = !S.settings.sfx;
+        if ($('#sfxBtn')) $('#sfxBtn').classList.toggle('off', !S.settings.sfx);
+        save();
+        if (S.settings.sfx) Sound.tap();
+        if ($('#settingsModal') && !$('#settingsModal').classList.contains('hidden')) renderSettings();
+        break;
       case 'town': openTown(); break;
       case 'towntab': townTab = id; Sound.tap(); renderTown(); break;
       case 'townrefresh': openTown(); break;
@@ -5220,9 +5598,18 @@
       case 'radiotoggle': {
         if (Radio.want) Radio.pause(); else Radio.play();
         save();
+        if ($('#settingsModal') && !$('#settingsModal').classList.contains('hidden')) renderSettings();
         break;
       }
       case 'radionext': Radio.next(); break;
+      case 'radiosize':
+        if (!S) break;
+        if (!S.settings) S.settings = { music: true, sfx: true, track: 0, radioWide: false };
+        S.settings.radioWide = !S.settings.radioWide;
+        save();
+        Radio.render();
+        if ($('#settingsModal') && !$('#settingsModal').classList.contains('hidden')) renderSettings();
+        break;
       case 'shelf': renderShelf(); show('shelf'); break;
       case 'closeDay': closeDay(); break;
       case 'nextDay': nextDay(); break;
@@ -5323,8 +5710,12 @@
     if (!S.today.kinds) S.today.kinds = {};
     if (!S.upgrades) S.upgrades = { board: 0, window: 0, tips: 0, regulars: 0, kettle: 0 };
     if (S.upgrades.kettle == null) S.upgrades.kettle = 0;
-    if (!S.settings) S.settings = { music: true, sfx: true, track: 0 };
+    if (!S.settings) S.settings = { music: true, sfx: true, track: 0, radioWide: false };
     if (S.settings.track == null) S.settings.track = 0;
+    if (S.settings.radioWide == null) S.settings.radioWide = false;
+    if (!S.look) S.look = 'cream';
+    if (!S.signPaint) S.signPaint = 'rose';
+    if (!S.avatar) S.avatar = '🧵';
     ensureVisit();
     ensurePlay();
     ensureWish();
@@ -5411,6 +5802,9 @@
     });
     $('#townModal').addEventListener('click', e => {
       if (e.target.id === 'townModal') $('#townModal').classList.add('hidden');
+    });
+    $('#settingsModal').addEventListener('click', e => {
+      if (e.target.id === 'settingsModal') $('#settingsModal').classList.add('hidden');
     });
 
     const peek = readSharedCraft();
