@@ -2892,13 +2892,9 @@
 
   function gameLink() {
     let url = GAME_URL;
-    const host = location.hostname || '';
-    if (host.indexOf('github.io') >= 0) {
-      url = location.href.split('#')[0].split('?')[0];
-    }
-    if (Net.acc && Net.acc.room) {
-      url += (url.indexOf('?') >= 0 ? '&' : '?') + 'room=' + encodeURIComponent(Net.acc.room);
-    }
+    const room = (Net.acc && Net.acc.room) || (($('#roomIn') && $('#roomIn').value) || DEFAULT_ROOM);
+    const code = sanitizeRoom(room);
+    if (code) url += '?room=' + encodeURIComponent(code);
     return url;
   }
   function ymd(d) {
@@ -3013,11 +3009,21 @@
   }
 
   function shareGame() {
-    sharePayload(
-      'Petal & Paper',
-      'Come play Petal & Paper with me — a cozy craft shop. Bracelets, hair clips, stationery. No timers 🎀',
-      gameLink()
-    );
+    const url = gameLink();
+    const modal = $('#shareModal');
+    modal.classList.remove('hidden');
+    modal.innerHTML = '<div class="card">' +
+      '<h2 class="hand" style="font-size:1.9rem;color:var(--rose-deep)">Send this to your sister</h2>' +
+      '<p style="color:var(--ink-soft);font-size:.9rem;margin:8px 0 12px">This opens the live shop on the internet — not this computer.</p>' +
+      '<div class="field"><label for="shareLinkIn">shareable link</label>' +
+      '<input id="shareLinkIn" readonly value="' + esc(url) + '"></div>' +
+      '<div class="bench-actions">' +
+      '<button class="btn primary" data-act="sharegamecopy">Copy link</button>' +
+      '<button class="btn ghost" data-act="shareclose">Close</button>' +
+      '</div></div>';
+    const inp = $('#shareLinkIn');
+    if (inp) { inp.focus(); inp.select(); }
+    copyText(url);
   }
 
   function openShareCraft(d, name) {
@@ -4593,6 +4599,7 @@
       case 'shoptab': shopTab = id; Sound.tap(); renderRestock(); break;
       case 'upgrade': buyUpgrade(id); break;
       case 'sharegame': shareGame(); break;
+      case 'sharegamecopy': copyText(gameLink()); break;
       case 'shareitem': {
         const it = S.shelf.find(s => s.id === id);
         if (it) openShareCraft(it.d, it.name);
