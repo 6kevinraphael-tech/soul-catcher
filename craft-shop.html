@@ -331,8 +331,55 @@
     animation: rain 0.7s linear infinite; opacity: 0.35;
   }
   @keyframes rain { to { background-position: 18px 28px; } }
-  .counter [data-act="petcat"] { cursor: pointer; filter: drop-shadow(0 2px 0 rgba(0,0,0,0.12)); }
-  .counter [data-act="petcat"]:hover { transform: scale(1.18) rotate(-8deg); }
+  .counter [data-act="petcat"] { cursor: pointer; }
+  .shop-cat-wrap {
+    position: absolute; bottom: 10px; z-index: 4;
+    width: 86px; height: 70px; border: 0; padding: 0; background: none;
+    cursor: pointer; transform: translateX(-50%);
+    transition: left 2.6s ease-in-out;
+  }
+  .shop-cat-wrap:focus { outline: none; }
+  .shop-cat-wrap .cat-art { display: block; width: 86px; height: 70px; overflow: visible; }
+  .shop-cat-wrap.flip .cat-art { transform: scaleX(-1); transform-origin: 50% 70%; }
+  .shop-cat-wrap.walk .cat-art { animation: catBob 0.38s ease-in-out infinite; }
+  .shop-cat-wrap.purr .cat-art { animation: catPurr 0.28s ease-in-out infinite; }
+  .shop-cat-wrap.sleep .cat-art { animation: catBreathe 2.4s ease-in-out infinite; }
+  .shop-cat-wrap .cat-eye { transform-box: fill-box; transform-origin: center; }
+  .shop-cat-wrap.sleep .cat-eye { transform: scaleY(0.18); }
+  .shop-cat-wrap .cat-tail { transform-box: fill-box; transform-origin: 18px 48px; animation: tailSway 2.2s ease-in-out infinite; }
+  .shop-cat-wrap.sleep .cat-tail { animation-duration: 3.6s; }
+  .shop-cat-wrap .cat-zzz {
+    position: absolute; right: 2px; top: -2px; opacity: 0;
+    font-family: 'Caveat', cursive; font-size: 1.05rem; color: var(--ink-soft);
+    pointer-events: none;
+  }
+  .shop-cat-wrap.sleep .cat-zzz { opacity: 1; animation: zzzUp 2s ease-in-out infinite; }
+  .shop-cat-wrap .cat-heart {
+    position: absolute; left: 50%; top: -8px; opacity: 0; pointer-events: none;
+    font-size: 0.85rem; transform: translateX(-50%);
+  }
+  .shop-cat-wrap.purr .cat-heart { animation: heartPop 1.6s ease-out forwards; }
+  .cat-bed {
+    position: absolute; bottom: 8px; left: 18%; width: 54px; height: 14px; z-index: 3;
+    border-radius: 20px 20px 10px 10px;
+    background: radial-gradient(ellipse at 50% 40%, #f4c4cc, #d78d9b);
+    box-shadow: 0 3px 0 rgba(160, 90, 100, 0.25), inset 0 2px 0 rgba(255,255,255,0.35);
+  }
+  @keyframes catBob { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-4px); } }
+  .shop-cat-wrap.flip.walk .cat-art { animation-name: catBobFlip; }
+  @keyframes catBobFlip { 0%, 100% { transform: scaleX(-1) translateY(0); } 50% { transform: scaleX(-1) translateY(-4px); } }
+  @keyframes catPurr { 0%, 100% { transform: scale(1, 1); } 50% { transform: scale(1.04, 0.96); } }
+  .shop-cat-wrap.flip.purr .cat-art { animation-name: catPurrFlip; }
+  @keyframes catPurrFlip { 0%, 100% { transform: scaleX(-1) scale(1, 1); } 50% { transform: scaleX(-1) scale(1.04, 0.96); } }
+  @keyframes catBreathe { 0%, 100% { transform: translateY(2px) scale(1.02, 0.96); } 50% { transform: translateY(0) scale(1, 1); } }
+  .shop-cat-wrap.flip.sleep .cat-art { animation-name: catBreatheFlip; }
+  @keyframes catBreatheFlip {
+    0%, 100% { transform: scaleX(-1) translateY(2px) scale(1.02, 0.96); }
+    50% { transform: scaleX(-1) translateY(0) scale(1, 1); }
+  }
+  @keyframes tailSway { 0%, 100% { transform: rotate(-8deg); } 50% { transform: rotate(14deg); } }
+  @keyframes zzzUp { 0% { opacity: 0; transform: translateY(4px); } 40% { opacity: 1; } 100% { opacity: 0; transform: translateY(-10px); } }
+  @keyframes heartPop { 0% { opacity: 0; transform: translate(-50%, 8px) scale(0.4); } 30% { opacity: 1; } 100% { opacity: 0; transform: translate(-50%, -16px) scale(1.2); } }
   .scene-lights { display: flex; justify-content: space-around; margin: -6px -6px 8px; }
   .scene-lights i {
     width: 9px; height: 9px; border-radius: 50%; background: #ffe9a8;
@@ -911,7 +958,7 @@
             <li>Hearts raise your <b>shop rank</b>. 3-star streaks and daily chalkboard wishes pay extra.</li>
             <li>Share a piece from your <b>shelf</b> — friends can open the link and see it.</li>
             <li>In the <b>town square</b>, visit other shops, send them an order, or ask to be partner stores.</li>
-            <li>Make one of every craft in a week for a <b>sampler bonus</b>. Pet the shop cat. Write a motto on the window.</li>
+            <li>Make one of every craft in a week for a <b>sampler bonus</b>. Tap <b>Miso</b> the shop cat — she walks, naps, and purrs. Write a motto on the window.</li>
             <li>No timers, ever. Leftover orders wait for tomorrow.</li>
           </ul>
         </div>
@@ -1182,7 +1229,7 @@
   const COSMETICS = {
     lights:  { n: 'Fairy lights', e: '✨' },
     plant:   { n: 'Big monstera', e: '🪴' },
-    cat:     { n: 'Shop cat',     e: '🐈' },
+    cat:     { n: 'Cat cushion',  e: '🎀' },
     radio:   { n: 'Old radio',    e: '📻' },
     flowers: { n: 'Fresh bouquet',e: '💐' },
     tea:     { n: 'Tea station',  e: '🍵' },
@@ -1224,7 +1271,7 @@
     ]},
     { cat: 'cosmetics', title: 'Shop decorations', items: [
       ['plant', 70], ['lights', 90], ['flowers', 80], ['tea', 100], ['candle', 60],
-      ['radio', 120], ['vinyl', 130], ['fish', 150], ['cat', 180]
+      ['radio', 120], ['vinyl', 130], ['fish', 150], ['cat', 90]
     ]}
   ];
 
@@ -1452,24 +1499,89 @@
     return null;
   }
   function petCat() {
-    if (!S || !S.unlocked.cosmetics || S.unlocked.cosmetics.indexOf('cat') < 0) return;
+    if (!S) return;
     ensurePlay();
     const now = Date.now();
-    const name = S.catName || 'the shop cat';
-    if ((S.play.catAt || 0) + 18000 > now) {
-      toast(name + ' is already purring');
+    const name = S.catName || 'Miso';
+    const napping = Cat.mood === 'sleep';
+    Cat.pet();
+    if ((S.play.catAt || 0) + 12000 > now) {
+      toast(name + (napping ? ' blinks at you' : ' is already purring'));
       return;
     }
     S.play.catAt = now;
     S.hearts += 1;
-    if (Math.random() < 0.4) {
+    if (Math.random() < 0.35) {
       const g = gainCoins(3);
-      toast(name + ' dropped a coin · +' + g.got);
-    } else toast(name + ' purrs ♡');
+      toast(name + ' brought you a coin · +' + g.got);
+    } else toast(napping ? name + ' yawns and keeps napping' : name + ' purrs');
     save();
     Sound.pop();
-    renderHome();
+    renderVisit();
   }
+  const Cat = {
+    mood: 'sit',
+    x: 62,
+    dir: -1,
+    timer: null,
+    html() {
+      const name = (S && S.catName) || 'Miso';
+      return '<button type="button" class="shop-cat-wrap" id="shopCat" data-act="petcat" title="' + esc(name) + ' — tap to pet">' +
+        '<span class="cat-heart">💗</span><span class="cat-zzz">z</span>' +
+        '<svg class="cat-art" viewBox="0 0 90 70" aria-hidden="true">' +
+        '<path class="cat-tail" d="M20 46 C8 40 6 26 18 20" fill="none" stroke="#e8c4a8" stroke-width="7" stroke-linecap="round"/>' +
+        '<ellipse cx="46" cy="50" rx="27" ry="15" fill="#f3d2b8"/>' +
+        '<circle cx="64" cy="32" r="15" fill="#f6d9c0"/>' +
+        '<path d="M52 24 L53 11 L63 22Z" fill="#efc8b0"/>' +
+        '<path d="M74 22 L80 11 L82 26Z" fill="#efc8b0"/>' +
+        '<path d="M54 22 L55 15 L61 22Z" fill="#e29a96"/>' +
+        '<path d="M75 22 L79 15 L81 24Z" fill="#e29a96"/>' +
+        '<ellipse class="cat-eye" cx="59" cy="32" rx="2.3" ry="3.3" fill="#4d4239"/>' +
+        '<ellipse class="cat-eye" cx="71" cy="32" rx="2.3" ry="3.3" fill="#4d4239"/>' +
+        '<circle cx="60.2" cy="31" r="0.7" fill="#fff"/>' +
+        '<circle cx="72.2" cy="31" r="0.7" fill="#fff"/>' +
+        '<ellipse cx="65" cy="37" rx="2.1" ry="1.5" fill="#d78d9b"/>' +
+        '<path d="M63 39 Q65 41 67 39" fill="none" stroke="#c48a7a" stroke-width="1" stroke-linecap="round"/>' +
+        '<ellipse cx="36" cy="61" rx="5.5" ry="3.4" fill="#efc8b0"/>' +
+        '<ellipse cx="50" cy="62" rx="5.5" ry="3.4" fill="#efc8b0"/>' +
+        '</svg></button>';
+    },
+    mount() {
+      const el = $('#shopCat');
+      if (!el) return;
+      el.style.left = this.x + '%';
+      el.classList.toggle('flip', this.dir < 0);
+      el.classList.toggle('sleep', this.mood === 'sleep');
+      el.classList.toggle('walk', this.mood === 'walk');
+      el.classList.toggle('purr', this.mood === 'purr');
+      el.title = ((S && S.catName) || 'Miso') + ' — tap to pet';
+    },
+    tick() {
+      const home = $('#screen-home');
+      if (!home || !home.classList.contains('active') || this.mood === 'purr') return;
+      const hour = shopHour();
+      const roll = Math.random();
+      if (hour.id === 'night' && roll < 0.6) this.mood = 'sleep';
+      else if (roll < 0.4) {
+        this.mood = 'walk';
+        this.dir = Math.random() < 0.5 ? -1 : 1;
+        this.x = Math.max(14, Math.min(82, this.x + this.dir * (10 + Math.random() * 26)));
+      } else if (roll < 0.62) this.mood = 'sleep';
+      else this.mood = 'sit';
+      this.mount();
+    },
+    pet() {
+      this.mood = 'purr';
+      this.mount();
+      setTimeout(() => {
+        if (this.mood === 'purr') { this.mood = 'sit'; this.mount(); }
+      }, 1600);
+    },
+    start() {
+      if (this.timer) return;
+      this.timer = setInterval(() => this.tick(), 2800);
+    }
+  };
   function remixCraft(d) {
     if (!d) { toast('make something first'); return; }
     benchMode = 'studio';
@@ -3133,21 +3245,19 @@
     if (cos.indexOf('lights') >= 0) {
       lights = '<div class="scene-lights">' + new Array(9).fill('<i></i>').join('') + '</div>';
     }
-    const props = ['plant', 'flowers', 'tea', 'candle', 'radio', 'vinyl', 'fish', 'cat']
+    const props = ['plant', 'flowers', 'tea', 'candle', 'radio', 'vinyl', 'fish']
       .filter(c => cos.indexOf(c) >= 0)
-      .map(c => {
-        if (c === 'cat') {
-          return '<span data-act="petcat" title="' + esc(S.catName || 'shop cat') + ' — tap to pet">' + COSMETICS[c].e + '</span>';
-        }
-        return '<span title="' + COSMETICS[c].n + '">' + COSMETICS[c].e + '</span>';
-      }).join('');
+      .map(c => '<span title="' + COSMETICS[c].n + '">' + COSMETICS[c].e + '</span>').join('');
     const note = (S.motto && S.motto.trim()) ? S.motto.trim() : (S.today && S.today.rain ? 'rainy & cozy' : hour.note);
+    const bed = (cos.indexOf('cat') >= 0) ? '<div class="cat-bed" title="cat cushion"></div>' : '';
     const el = $('#shopScene');
     el.className = 'scene ' + hour.id + ((S.today && S.today.rain) ? ' rain' : '');
     el.innerHTML = lights +
       '<div class="shelf">' + jars + '</div>' +
       '<div class="counter">' + (props || '<span style="font-size:1rem;color:#8a6f58;font-family:Caveat,cursive">a bare little counter...</span>') + '</div>' +
+      bed + Cat.html() +
       '<div class="scene-note">' + esc(note) + '</div>';
+    Cat.mount();
   }
 
   function renderVisit() {
@@ -3187,8 +3297,7 @@
       '<input id="mottoIn" maxlength="28" placeholder="handmade with love" value="' + esc(S.motto || '') + '"></div>' +
       '<div class="share-row">' +
       '<button class="btn small" data-act="savemotto">Save motto</button>' +
-      (S.unlocked.cosmetics && S.unlocked.cosmetics.indexOf('cat') >= 0
-        ? '<button class="btn small ghost" data-act="namecat">Name the cat</button>' : '') +
+      '<button class="btn small ghost" data-act="namecat">Name the cat</button>' +
       (S.lastCraft ? '<button class="btn small ghost" data-act="remixlast">🎨 Remake last piece</button>' : '') +
       '<button class="btn small" data-act="sharegame">💌 Share with a friend</button>' +
       '</div>';
@@ -4618,6 +4727,7 @@
     save();
     renderHome();
     show('home');
+    Cat.start();
     Radio.render();
     updateAccountUI();
     Net.listen();
