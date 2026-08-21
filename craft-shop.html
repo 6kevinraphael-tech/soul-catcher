@@ -243,6 +243,24 @@
     padding: 9px 15px; border-radius: 999px;
     background: rgba(255, 255, 255, 0.66); border: 2px solid rgba(150, 124, 98, 0.2);
     font-weight: 700; font-size: 0.9rem; box-shadow: 0 3px 0 rgba(150, 124, 98, 0.13);
+    position: relative; overflow: visible;
+  }
+  .stat.coin-pop { animation: coinPop 0.45s ease; }
+  @keyframes coinPop {
+    0% { transform: scale(1); }
+    35% { transform: scale(1.12); }
+    100% { transform: scale(1); }
+  }
+  .coin-fly {
+    position: absolute; left: 50%; top: 4px; width: 9px; height: 9px; margin-left: -4px;
+    border-radius: 50%; pointer-events: none;
+    background: radial-gradient(circle at 30% 30%, #fff4c8, #d9b45e);
+    box-shadow: 0 0 0 1px rgba(180,140,50,0.35);
+    animation: coinFly 0.7s ease-out forwards;
+  }
+  @keyframes coinFly {
+    0% { opacity: 1; transform: translate(0, 0) scale(1); }
+    100% { opacity: 0; transform: translate(var(--dx, -12px), -32px) scale(0.4); }
   }
   .stat small { font-weight: 600; color: var(--ink-soft); font-size: 0.72rem; letter-spacing: 0.06em; text-transform: uppercase; }
 
@@ -446,6 +464,8 @@
   .hang-lamp.b { left: 62%; }
   .scene.night .hang-lamp::after { box-shadow: 0 14px 28px rgba(255, 190, 100, 0.7); }
   .shelf-unit { position: absolute; left: 142px; right: 112px; top: 48px; z-index: 3; }
+  .shelf-unit.tall { top: 28px; }
+  .shelf-unit.tall .shelf { margin-bottom: 8px; padding-bottom: 4px; }
   .shelf {
     display: flex; align-items: flex-end; justify-content: center; gap: 7px;
     padding-bottom: 6px; margin-bottom: 16px;
@@ -484,6 +504,55 @@
   .register::after {
     content: ''; position: absolute; left: 4px; right: 4px; bottom: 4px; height: 6px;
     background: repeating-linear-gradient(90deg, #222 0 3px, #444 3px 6px); border-radius: 1px;
+  }
+  .npc {
+    position: absolute; bottom: 8px; z-index: 7; width: 22px; height: 38px;
+    animation: npcWalk 22s linear infinite;
+    pointer-events: none;
+  }
+  .npc:nth-child(odd) { animation-duration: 26s; }
+  .npc-head {
+    position: absolute; left: 4px; top: 0; width: 14px; height: 14px; border-radius: 50%;
+    background: linear-gradient(#f3d2b8, #e2b894);
+    box-shadow: 0 1px 0 rgba(80,50,30,0.15);
+  }
+  .npc-coat {
+    position: absolute; left: 2px; top: 13px; width: 18px; height: 22px; border-radius: 8px 8px 4px 4px;
+    background: linear-gradient(#d78d9b, #bd6f7f);
+  }
+  .npc.sage .npc-coat { background: linear-gradient(#9fb28f, #7a9468); }
+  .npc.sky .npc-coat { background: linear-gradient(#8eb4d4, #6a8fb4); }
+  .npc-name {
+    position: absolute; left: 50%; top: -12px; transform: translateX(-50%);
+    font-size: 0.55rem; font-weight: 700; white-space: nowrap;
+    background: rgba(255,252,246,0.9); padding: 1px 5px; border-radius: 8px;
+    color: var(--ink); box-shadow: 0 1px 2px rgba(80,50,30,0.15);
+  }
+  @keyframes npcWalk {
+    0% { left: -8%; }
+    38% { left: 36%; }
+    52% { left: 36%; }
+    100% { left: 108%; }
+  }
+  .cozy-papers {
+    position: absolute; left: 62px; bottom: 62px; z-index: 6; width: 22px; height: 16px;
+    background: #fffdf8; border-radius: 2px; transform: rotate(-8deg);
+    box-shadow: 3px -3px 0 #f4e3ac, 6px -6px 0 #f0c9d2;
+    pointer-events: none;
+  }
+  .cozy-steam {
+    position: absolute; left: 78px; bottom: 78px; z-index: 7; width: 10px; height: 18px;
+    pointer-events: none; opacity: 0.7;
+  }
+  .cozy-steam i {
+    display: block; width: 3px; height: 10px; border-radius: 4px; background: rgba(255,255,255,0.7);
+    animation: steamUp 2.2s ease-in-out infinite; margin: 0 auto;
+  }
+  .cozy-steam i:nth-child(2) { animation-delay: 0.4s; margin-left: 5px; }
+  @keyframes steamUp {
+    0% { transform: translateY(6px); opacity: 0; }
+    40% { opacity: 0.8; }
+    100% { transform: translateY(-10px); opacity: 0; }
   }
   .prop {
     display: inline-block; animation: sway 6s ease-in-out infinite; transform-origin: bottom center;
@@ -936,11 +1005,63 @@
   .shop-cat { margin-bottom: 20px; }
   .goods { display: grid; grid-template-columns: repeat(auto-fill, minmax(148px, 1fr)); gap: 12px; }
   .good {
+    position: relative;
     padding: 14px 12px 12px; border-radius: 16px; text-align: center;
     background: rgba(255, 255, 255, 0.78); border: 2px solid rgba(150, 124, 98, 0.2);
-    box-shadow: 0 3px 0 rgba(150, 124, 98, 0.14); transition: transform 0.14s ease;
+    box-shadow: 0 3px 0 rgba(150, 124, 98, 0.14); transition: transform 0.18s ease, box-shadow 0.18s ease, border-color 0.18s;
   }
-  .good:hover { transform: translateY(-3px); }
+  .good:hover { transform: translateY(-6px) rotate(-1deg); box-shadow: 0 10px 18px rgba(120, 92, 70, 0.18); }
+  .good:hover .vis { animation: icoBounce 0.45s ease; }
+  @keyframes icoBounce {
+    0% { transform: scale(1); }
+    40% { transform: scale(1.16) translateY(-5px); }
+    100% { transform: scale(1); }
+  }
+  .good.r-common { border-color: rgba(140, 160, 120, 0.45); }
+  .good.r-uncommon { border-color: rgba(189, 111, 127, 0.5); }
+  .good.r-rare { border-color: rgba(110, 140, 190, 0.62); box-shadow: 0 0 0 2px rgba(110,140,190,0.16), 0 3px 0 rgba(150,124,98,0.1); }
+  .good.r-legend { border-color: #d9b45e; box-shadow: 0 0 0 2px rgba(217,180,94,0.32), 0 3px 0 rgba(180,140,50,0.16); }
+  .rarity-pip {
+    display: inline-block; font-size: 0.58rem; font-weight: 800; letter-spacing: 0.1em;
+    text-transform: uppercase; margin-bottom: 4px; color: var(--ink-soft);
+  }
+  .good.r-rare .rarity-pip { color: #4d6a8a; }
+  .good.r-legend .rarity-pip { color: #9a7428; }
+  .good .tip {
+    display: none; position: absolute; left: 8px; right: 8px; bottom: calc(100% + 8px);
+    background: #4d4239; color: #fffdf8; font-size: 0.72rem; line-height: 1.35;
+    padding: 8px 10px; border-radius: 12px; z-index: 8; text-align: left; font-weight: 500;
+    box-shadow: 0 8px 18px rgba(70,50,30,0.28);
+  }
+  .good .tip::after {
+    content: ''; position: absolute; left: 50%; bottom: -6px; margin-left: -6px;
+    border: 6px solid transparent; border-top-color: #4d4239; border-bottom: 0;
+  }
+  @media (hover: hover) {
+    .good:hover .tip { display: block; }
+  }
+  .feat-wrap { overflow: hidden; border-radius: 18px; margin-bottom: 14px; }
+  .feat-track { display: flex; width: 300%; animation: featSlide 14s ease-in-out infinite; }
+  .feat-track.n1 { width: 100%; animation: none; }
+  .feat-track.n2 { width: 200%; animation: featSlide2 10s ease-in-out infinite; }
+  .feat-slide .shop-hero { margin-bottom: 0; }
+  .feat-track.n1 .feat-slide, .feat-track.n2 .feat-slide { width: 50%; flex-basis: 50%; }
+  .feat-track.n1 .feat-slide { width: 100%; flex-basis: 100%; }
+  @keyframes featSlide {
+    0%, 26% { transform: translateX(0); }
+    33%, 59% { transform: translateX(-33.333%); }
+    66%, 92% { transform: translateX(-66.666%); }
+    100% { transform: translateX(0); }
+  }
+  @keyframes featSlide2 {
+    0%, 42% { transform: translateX(0); }
+    50%, 92% { transform: translateX(-50%); }
+    100% { transform: translateX(0); }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .feat-track, .npc, .coin-fly, .good:hover .vis { animation: none; }
+    .stat.coin-pop { animation: none; }
+  }
   .good .vis { height: 48px; display: grid; place-items: center; margin-bottom: 4px; }
   .good .gname { font-size: 0.84rem; font-weight: 700; }
   .good .gdesc { font-size: 0.72rem; color: var(--ink-soft); line-height: 1.3; margin: 4px 0 2px; min-height: 2.4em; }
@@ -1048,7 +1169,9 @@
     position: relative; padding: 12px; border-radius: 14px; text-align: center;
     background: rgba(255, 255, 255, 0.72); border: 2px solid rgba(150, 124, 98, 0.2);
     box-shadow: 0 6px 16px var(--shadow);
+    transition: transform 0.16s ease;
   }
+  .shelf-item:hover { transform: translateY(-4px) rotate(-0.6deg); }
   .shelf-thumb { min-height: 132px; display: grid; place-items: center; margin-bottom: 8px; }
   .shelf-item .sname { font-family: 'Caveat', cursive; font-size: 1.2rem; }
   .shelf-item .srow { display: flex; gap: 6px; justify-content: center; margin-top: 7px; }
@@ -1151,7 +1274,9 @@
     display: flex; align-items: center; gap: 10px; width: 100%; text-align: left;
     padding: 10px 12px; border-radius: 14px;
     background: rgba(255,255,255,0.72); border: 2px solid rgba(150,124,98,0.2);
+    transition: transform 0.16s ease;
   }
+  .chore:hover:not(:disabled) { transform: translateX(4px); }
   .chore.done { opacity: 0.55; text-decoration: line-through; }
   .chore .em { font-size: 1.2rem; }
   .chore .hint { margin-left: auto; }
@@ -1823,7 +1948,8 @@
     { id: 'window', n: 'Roomier window', d: 'One extra display slot for the shelf', cost: 75, max: 2, e: '🪟' },
     { id: 'tips', n: 'Pretty packing table', d: 'Fatter tips when you nail an order', cost: 140, max: 1, e: '🎀' },
     { id: 'regulars', n: 'Loyalty cards', d: 'Regulars drop by more often', cost: 110, max: 1, e: '💌' },
-    { id: 'kettle', n: 'Warm kettle', d: 'A little extra on the first ship of the day', cost: 85, max: 1, e: '🫖' }
+    { id: 'kettle', n: 'Warm kettle', d: 'A little extra on the first ship of the day', cost: 85, max: 1, e: '🫖' },
+    { id: 'shelf', n: 'Extra wall shelf', d: 'Another row of bead jars on the shop wall', cost: 95, max: 2, e: '📚' }
   ];
 
   /* Topic/auto-generated audio videos (same songs). Official MVs and
@@ -2024,8 +2150,103 @@
     n = Math.max(0, Math.round(n));
     const mult = isFlow() ? 2 : 1;
     const got = n * mult;
+    const from = S.coins;
     S.coins += got;
+    pulseCoins(from);
     return { base: n, got: got, mult: mult };
+  }
+  let shownCoins = 0;
+  let coinBusy = 0;
+  function paintCoins(n) {
+    const a = $('#statCoins');
+    const b = $('#restockCoins');
+    if (a) a.textContent = n;
+    if (b) b.textContent = n;
+  }
+  function pulseCoins(fromVal) {
+    if (!S) return;
+    const to = S.coins;
+    const from = fromVal != null ? fromVal : shownCoins;
+    shownCoins = to;
+    if (from === to) { paintCoins(to); return; }
+    const start = performance.now();
+    const dur = Math.min(720, 260 + Math.abs(to - from) * 6);
+    coinBusy += 1;
+    const id = coinBusy;
+    const parent = $('#statCoins') && $('#statCoins').parentElement;
+    if (parent) parent.classList.add('coin-pop');
+    if (to > from) coinBurst(parent, to - from);
+    function tick(now) {
+      if (id !== coinBusy) return;
+      const p = Math.min(1, (now - start) / dur);
+      const ease = 1 - Math.pow(1 - p, 3);
+      paintCoins(Math.round(from + (to - from) * ease));
+      if (p < 1) requestAnimationFrame(tick);
+      else {
+        paintCoins(to);
+        if (parent) parent.classList.remove('coin-pop');
+      }
+    }
+    requestAnimationFrame(tick);
+  }
+  function coinBurst(host, n) {
+    if (!host) return;
+    const c = Math.min(7, 2 + Math.floor(Math.abs(n) / 6));
+    for (let i = 0; i < c; i++) {
+      const d = document.createElement('i');
+      d.className = 'coin-fly';
+      d.style.setProperty('--dx', (Math.random() * 36 - 18) + 'px');
+      d.style.animationDelay = (i * 40) + 'ms';
+      host.appendChild(d);
+      setTimeout(() => d.remove(), 800);
+    }
+  }
+  function spendCoins(n) {
+    const from = S.coins;
+    S.coins -= n;
+    pulseCoins(from);
+  }
+  function rarityOf(price) {
+    if (price >= 110) return { id: 'legend', n: 'keepsake' };
+    if (price >= 70) return { id: 'rare', n: 'rare' };
+    if (price >= 40) return { id: 'uncommon', n: 'pretty' };
+    return { id: 'common', n: 'everyday' };
+  }
+  function goodTip(cat, id) {
+    const name = goodName(cat, id);
+    const use = {
+      colors: 'Shows up as a bead, ribbon, paper and packing colour.',
+      shapes: 'A new bead shape on bracelets, earrings, clips and keychains.',
+      charms: 'Dangles from finished jewellery.',
+      cords: 'The string your bracelets are tied on.',
+      hooks: 'The metal finding for earrings.',
+      rings: 'The loop that holds a keychain.',
+      clips: 'The bar a hair clip sits on.',
+      patterns: 'Prints on stationery you make.',
+      borders: 'The edge around a card or notepad.',
+      motifs: 'A stamp you press onto stationery.',
+      wraps: 'How an order is boxed at packing.',
+      seals: 'Closes the package with a little flourish.',
+      notes: 'The message slipped into the box.',
+      cosmetics: 'A cozy bit of scenery on the shop floor.'
+    };
+    return name + ' — ' + (use[cat] || GOOD_DESC[cat] || 'Used around the shop.');
+  }
+  function featuredPool() {
+    const deal = saleDeal();
+    const locked = [];
+    SHOP.forEach(g => g.items.forEach(it => {
+      if ((S.unlocked[g.cat] || []).indexOf(it[0]) < 0) locked.push({ cat: g.cat, id: it[0], price: it[1] });
+    }));
+    locked.sort((a, b) => b.price - a.price);
+    const out = [];
+    if (deal) out.push(Object.assign({ featured: 'sale' }, deal));
+    locked.forEach(x => {
+      if (out.length >= 3) return;
+      if (out.some(p => p.cat === x.cat && p.id === x.id)) return;
+      out.push(x);
+    });
+    return out;
   }
   function shopHour() {
     const h = new Date().getHours();
@@ -2082,7 +2303,6 @@
     Sound.meow();
     renderVisit();
     updateCatHud();
-    if ($('#statCoins')) $('#statCoins').textContent = S.coins;
     if ($('#statHearts')) $('#statHearts').textContent = S.hearts;
   }
   function shopCatMeta() {
@@ -2169,7 +2389,6 @@
     save();
     Cat.showLoot(bubble);
     updateCatHud();
-    if ($('#statCoins')) $('#statCoins').textContent = S.coins;
     if ($('#statHearts')) $('#statHearts').textContent = S.hearts;
     return gift;
   }
@@ -2182,16 +2401,15 @@
     const name = S.catName || shopCatMeta().name;
     if (S.today.treats >= 3) { toast(name + ' is full of treats for today'); return; }
     if (S.coins < 12) { toast('not quite enough coins yet'); return; }
-    S.coins -= 12;
+    spendCoins(12);
     S.today.treats++;
     S.catHappy = Math.min(100, (S.catHappy || 36) + 10);
     Cat.pet();
-    Sound.meow();
+    Sound.buy();
     const loot = tryCatGift('treat');
     if (!loot) toast(name + ' crunches a treat · so happy');
     save();
     updateCatHud();
-    if ($('#statCoins')) $('#statCoins').textContent = S.coins;
     if ($('#screen-restock') && $('#screen-restock').classList.contains('active')) renderRestock();
   }
   function showCatPicker() {
@@ -3006,6 +3224,14 @@
       if (!S || !S.settings.sfx) return;
       this.fx(880, 'triangle', 0.16, 0.08);
       setTimeout(() => this.fx(1180, 'triangle', 0.22, 0.07), 70);
+    },
+    buy() {
+      if (!S || !S.settings.sfx || !this.init()) return;
+      this.resume();
+      this.fx(620, 'square', 0.08, 0.05);
+      setTimeout(() => this.fx(880, 'triangle', 0.14, 0.07), 50);
+      setTimeout(() => this.fx(1180, 'sine', 0.18, 0.07), 110);
+      setTimeout(() => this.fx(1480, 'triangle', 0.16, 0.05), 180);
     }
   };
 
@@ -3520,7 +3746,7 @@
       visit: { last: '', streak: 0, best: 0, stamps: 0, week: '', bonus: '', mail: null, news: null },
       play: { acc: 0, flowUntil: 0, last: 0, wasFlow: false, saved: 0 },
       mastery: {}, wish: null,
-      upgrades: { board: 0, window: 0, tips: 0, regulars: 0, kettle: 0 },
+      upgrades: { board: 0, window: 0, tips: 0, regulars: 0, kettle: 0, shelf: 0 },
       motto: '', catId: '', catName: '', catHappy: 36, catFurn: [], lastCraft: null, collect: null,
       look: 'cream', signPaint: 'rose', avatar: '🧵'
     };
@@ -3806,6 +4032,7 @@
     S.visit.last = today;
     S.visit.bonus = today;
     S.stats.streak = S.visit.streak;
+    const fromCoins = S.coins;
     S.coins += news.coins;
     const wk = weekKey(today);
     if (S.visit.week !== wk) { S.visit.week = wk; S.visit.stamps = 0; }
@@ -3823,6 +4050,7 @@
       S.visit.mail = { who: who, text: pick(MAIL_NOTES) };
     }
     S.visit.news = news;
+    pulseCoins(fromCoins);
     save();
     toast('+' + news.coins + ' coins · ' + (S.visit.streak || 1) + '-day streak');
   }
@@ -4016,7 +4244,7 @@
     const rank = shopRank();
     const sr = $('#shopRank');
     if (sr) sr.textContent = rank.e + ' ' + rank.n;
-    $('#statCoins').textContent = S.coins;
+    if (!coinBusy) paintCoins(S.coins);
     $('#statCoins').parentElement.classList.toggle('hot', isFlow());
     $('#statDay').textContent = S.day;
     $('#statHearts').textContent = S.hearts;
@@ -4153,6 +4381,17 @@
         '<div class="cat-happy' + happyClass(happy) + '"><i style="width:' + happy + '%"></i></div>' +
         '<button type="button" class="treat-btn" data-act="feedcat" title="' + (treatsLeft > 0 ? 'treat · 🪙 12 · ' + treatsLeft + ' left today' : 'full of treats today') + '">🐟</button></div>'
       : '';
+    const extraShelves = (S.upgrades && S.upgrades.shelf) || 0;
+    let shelfHtml = jarRow(5) + jarRow(5);
+    if (extraShelves >= 1) shelfHtml += jarRow(4);
+    if (extraShelves >= 2) shelfHtml += jarRow(4);
+    const visitors = (S.orders || []).filter(o => !o.done).slice(0, 2);
+    const npcHtml = visitors.map((o, i) => {
+      const tone = i ? 'sage' : 'sky';
+      return '<div class="npc ' + tone + '" style="animation-delay:-' + (i * 9) + 's" title="' + esc(o.cust.n) + ' is browsing">' +
+        '<span class="npc-name">' + esc(o.cust.n) + '</span><i class="npc-head"></i><i class="npc-coat"></i></div>';
+    }).join('');
+    const steam = (S.upgrades && S.upgrades.kettle) ? '<div class="cozy-steam" title="kettle"><i></i><i></i></div>' : '';
     const yarn = S.catId ? '<div class="yarn" title="yarn"></div>' : '';
     const el = $('#shopScene');
     el.className = 'scene ' + hour.id + ((S.today && S.today.rain) ? ' rain' : '');
@@ -4171,11 +4410,12 @@
       '<span class="peg-tool" style="left:34px;top:28px">🎀</span>' +
       '<span class="peg-tool" style="left:58px;top:12px">📏</span></div>' +
       bunting +
-      '<div class="shelf-unit">' + jarRow(5) + jarRow(5) + '</div>' +
+      '<div class="shelf-unit' + (extraShelves ? ' tall' : '') + '">' + shelfHtml + '</div>' +
       plant +
       '<div class="wainscot"></div>' +
       '<div class="scene-floor"></div>' +
-      rug + furnHtml + yarn +
+      rug + furnHtml + yarn + npcHtml +
+      '<div class="cozy-papers" title="order notes"></div>' + steam +
       '<div class="counter"><div class="register" title="till"></div>' +
       (props || '<span style="font-size:.85rem;color:#8a6f58;font-family:Caveat,cursive;opacity:.8">a quiet counter</span>') +
       '</div>' +
@@ -4211,7 +4451,7 @@
       '<p class="hint" style="margin:4px 0 8px">little minigames — pour, sweep, tidy. two new ones each day.</p>' +
       '<div class="chore-list">' + jobs.map(c =>
         '<button type="button" class="chore' + (choreDone(c.id) ? ' done' : '') + '" data-act="chore" data-id="' + c.id + '"' +
-        (choreDone(c.id) ? ' disabled' : '') + '>' +
+        (choreDone(c.id) ? ' disabled' : '') + ' title="' + esc(c.hint) + '">' +
         '<span class="em">' + c.e + '</span><span>' + c.n + '</span>' +
         '<span class="hint">' + (choreDone(c.id) ? 'done' : 'play') + '</span></button>'
       ).join('') + '</div>';
@@ -5810,7 +6050,8 @@
       window: visSvg('<rect x="6" y="6" width="20" height="20" rx="1" fill="#8ec4e0" stroke="#c9a078" stroke-width="2"/><path d="M16 6v20M6 16h20" stroke="#c9a078" stroke-width="1.5"/>'),
       tips: visSvg('<rect x="6" y="10" width="20" height="14" rx="2" fill="#f4e3ac"/><path d="M6 14h20" stroke="#d78d9b" stroke-width="3"/>'),
       regulars: visSvg('<rect x="6" y="8" width="20" height="16" rx="2" fill="#fffdf8" stroke="#c9a078" stroke-width="1.5"/><circle cx="12" cy="14" r="2" fill="#bd6f7f"/><path d="M10 20c2-3 6-3 8 0" fill="none" stroke="#bd6f7f" stroke-width="1.5"/>'),
-      kettle: visSvg('<ellipse cx="16" cy="22" rx="8" ry="4" fill="#c9a078"/><path d="M10 22c0-10 12-10 12 0" fill="#e8d5b5"/><path d="M22 16c5 0 5 8 0 8" fill="none" stroke="#c9a078" stroke-width="2"/>')
+      kettle: visSvg('<ellipse cx="16" cy="22" rx="8" ry="4" fill="#c9a078"/><path d="M10 22c0-10 12-10 12 0" fill="#e8d5b5"/><path d="M22 16c5 0 5 8 0 8" fill="none" stroke="#c9a078" stroke-width="2"/>'),
+      shelf: visSvg('<path d="M4 12h24M4 20h24" stroke="#c9a078" stroke-width="3"/><rect x="8" y="6" width="5" height="6" fill="#e28a96"/><rect x="16" y="14" width="5" height="6" fill="#9fb28f"/>')
     };
     return m[id] || visSvg('<rect x="8" y="8" width="16" height="16" rx="4" fill="#c9a078"/>');
   }
@@ -5865,7 +6106,7 @@
   }
 
   function renderRestock() {
-    $('#restockCoins').textContent = S.coins;
+    if (!coinBusy) $('#restockCoins').textContent = S.coins;
     const deal = saleDeal();
     const keepers = [
       '“the rose beads just came in — they look like candy.”',
@@ -5874,12 +6115,20 @@
       '“upgrades change how busy tomorrow feels.”',
       '“a happy shop cat brings home the rarest beads.”'
     ];
+    const featured = featuredPool();
     let hero = '';
-    if (deal) {
-      hero = '<div class="shop-hero"><div class="hand">today\'s restock deal</div>' +
-        '<div style="font-weight:700;margin:4px 0 8px">30% off ' + goodName(deal.cat, deal.id) +
-        ' — 🪙 ' + priceOf(deal.cat, deal.id) + ' <s style="opacity:.55"> ' + deal.price + '</s></div>' +
-        '<button class="btn small primary" data-act="buy" data-cat="' + deal.cat + '" data-id="' + deal.id + '">Grab it</button></div>';
+    if (featured.length) {
+      hero = '<div class="feat-wrap"><div class="feat-track n' + featured.length + '">' + featured.map(f => {
+        const r = rarityOf(f.price || 0);
+        const sale = f.featured === 'sale';
+        return '<div class="feat-slide"><div class="shop-hero"><div class="hand">' + (sale ? 'today\'s restock deal' : 'in the window') + '</div>' +
+          '<div style="font-weight:700;margin:4px 0 8px">' + (sale ? '30% off ' : '') + goodName(f.cat, f.id) +
+          ' — 🪙 ' + priceOf(f.cat, f.id) +
+          (sale ? ' <s style="opacity:.55"> ' + f.price + '</s>' : '') +
+          ' <span class="rarity-pip">' + r.n + '</span></div>' +
+          '<p class="hint" style="margin:0 0 8px">' + esc(goodTip(f.cat, f.id)) + '</p>' +
+          '<button class="btn small primary" data-act="buy" data-cat="' + f.cat + '" data-id="' + f.id + '">Grab it</button></div></div>';
+      }).join('') + '</div></div>';
     }
     const tabs = '<div class="shop-tabs">' + SHOP_TABS.map(t =>
       '<button class="chip' + (shopTab === t.id ? ' on' : '') + '" data-act="shoptab" data-id="' + t.id + '">' + t.n + '</button>'
@@ -5893,8 +6142,10 @@
           const maxed = lvl >= u.max;
           const cost = u.cost + lvl * 40;
           const afford = S.coins >= cost;
-          return '<button class="good' + (maxed ? ' owned' : '') + '" data-act="upgrade" data-id="' + u.id + '"' +
-            (maxed || !afford ? ' disabled' : '') + '>' +
+          return '<button class="good' + (maxed ? ' owned' : '') + ' r-' + rarityOf(cost).id + '" data-act="upgrade" data-id="' + u.id + '"' +
+            (maxed || !afford ? ' disabled' : '') + ' title="' + esc(u.d) + '">' +
+            '<span class="tip">' + esc(u.d) + '</span>' +
+            '<div class="rarity-pip">' + rarityOf(cost).n + '</div>' +
             '<div class="vis">' + upgradeVis(u.id) + '</div><div class="gname">' + u.n + '</div>' +
             '<div class="gdesc">' + u.d + (u.max > 1 ? ' (' + lvl + '/' + u.max + ')' : '') + '</div>' +
             '<div class="price">' + (maxed ? 'fully upgraded ✓' : '🪙 ' + cost) + '</div></button>';
@@ -5916,8 +6167,11 @@
         CAT_FURN.map(f => {
           const owned = (S.catFurn || []).indexOf(f.id) >= 0;
           const afford = S.coins >= f.cost;
-          return '<button class="good' + (owned ? ' owned' : '') + '" data-act="buyfurn" data-id="' + f.id + '"' +
-            (owned || !afford ? ' disabled' : '') + '>' +
+          const r = rarityOf(f.cost);
+          return '<button class="good' + (owned ? ' owned' : '') + ' r-' + r.id + '" data-act="buyfurn" data-id="' + f.id + '"' +
+            (owned || !afford ? ' disabled' : '') + ' title="' + esc(f.d) + '">' +
+            '<span class="tip">' + esc(f.n) + ' — ' + esc(f.d) + ' Makes rare cat finds more likely.</span>' +
+            '<div class="rarity-pip">' + r.n + '</div>' +
             '<div class="vis"><img class="shop-ico" src="' + f.img + '" alt=""></div><div class="gname">' + f.n + '</div>' +
             '<div class="gdesc">' + f.d + ' +' + f.happy + ' happy</div>' +
             '<div class="price">' + (owned ? 'in the shop ✓' : '🪙 ' + f.cost) + '</div></button>';
@@ -5932,10 +6186,13 @@
           const price = priceOf(g.cat, id);
           const onSale = deal && deal.cat === g.cat && deal.id === id && !owned;
           const afford = S.coins >= price;
-          return '<button class="good' + (owned ? ' owned' : '') + (onSale ? ' sale' : '') +
+          const r = rarityOf(full);
+          return '<button class="good' + (owned ? ' owned' : '') + (onSale ? ' sale' : '') + ' r-' + r.id +
             '" data-act="buy" data-cat="' + g.cat + '" data-id="' + id + '"' +
-            (owned || !afford ? ' disabled' : '') + '>' +
+            (owned || !afford ? ' disabled' : '') + ' title="' + esc(goodTip(g.cat, id)) + '">' +
+            '<span class="tip">' + esc(goodTip(g.cat, id)) + '</span>' +
             (onSale ? '<div class="sale-tag">today 30% off</div>' : '') +
+            '<div class="rarity-pip">' + r.n + '</div>' +
             '<div class="vis">' + goodVis(g.cat, id) + '</div>' +
             '<div class="gname">' + goodName(g.cat, id) + '</div>' +
             '<div class="gdesc">' + (GOOD_DESC[g.cat] || '') + '</div>' +
@@ -5948,6 +6205,7 @@
     $('#restockList').innerHTML = '<div class="card">' +
       '<h2 class="hand" style="font-size:2rem;color:var(--rose-deep);margin-bottom:2px">The supply closet</h2>' +
       '<p class="shop-keep">' + pick(keepers) + '</p>' +
+      '<p class="rarity-key">everyday · pretty · rare · keepsake — hover a card to see how it\'s used</p>' +
       hero + tabs + body + '</div>';
   }
 
@@ -5958,11 +6216,11 @@
     if ((S.unlocked[cat] || []).indexOf(id) >= 0) return;
     const price = priceOf(cat, id);
     if (S.coins < price) { toast('not quite enough coins yet'); return; }
-    S.coins -= price;
+    spendCoins(price);
     if (!S.unlocked[cat]) S.unlocked[cat] = [];
     S.unlocked[cat].push(id);
     save();
-    Sound.coin();
+    Sound.buy();
     toast(goodName(cat, id) + ' — added to the shop ♡');
     renderRestock();
     renderHome();
@@ -5974,11 +6232,11 @@
     if (!f) return;
     if ((S.catFurn || []).indexOf(id) >= 0) return;
     if (S.coins < f.cost) { toast('not quite enough coins yet'); return; }
-    S.coins -= f.cost;
+    spendCoins(f.cost);
     S.catFurn.push(id);
     S.catHappy = Math.min(100, (S.catHappy || 36) + 6);
     save();
-    Sound.coin();
+    Sound.buy();
     toast(f.n + ' — ' + (S.catName || 'the cat') + ' looks pleased');
     renderRestock();
     renderHome();
@@ -5987,16 +6245,17 @@
   function buyUpgrade(id) {
     const u = UPGRADES.find(x => x.id === id);
     if (!u) return;
-    if (!S.upgrades) S.upgrades = { board: 0, window: 0, tips: 0, regulars: 0, kettle: 0 };
+    if (!S.upgrades) S.upgrades = { board: 0, window: 0, tips: 0, regulars: 0, kettle: 0, shelf: 0 };
     if (S.upgrades.kettle == null) S.upgrades.kettle = 0;
+    if (S.upgrades.shelf == null) S.upgrades.shelf = 0;
     const lvl = S.upgrades[id] || 0;
     if (lvl >= u.max) return;
     const cost = u.cost + lvl * 40;
     if (S.coins < cost) { toast('not quite enough coins yet'); return; }
-    S.coins -= cost;
+    spendCoins(cost);
     S.upgrades[id] = lvl + 1;
     save();
-    Sound.chime(2);
+    Sound.buy();
     toast(u.n + ' — the shop feels fancier');
     renderRestock();
     renderHome();
@@ -6316,8 +6575,9 @@
   function boot() {
     if (!S.today) S.today = { log: [], coins: 0, kinds: {}, shipped: false };
     if (!S.today.kinds) S.today.kinds = {};
-    if (!S.upgrades) S.upgrades = { board: 0, window: 0, tips: 0, regulars: 0, kettle: 0 };
+    if (!S.upgrades) S.upgrades = { board: 0, window: 0, tips: 0, regulars: 0, kettle: 0, shelf: 0 };
     if (S.upgrades.kettle == null) S.upgrades.kettle = 0;
+    if (S.upgrades.shelf == null) S.upgrades.shelf = 0;
     if (!S.settings) S.settings = { music: true, sfx: true, track: 0, radioWide: false };
     if (S.settings.track == null) S.settings.track = 0;
     if (S.settings.radioWide == null) S.settings.radioWide = false;
