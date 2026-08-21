@@ -1,0 +1,13 @@
+---
+description: Always commit and push finished work without asking
+alwaysApply: true
+---
+
+# Always push
+
+When work is done, create a git commit and `git push` to the tracked remote. Do not ask first.
+
+- Prefer the current branch (`main` unless already on another branch).
+- Do not force-push.
+- Never commit `firebase-config.js` or other secret/credential files.
+- Skip unrelated untracked files only when they are clearly secrets; otherwise include the session’s project files.
