@@ -13,6 +13,7 @@
   <link rel="manifest" href="verse-keepers.webmanifest">
   <link rel="icon" href="verse-keepers-icon.svg">
   <title>Verse Keepers</title>
+  <meta name="verse-keepers-build" content="dad-grades-keep-history-2026-08-21">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;0,700;1,500&family=Outfit:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -951,6 +952,57 @@
       font-weight: 700;
     }
 
+    .dad-day-history {
+      display: grid;
+      grid-template-columns: repeat(7, minmax(0, 1fr));
+      gap: 6px;
+    }
+
+    .dad-day-chip {
+      border: 2px solid #d5e6e2;
+      border-radius: 12px;
+      background: white;
+      color: #456661;
+      padding: 8px 4px;
+      cursor: pointer;
+      font-family: inherit;
+      text-align: center;
+      line-height: 1.15;
+    }
+
+    .dad-day-chip .dow {
+      display: block;
+      font-size: 0.68rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+
+    .dad-day-chip .pts {
+      display: block;
+      margin-top: 4px;
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1.15rem;
+      font-weight: 700;
+      color: var(--deep);
+    }
+
+    .dad-day-chip.has-score {
+      border-color: var(--gold);
+      background: #fff6cf;
+    }
+
+    .dad-day-chip.selected {
+      border-color: var(--deep);
+      background: var(--mist);
+    }
+
+    .dad-grade-label {
+      color: #5a746f;
+      font-size: 0.78rem;
+      font-weight: 600;
+    }
+
     .star-row {
       display: flex;
       flex-wrap: wrap;
@@ -991,7 +1043,8 @@
     .prize-banner p { color: #456661; margin-top: 4px; line-height: 1.4; }
 
     body[data-theme="dark"] .dad-grade-card,
-    body[data-theme="dark"] .star-btn {
+    body[data-theme="dark"] .star-btn,
+    body[data-theme="dark"] .dad-day-chip {
       background: rgba(17, 43, 40, 0.94);
       border-color: #315b55;
     }
@@ -2256,7 +2309,7 @@
       <div class="brand">
         <div class="brand-mark" aria-hidden="true">V</div>
         <h1>Dad screen</h1>
-        <p>See this week’s verse, grade each person out of 5 today, and race for the monthly prize.</p>
+        <p>See this week’s verse, grade each person out of 5 each day, and race for the monthly prize. Yesterday’s points stay on the month total.</p>
       </div>
       <div class="panel">
         <div class="month-banner">
@@ -2276,6 +2329,7 @@
           <div class="status-pill warn" id="dad-month-pill">This month</div>
         </div>
 
+        <p class="notify-status" id="dad-sync-status"></p>
         <div id="dad-grade-list"></div>
         <div class="leaderboard" style="margin-top:16px">
           <div class="leaderboard-head">
@@ -2284,7 +2338,7 @@
           </div>
           <div class="leaderboard-list" id="dad-month-standings"></div>
         </div>
-        <p class="footer-note">Kids still use their own pages to practice and take tests. This screen is only for daily grades out of 5.</p>
+        <p class="footer-note">Kids still use their own pages to practice and take tests. Daily grades add up all month. Tap a day above the stars to check or change that day’s score.</p>
       </div>
     </section>
 
@@ -3001,10 +3055,13 @@ const VERSES = [
     let familyDoc = null;
     let familySyncTimer = null;
     let applyingFamilyRemote = false;
+    let familyReady = false;
 
     function setFamilySyncStatus(text) {
-      const status = document.getElementById("family-sync-status");
-      if (status) status.textContent = text;
+      ["family-sync-status", "dad-sync-status"].forEach((id) => {
+        const status = document.getElementById(id);
+        if (status) status.textContent = text;
+      });
     }
 
     function cleanForCloud(value) {
@@ -3022,11 +3079,13 @@ const VERSES = [
         familyDoc = firebase.firestore().collection("prayerChains").doc(FAMILY_ID);
         familyDoc.onSnapshot((snap) => {
           applyFamilyRemote(snap.data() || {});
-          setFamilySyncStatus("Family sync is on. Accounts from every device show up here.");
+          const firstReady = !familyReady;
+          familyReady = true;
+          setFamilySyncStatus("Family sync is on. Dad points and accounts stay saved.");
+          if (firstReady) queueFamilySync();
         }, () => {
           setFamilySyncStatus("Family sync could not connect. Check the internet and try again.");
         });
-        queueFamilySync();
       } catch {
         setFamilySyncStatus("Family sync could not start.");
       }
@@ -3059,17 +3118,11 @@ const VERSES = [
       });
 
       if (data.dadGrades && typeof data.dadGrades === "object") {
-        const remoteDays = data.dadGrades.days && typeof data.dadGrades.days === "object"
-          ? data.dadGrades.days
-          : {};
-        dadGrades.days = { ...remoteDays, ...dadGrades.days };
-        Object.entries(remoteDays).forEach(([day, scores]) => {
-          dadGrades.days[day] = { ...(dadGrades.days[day] || {}), ...scores };
-        });
-        if (data.dadGrades.prizeLog && typeof data.dadGrades.prizeLog === "object") {
-          dadGrades.prizeLog = { ...data.dadGrades.prizeLog, ...dadGrades.prizeLog };
-        }
+        dadGrades = mergeDadGrades(dadGrades, data.dadGrades);
         persistDadGrades({ sync: false });
+        if (document.getElementById("screen-dad")?.classList.contains("active")) {
+          updateDadScreen();
+        }
       }
 
       if (changed) {
@@ -3091,13 +3144,53 @@ const VERSES = [
     }
 
     function queueFamilySync() {
-      if (applyingFamilyRemote || !familyDoc) return;
+      if (applyingFamilyRemote || !familyDoc || !familyReady) return;
       clearTimeout(familySyncTimer);
       familySyncTimer = setTimeout(pushFamilyState, 250);
     }
 
+    function dadStampValue(stamps, day, uid) {
+      if (!stamps || typeof stamps !== "object") return 0;
+      const nested = stamps[day];
+      if (nested && typeof nested === "object" && Number.isFinite(nested[uid])) return nested[uid];
+      const flat = stamps[`${day}|${uid}`];
+      return Number.isFinite(flat) ? flat : 0;
+    }
+
+    function setDadStampValue(stamps, day, uid, value) {
+      stamps[day] = stamps[day] && typeof stamps[day] === "object" ? stamps[day] : {};
+      stamps[day][uid] = value;
+    }
+
+    function mergeDadGrades(base = {}, incoming = {}) {
+      const result = {
+        days: {},
+        stamps: {},
+        prizeLog: { ...(incoming.prizeLog || {}), ...(base.prizeLog || {}) }
+      };
+      const addDays = (source, sourceStamps = {}) => {
+        Object.entries(source || {}).forEach(([day, scores]) => {
+          if (!scores || typeof scores !== "object") return;
+          result.days[day] = result.days[day] || {};
+          Object.entries(scores).forEach(([uid, stars]) => {
+            if (!Number.isFinite(stars)) return;
+            const incomingStamp = dadStampValue(sourceStamps, day, uid);
+            const currentStamp = dadStampValue(result.stamps, day, uid);
+            const current = result.days[day][uid];
+            if (!Number.isFinite(current) || incomingStamp > currentStamp || (incomingStamp === currentStamp && stars > current)) {
+              result.days[day][uid] = stars;
+              if (incomingStamp) setDadStampValue(result.stamps, day, uid, incomingStamp);
+            }
+          });
+        });
+      };
+      addDays(base.days, base.stamps);
+      addDays(incoming.days, incoming.stamps);
+      return result;
+    }
+
     async function pushFamilyState() {
-      if (!familyDoc || applyingFamilyRemote) return;
+      if (!familyDoc || applyingFamilyRemote || !familyReady) return;
       const accounts = {};
       Object.values(localAccounts).forEach((profile) => {
         if (!profile?.uid || !profile.pinHash || shouldRemoveAccount(profile.uid, profile)) return;
@@ -3106,12 +3199,25 @@ const VERSES = [
           updatedAt: profile.updatedAt || Date.now()
         });
       });
+      const payload = {
+        updatedAt: Date.now()
+      };
+      Object.entries(accounts).forEach(([uid, profile]) => {
+        payload[`accounts.${uid}`] = profile;
+      });
+      Object.entries(dadGrades.days || {}).forEach(([day, scores]) => {
+        Object.entries(scores || {}).forEach(([uid, stars]) => {
+          if (!Number.isFinite(stars)) return;
+          payload[`dadGrades.days.${day}.${uid}`] = stars;
+          const stamp = dadStampValue(dadGrades.stamps, day, uid);
+          if (stamp) payload[`dadGrades.stamps.${day}.${uid}`] = stamp;
+        });
+      });
+      Object.entries(dadGrades.prizeLog || {}).forEach(([monthKey, prize]) => {
+        if (prize) payload[`dadGrades.prizeLog.${monthKey}`] = cleanForCloud(prize);
+      });
       try {
-        await familyDoc.set({
-          accounts,
-          dadGrades: cleanForCloud(dadGrades),
-          updatedAt: Date.now()
-        }, { merge: true });
+        await familyDoc.set(payload, { merge: true });
       } catch {
         setFamilySyncStatus("Family sync could not save. Check the internet.");
       }
@@ -3130,7 +3236,8 @@ const VERSES = [
 
     const DAD_CODE = "2013";
     const DAD_GRADES_KEY = "verse-keepers-dad-grades-v1";
-    let dadGrades = { days: {}, prizeLog: {} };
+    let dadGrades = { days: {}, stamps: {}, prizeLog: {} };
+    let dadGradeDay = "";
 
     function calendarMonthKey(date = new Date()) {
       return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}`;
@@ -3144,12 +3251,9 @@ const VERSES = [
     function loadDadGrades() {
       try {
         const saved = JSON.parse(localStorage.getItem(DAD_GRADES_KEY)) || {};
-        dadGrades = {
-          days: saved.days && typeof saved.days === "object" ? saved.days : {},
-          prizeLog: saved.prizeLog && typeof saved.prizeLog === "object" ? saved.prizeLog : {}
-        };
+        dadGrades = mergeDadGrades(dadGrades, saved);
       } catch {
-        dadGrades = { days: {}, prizeLog: {} };
+        dadGrades = mergeDadGrades(dadGrades, {});
       }
       for (const scores of Object.values(dadGrades.days)) {
         for (const uid of Object.keys(scores)) {
@@ -3206,10 +3310,28 @@ const VERSES = [
     }
 
     function setDadGrade(uid, stars) {
-      const day = localDayKey();
+      const day = dadGradeDay || localDayKey();
       dadGrades.days[day] = { ...(dadGrades.days[day] || {}), [uid]: stars };
+      dadGrades.stamps = dadGrades.stamps || {};
+      setDadStampValue(dadGrades.stamps, day, uid, Date.now());
       persistDadGrades();
+      setFamilySyncStatus("Saving Dad points…");
       updateDadScreen();
+    }
+
+    function recentDadDays(count = 7) {
+      const days = [];
+      for (let i = count - 1; i >= 0; i--) {
+        const date = new Date();
+        date.setHours(12, 0, 0, 0);
+        date.setDate(date.getDate() - i);
+        days.push({
+          key: localDayKey(date),
+          label: date.toLocaleDateString(undefined, { weekday: "short" }),
+          date
+        });
+      }
+      return days;
     }
 
     function openDadScreen() {
@@ -3224,6 +3346,7 @@ const VERSES = [
       document.getElementById("dad-code").value = "";
       loadLocalAccounts();
       loadDadGrades();
+      dadGradeDay = localDayKey();
       updateDadScreen();
       showScreen("dad");
     }
@@ -3231,18 +3354,26 @@ const VERSES = [
     function updateDadScreen() {
       loadDadGrades();
       const today = new Date();
+      const todayKey = localDayKey(today);
+      if (!dadGradeDay) dadGradeDay = todayKey;
       const monday = mondayStart(today);
       const weekKeyValue = verseWeekKey(today);
       const verse = verseForWeek(weekKeyValue);
       const monthKey = calendarMonthKey(today);
       const lastPrize = lockLastMonthPrize();
+      const selectedDate = new Date(`${dadGradeDay}T12:00:00`);
+      const selectedLabel = dadGradeDay === todayKey
+        ? "today"
+        : selectedDate.toLocaleDateString(undefined, { weekday: "long", month: "short", day: "numeric" });
 
       document.getElementById("dad-week-label").textContent =
         `Week of ${MONTH_NAMES[monday.getMonth()]} ${monday.getDate()} · new verse Monday`;
       document.getElementById("dad-verse-ref").textContent = verse.ref;
       document.getElementById("dad-verse-text").textContent = `"${verse.text}"`;
       document.getElementById("dad-today-pill").textContent =
-        today.toLocaleDateString(undefined, { weekday: "long", month: "short", day: "numeric" });
+        dadGradeDay === todayKey
+          ? today.toLocaleDateString(undefined, { weekday: "long", month: "short", day: "numeric" })
+          : `Editing ${selectedLabel}`;
       document.getElementById("dad-month-pill").textContent =
         `${MONTH_NAMES[today.getMonth()]} prize race`;
 
@@ -3270,8 +3401,13 @@ const VERSES = [
       }
 
       list.innerHTML = "";
+      const yesterday = new Date(today);
+      yesterday.setDate(today.getDate() - 1);
+      const yesterdayKey = localDayKey(yesterday);
       accounts.forEach((profile) => {
-        const todayScore = dadDayScore(profile.uid);
+        const selectedScore = dadDayScore(profile.uid, dadGradeDay);
+        const todayScore = dadDayScore(profile.uid, todayKey);
+        const yesterdayScore = dadDayScore(profile.uid, yesterdayKey);
         const monthScore = dadMonthScore(profile.uid, monthKey);
         const currentVerse = verseForWeek(
           profile.weeklyVerseKey || weekKeyValue,
@@ -3293,27 +3429,52 @@ const VERSES = [
           avatar.textContent = (profile.displayName || "?").charAt(0).toUpperCase();
         }
         const info = document.createElement("div");
+        const dayBits = [
+          yesterdayScore ? `Yesterday ${yesterdayScore}/5` : "",
+          `Today ${todayScore}/5`
+        ].filter(Boolean).join(" · ");
         info.innerHTML = `<div class="name">${profile.displayName}</div>
-          <div class="meta">Working on ${currentVerse.ref} · Today ${todayScore}/5</div>`;
+          <div class="meta">Working on ${currentVerse.ref} · ${dayBits}</div>`;
         const monthPts = document.createElement("div");
         monthPts.className = "dad-month-pts";
         monthPts.textContent = monthScore;
+        monthPts.title = `${MONTH_NAMES[today.getMonth()]} points`;
         person.append(avatar, info, monthPts);
+
+        const history = document.createElement("div");
+        history.className = "dad-day-history";
+        recentDadDays(7).forEach((day) => {
+          const score = dadDayScore(profile.uid, day.key);
+          const chip = document.createElement("button");
+          chip.type = "button";
+          chip.className = `dad-day-chip${day.key === dadGradeDay ? " selected" : ""}${score ? " has-score" : ""}`;
+          chip.innerHTML = `<span class="dow">${day.label}</span><span class="pts">${score || "—"}</span>`;
+          chip.setAttribute("aria-label", `${day.label} ${score || 0} out of 5`);
+          chip.onclick = () => {
+            dadGradeDay = day.key;
+            updateDadScreen();
+          };
+          history.appendChild(chip);
+        });
+
+        const gradeLabel = document.createElement("div");
+        gradeLabel.className = "dad-grade-label";
+        gradeLabel.textContent = `Grade for ${selectedLabel}`;
 
         const stars = document.createElement("div");
         stars.className = "star-row";
-        stars.setAttribute("aria-label", `Grade ${profile.displayName} out of 5`);
+        stars.setAttribute("aria-label", `Grade ${profile.displayName} out of 5 for ${selectedLabel}`);
         for (let star = 1; star <= 5; star++) {
           const button = document.createElement("button");
           button.type = "button";
-          button.className = `star-btn${star <= todayScore ? " on" : ""}`;
+          button.className = `star-btn${star <= selectedScore ? " on" : ""}`;
           button.textContent = "★";
           button.setAttribute("aria-label", `${star} out of 5`);
-          button.onclick = () => setDadGrade(profile.uid, star === todayScore ? 0 : star);
+          button.onclick = () => setDadGrade(profile.uid, star === selectedScore ? 0 : star);
           stars.appendChild(button);
         }
 
-        card.append(person, stars);
+        card.append(person, history, gradeLabel, stars);
         list.appendChild(card);
       });
 
@@ -3340,9 +3501,12 @@ const VERSES = [
         identity.textContent = profile.displayName;
         const vault = document.createElement("span");
         vault.className = "leaderboard-vault";
+        const yesterdayPts = dadDayScore(profile.uid, yesterdayKey);
         vault.textContent = profile.todayScore
-          ? `Today ${profile.todayScore}/5`
-          : "Not graded yet today";
+          ? `Today ${profile.todayScore}/5 · ${profile.monthScore} this month`
+          : yesterdayPts
+            ? `Yesterday ${yesterdayPts}/5 · not graded today`
+            : "Not graded yet today";
         identity.appendChild(vault);
         const points = document.createElement("div");
         points.className = "leaderboard-points";
@@ -5726,7 +5890,12 @@ function startStudy() {
     };
 
     document.addEventListener("visibilitychange", () => {
-      if (document.visibilityState === "visible" && state.profile) {
+      if (document.visibilityState !== "visible") return;
+      if (document.getElementById("screen-dad")?.classList.contains("active")) {
+        loadDadGrades();
+        updateDadScreen();
+      }
+      if (state.profile) {
         applyWeeklyResetIfNeeded();
         document.getElementById("week-note").textContent = formatResetCountdown();
         checkDueReminders();
@@ -5757,6 +5926,7 @@ function startStudy() {
       state.verseKey = verseWeekKey();
       state.verse = verseForWeek(state.verseKey);
       loadLocalAccounts();
+      loadDadGrades();
       applyPreferences();
       initBackgroundMusic();
       showAccountPicker();
