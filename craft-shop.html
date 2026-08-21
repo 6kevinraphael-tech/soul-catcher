@@ -570,14 +570,9 @@
     background-position: 0 0, 2px 12px; border-radius: 2px;
   }
   .yarn {
-    position: absolute; bottom: 30px; left: 58%; width: 16px; height: 16px; z-index: 5;
-    border-radius: 50%; background: radial-gradient(circle at 35% 30%, #f4c4cc, #c56d7c);
-    box-shadow: 1px 2px 2px rgba(80,50,30,0.25), inset -3px -2px 0 rgba(255,255,255,0.25);
+    position: absolute; bottom: 26px; left: 56%; width: 28px; height: 32px; z-index: 5;
+    background: url('assets/craft-shop/prop-yarn.png') center / contain no-repeat;
     pointer-events: none;
-  }
-  .yarn::after {
-    content: ''; position: absolute; left: 14px; top: 8px; width: 18px; height: 2px;
-    background: #d78d9b; border-radius: 2px; transform: rotate(12deg);
   }
   .cat-hud {
     position: absolute; left: 10px; bottom: 84px; z-index: 7;
@@ -663,60 +658,38 @@
   }
   @keyframes zzzUp { 0% { opacity: 0; transform: translateY(4px); } 40% { opacity: 1; } 100% { opacity: 0; transform: translateY(-10px); } }
   @keyframes heartPop { 0% { opacity: 0; transform: translate(-50%, 8px) scale(0.4); } 30% { opacity: 1; } 100% { opacity: 0; transform: translate(-50%, -18px) scale(1.2); } }
-  .furn-cushion, .furn-tree, .furn-perch, .furn-tunnel, .furn-fountain, .furn-tower { pointer-events: none; }
+  .furn-cushion, .furn-tree, .furn-perch, .furn-tunnel, .furn-fountain, .furn-tower {
+    pointer-events: none;
+    background-repeat: no-repeat;
+    background-position: center bottom;
+    background-size: contain;
+  }
   .furn-cushion {
-    position: absolute; bottom: 30px; left: 22%; width: 52px; height: 16px; z-index: 5;
-    border-radius: 20px 20px 10px 10px;
-    background: radial-gradient(ellipse at 50% 40%, #f4c4cc, #c56d7c);
-    box-shadow: 0 3px 0 rgba(140, 70, 80, 0.28), inset 0 2px 0 rgba(255,255,255,0.4);
+    position: absolute; bottom: 26px; left: 18%; width: 58px; height: 46px; z-index: 5;
+    background-image: url('assets/craft-shop/furn-cushion.png');
   }
   .furn-tree {
-    position: absolute; bottom: 78px; left: 46%; width: 14px; height: 70px; z-index: 4;
-    background: repeating-linear-gradient(#d8b48a, #d8b48a 3px, #c49a72 3px 5px);
-    border-radius: 3px; box-shadow: 2px 4px 6px rgba(80,50,30,0.25);
-  }
-  .furn-tree::before {
-    content: ''; position: absolute; left: -10px; right: -10px; top: 10px; height: 8px;
-    background: #c56d7c; border-radius: 8px;
-  }
-  .furn-tree::after {
-    content: ''; position: absolute; left: -8px; bottom: -4px; width: 30px; height: 8px;
-    background: #8a6244; border-radius: 3px;
+    position: absolute; bottom: 76px; left: 44%; width: 36px; height: 72px; z-index: 4;
+    background-image: url('assets/craft-shop/furn-tree.png');
   }
   .furn-perch {
-    position: absolute; left: 18px; top: 138px; width: 102px; height: 10px; z-index: 4;
-    background: linear-gradient(#e8c8a4, #c9a078); border-radius: 3px;
-    box-shadow: 0 3px 0 #a67b52;
-  }
-  .furn-perch::after {
-    content: ''; position: absolute; left: 8px; right: 8px; top: -5px; height: 7px;
-    background: #d78d9b; border-radius: 6px 6px 2px 2px;
+    position: absolute; left: 22px; top: 118px; width: 48px; height: 46px; z-index: 4;
+    background-image: url('assets/craft-shop/furn-perch.png');
   }
   .furn-tunnel {
-    position: absolute; bottom: 32px; right: 18%; width: 58px; height: 28px; z-index: 5;
-    background: radial-gradient(circle at 18% 50%, transparent 10px, #f0b3c0 11px);
-    border-radius: 16px; box-shadow: inset 8px 0 0 #e89aab, 2px 3px 4px rgba(80,50,30,0.2);
+    position: absolute; bottom: 28px; right: 14%; width: 52px; height: 46px; z-index: 5;
+    background-image: url('assets/craft-shop/furn-tunnel.png');
   }
   .furn-fountain {
-    position: absolute; bottom: 80px; right: 38%; z-index: 4; width: 28px; height: 22px;
-    background: linear-gradient(#efe6d8, #d9cbb8); border-radius: 50% 50% 40% 40%;
-    box-shadow: inset 0 6px 0 #8ec4e0, 1px 2px 3px rgba(80,50,30,0.25);
-  }
-  .furn-fountain::after {
-    content: ''; position: absolute; left: 50%; top: 2px; width: 5px; height: 5px; border-radius: 50%;
-    background: #cfeaf6; transform: translateX(-50%); animation: twinkle 1.6s ease-in-out infinite;
+    position: absolute; bottom: 80px; right: 36%; z-index: 4; width: 42px; height: 28px;
+    background-image: url('assets/craft-shop/furn-fountain.png');
   }
   .furn-tower {
-    position: absolute; bottom: 78px; left: 8%; width: 36px; height: 92px; z-index: 3;
-    background: linear-gradient(#c9a078, #b8885c); border-radius: 4px 4px 2px 2px;
-    box-shadow: 3px 6px 8px rgba(80,50,30,0.22);
+    position: absolute; bottom: 76px; left: 4%; width: 72px; height: 88px; z-index: 3;
+    background-image: url('assets/craft-shop/furn-tower.png');
   }
-  .furn-tower::before, .furn-tower::after {
-    content: ''; position: absolute; left: -8px; width: 52px; height: 10px;
-    background: #d78d9b; border-radius: 8px;
-  }
-  .furn-tower::before { top: 18px; }
-  .furn-tower::after { top: 48px; }
+  .shop-ico { width: 42px; height: 42px; object-fit: contain; display: block; margin: 0 auto; }
+  .shop-ico.sm { width: 30px; height: 30px; margin-bottom: 4px; }
   .cat-pick-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 12px; }
   .cat-pick {
     border: 2px solid rgba(150,124,98,0.28); border-radius: 16px;
@@ -968,7 +941,7 @@
     box-shadow: 0 3px 0 rgba(150, 124, 98, 0.14); transition: transform 0.14s ease;
   }
   .good:hover { transform: translateY(-3px); }
-  .good .vis { font-size: 1.6rem; height: 44px; display: grid; place-items: center; margin-bottom: 4px; }
+  .good .vis { height: 48px; display: grid; place-items: center; margin-bottom: 4px; }
   .good .gname { font-size: 0.84rem; font-weight: 700; }
   .good .gdesc { font-size: 0.72rem; color: var(--ink-soft); line-height: 1.3; margin: 4px 0 2px; min-height: 2.4em; }
   .good .price { font-size: 0.8rem; color: var(--ink-soft); font-weight: 700; margin-top: 5px; }
@@ -1005,11 +978,11 @@
     border-radius: 8px; overflow: hidden; background: #21181c;
     box-shadow: inset 0 0 0 1px rgba(255,255,255,0.08);
   }
-  #ytScreen iframe {
+  #ytScreen iframe, #ytFrame {
     width: 72px; height: 40px; border: 0; display: block; pointer-events: none;
   }
   .radio-bar.wide #ytScreen { width: 128px; height: 72px; flex-basis: 128px; }
-  .radio-bar.wide #ytScreen iframe { width: 128px; height: 72px; }
+  .radio-bar.wide #ytScreen iframe, .radio-bar.wide #ytFrame { width: 128px; height: 72px; }
   #ytPlayHit {
     position: absolute; inset: 0; z-index: 2;
     display: grid; place-items: center;
@@ -1588,11 +1561,10 @@
 <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js"></script>
 <div class="radio-bar hidden paused" id="radioBar">
   <div id="ytScreen">
-    <iframe id="ytFrame" title="Shop radio" width="72" height="40"
-      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-      referrerpolicy="strict-origin-when-cross-origin"
-      src="about:blank"></iframe>
-    <button type="button" id="ytPlayHit" data-act="radioplay">▶</button>
+    <div id="ytScreen">
+      <div id="ytFrame"></div>
+      <button type="button" id="ytPlayHit" data-act="radioplay">▶</button>
+    </div>
   </div>
   <div class="radio-eq" aria-hidden="true"><i></i><i></i><i></i></div>
   <div id="radioMeta">
@@ -1889,12 +1861,12 @@
     { id: 'calico', n: 'Calico', name: 'Maple', blurb: 'brings you the shiniest scraps' }
   ];
   const CAT_FURN = [
-    { id: 'cushion', n: 'Velvet cushion', d: 'A plush nest by the counter.', cost: 55, happy: 8, rare: 0.02, e: '🎀' },
-    { id: 'tree', n: 'Scratching post', d: 'Sisal to climb and shred.', cost: 85, happy: 10, rare: 0.03, e: '🪵' },
-    { id: 'perch', n: 'Window perch', d: 'Sunny ledge for birdwatching.', cost: 110, happy: 12, rare: 0.05, e: '🪟' },
-    { id: 'tunnel', n: 'Play tunnel', d: 'A hidey-hole for zoomies.', cost: 70, happy: 7, rare: 0.02, e: '🌀' },
-    { id: 'fountain', n: 'Water fountain', d: 'Soft bubbling bowl.', cost: 130, happy: 14, rare: 0.06, e: '⛲' },
-    { id: 'tower', n: 'Carpeted cat tree', d: 'The deluxe condo. Best rare luck.', cost: 190, happy: 16, rare: 0.08, e: '🏠' }
+    { id: 'cushion', n: 'Ear bed', d: 'A plush pink nest with little ears.', cost: 55, happy: 8, rare: 0.02, img: 'assets/craft-shop/furn-cushion.png' },
+    { id: 'tree', n: 'Scratching post', d: 'Sisal to climb, with hanging toys.', cost: 85, happy: 10, rare: 0.03, img: 'assets/craft-shop/furn-tree.png' },
+    { id: 'perch', n: 'Hooded hide', d: 'A cozy green nook by the window.', cost: 110, happy: 12, rare: 0.05, img: 'assets/craft-shop/furn-perch.png' },
+    { id: 'tunnel', n: 'Ball track', d: 'Three rings of batting fun.', cost: 70, happy: 7, rare: 0.02, img: 'assets/craft-shop/furn-tunnel.png' },
+    { id: 'fountain', n: 'Fish bowl', d: 'A little water dish with a fish.', cost: 130, happy: 14, rare: 0.06, img: 'assets/craft-shop/furn-fountain.png' },
+    { id: 'tower', n: 'Cat tree', d: 'The deluxe condo. Best rare luck.', cost: 190, happy: 16, rare: 0.08, img: 'assets/craft-shop/furn-tower.png' }
   ];
   let catPickId = '';
   let catPickFocus = true;
@@ -3039,26 +3011,51 @@
 
   const Radio = {
     want: false,
+    player: null,
     idx() { return (S && S.settings && S.settings.track) || 0; },
     track() { return RADIO_TRACKS[this.idx() % RADIO_TRACKS.length]; },
-    frame() { return document.getElementById('ytFrame'); },
-    src() {
-      const id = this.track().id;
-      return 'https://www.youtube.com/embed/' + id +
-        '?autoplay=1&playsinline=1&rel=0&modestbranding=1&loop=1&playlist=' + id;
+    bind() {
+      if (this.player || !window.YT || !YT.Player) return;
+      const el = document.getElementById('ytFrame');
+      if (!el) return;
+      const self = this;
+      this.player = new YT.Player('ytFrame', {
+        width: '100%',
+        height: '100%',
+        videoId: this.track().id,
+        playerVars: {
+          autoplay: this.want ? 1 : 0,
+          playsinline: 1,
+          rel: 0,
+          modestbranding: 1,
+          origin: location.origin
+        },
+        events: {
+          onReady: function () {
+            if (self.want && self.player && self.player.playVideo) self.player.playVideo();
+          },
+          onStateChange: function (ev) {
+            if (window.YT && ev.data === YT.PlayerState.ENDED) self.next();
+          }
+        }
+      });
     },
     play() {
       this.want = true;
       if (S) S.settings.music = true;
       this.render();
-      const iframe = this.frame();
-      if (iframe) iframe.src = this.src();
+      if (this.player && this.player.playVideo) {
+        try {
+          const cur = this.player.getVideoData && this.player.getVideoData();
+          if (cur && cur.video_id === this.track().id) this.player.playVideo();
+          else this.player.loadVideoById(this.track().id);
+        } catch (e) { this.player.loadVideoById(this.track().id); }
+      } else this.bind();
     },
     pause() {
       this.want = false;
       if (S) S.settings.music = false;
-      const iframe = this.frame();
-      if (iframe) iframe.src = 'about:blank';
+      if (this.player && this.player.pauseVideo) this.player.pauseVideo();
       this.render();
     },
     next() {
@@ -3066,10 +3063,7 @@
       S.settings.track = (this.idx() + 1) % RADIO_TRACKS.length;
       save();
       this.render();
-      if (this.want) {
-        const iframe = this.frame();
-        if (iframe) iframe.src = this.src();
-      }
+      if (this.want && this.player && this.player.loadVideoById) this.player.loadVideoById(this.track().id);
     },
     render() {
       const bar = $('#radioBar');
@@ -3089,6 +3083,12 @@
       if (mb) mb.classList.toggle('off', !this.want);
     }
   };
+  window.onYouTubeIframeAPIReady = function () { Radio.bind(); };
+  if (!window.YT || !YT.Player) {
+    const ytScript = document.createElement('script');
+    ytScript.src = 'https://www.youtube.com/iframe_api';
+    document.head.appendChild(ytScript);
+  } else Radio.bind();
 
   /* =========================================================
      STATE
@@ -4650,7 +4650,9 @@
         (CHARMS[id].e || '·') + '<div>' + esc(CHARMS[id].n) + '</div></div>').join('') + '</div>' +
       '<div class="ctrl-title">cat corner · ' + furnHave + '/' + CAT_FURN.length + ' furniture</div>' +
       '<div class="journal-grid">' + CAT_FURN.map(f =>
-        '<div class="journal-pip' + (hasFurn(f.id) ? '' : ' off') + '">' + f.e + '<div>' + esc(f.n) + '</div></div>').join('') +
+        '<div class="journal-pip' + (hasFurn(f.id) ? '' : ' off') + '">' +
+        '<img class="shop-ico sm" src="' + f.img + '" alt="">' +
+        '<div>' + esc(f.n) + '</div></div>').join('') +
       '</div>' +
       (S.catId ? '<p class="shop-keep" style="margin-top:12px">' + esc(S.catName) + ' is ' + catHappyScore() + '% happy</p>' : '') +
       '</div>';
@@ -5754,24 +5756,92 @@
     return id;
   }
 
+  function visSvg(inner) {
+    return '<svg class="shop-ico" viewBox="0 0 32 32" aria-hidden="true">' + inner + '</svg>';
+  }
+  function charmVis(id) {
+    const m = {
+      star: visSvg('<polygon points="16,2 20,12 31,12 22,19 25,30 16,23 7,30 10,19 1,12 12,12" fill="#e6be72"/>'),
+      heart: visSvg('<path d="M16 28C7 20 4 16 4 11a6 6 0 0 1 12-1 6 6 0 0 1 12 1c0 5-3 9-12 17z" fill="#e28a96"/>'),
+      bow: visSvg('<path d="M16 17c-6-8-13-6-13-1s5 6 13 3c8 3 13-2 13-3s-7-7-13 1z" fill="#d78d9b"/><circle cx="16" cy="16" r="3" fill="#bd6f7f"/>'),
+      moon: visSvg('<path d="M20 4a12 12 0 1 0 8 20A11 11 0 0 1 20 4z" fill="#f4e3ac"/>'),
+      butterfly: visSvg('<ellipse cx="10" cy="12" rx="7" ry="8" fill="#c9a0d4"/><ellipse cx="22" cy="12" rx="7" ry="8" fill="#c9a0d4"/><ellipse cx="10" cy="22" rx="5" ry="6" fill="#e28a96"/><ellipse cx="22" cy="22" rx="5" ry="6" fill="#e28a96"/><rect x="15" y="8" width="2" height="16" rx="1" fill="#6a5344"/>'),
+      mushroom: visSvg('<ellipse cx="16" cy="13" rx="11" ry="8" fill="#e28a96"/><rect x="11" y="14" width="10" height="12" rx="3" fill="#f4e3ac"/><circle cx="12" cy="12" r="2" fill="#fff"/><circle cx="19" cy="11" r="1.6" fill="#fff"/>'),
+      cat: visSvg('<path d="M6 14l4-8 6 5 6-5 4 8v8a8 8 0 0 1-16 0z" fill="#c9a078"/><circle cx="12" cy="18" r="1.4" fill="#4d4239"/><circle cx="20" cy="18" r="1.4" fill="#4d4239"/>'),
+      shell: visSvg('<path d="M16 28c8 0 12-8 12-14S22 4 16 4 4 8 4 14s4 14 12 14z" fill="#f2c79a"/><path d="M16 28V6" stroke="#d7a56a" stroke-width="1.5" fill="none"/>'),
+      cherry: visSvg('<circle cx="11" cy="20" r="6" fill="#d45b63"/><circle cx="21" cy="22" r="6" fill="#c94b55"/><path d="M11 14c2-6 10-8 10-2" stroke="#6f8560" stroke-width="2" fill="none"/>'),
+      clover: visSvg('<circle cx="16" cy="10" r="5" fill="#7aa36a"/><circle cx="10" cy="16" r="5" fill="#7aa36a"/><circle cx="22" cy="16" r="5" fill="#7aa36a"/><circle cx="16" cy="22" r="5" fill="#7aa36a"/>'),
+      key: visSvg('<circle cx="11" cy="12" r="5" fill="none" stroke="#d9b45e" stroke-width="2.4"/><rect x="15" y="10.5" width="13" height="3" fill="#d9b45e"/><rect x="23" y="13.5" width="2.4" height="6" fill="#d9b45e"/><rect x="27" y="13.5" width="2.4" height="4" fill="#d9b45e"/>'),
+      daisy: visSvg('<circle cx="16" cy="16" r="4" fill="#f4e3ac"/><g fill="#f7f0e4">' + [0,45,90,135,180,225,270,315].map(a => '<ellipse cx="16" cy="7" rx="3" ry="6" transform="rotate(' + a + ' 16 16)"/>').join('') + '</g>'),
+      sparkle: visSvg('<polygon points="16,2 18,14 30,16 18,18 16,30 14,18 2,16 14,14" fill="#f4e3ac"/>'),
+      bunny: visSvg('<ellipse cx="11" cy="8" rx="3" ry="8" fill="#f4e6d6"/><ellipse cx="21" cy="8" rx="3" ry="8" fill="#f4e6d6"/><circle cx="16" cy="20" r="8" fill="#f4e6d6"/><circle cx="13" cy="19" r="1.2" fill="#4d4239"/><circle cx="19" cy="19" r="1.2" fill="#4d4239"/>')
+    };
+    return m[id] || visSvg('<circle cx="16" cy="16" r="8" fill="#d78d9b"/>');
+  }
+  function wrapVis(id) {
+    const m = {
+      kraft: visSvg('<rect x="6" y="8" width="20" height="16" rx="2" fill="#c9a078"/><path d="M6 12h20" stroke="#a67b52" stroke-width="2"/>'),
+      pouch: visSvg('<path d="M8 12h16l-2 14H10z" fill="#d78d9b"/><path d="M10 12c0-6 12-6 12 0" fill="none" stroke="#bd6f7f" stroke-width="2"/>'),
+      glassine: visSvg('<path d="M9 6h14l3 20H6z" fill="#e8f0e4" stroke="#9fb28f" stroke-width="1.5"/><path d="M9 14h17" stroke="#9fb28f" stroke-width="1"/>'),
+      ribbonbox: visSvg('<rect x="5" y="10" width="22" height="16" rx="2" fill="#e28a96"/><rect x="5" y="16" width="22" height="4" fill="#f4e3ac"/><rect x="14" y="10" width="4" height="16" fill="#f4e3ac"/>')
+    };
+    return m[id] || wrapVis('kraft');
+  }
+  function cosmeticVis(id) {
+    const m = {
+      lights: visSvg('<path d="M4 8h24" stroke="#c9a078" stroke-width="2"/><circle cx="8" cy="14" r="3" fill="#f4e3ac"/><circle cx="16" cy="16" r="3" fill="#e28a96"/><circle cx="24" cy="14" r="3" fill="#9fb28f"/>'),
+      plant: visSvg('<path d="M16 14c-8-2-10-10-4-12 2 6 8 6 4 12z" fill="#7aa36a"/><path d="M16 14c8-2 10-10 4-12-2 6-8 6-4 12z" fill="#5d7a4a"/><rect x="13" y="14" width="6" height="12" rx="1" fill="#c56b58"/>'),
+      cat: visSvg('<rect x="6" y="14" width="20" height="12" rx="3" fill="#d78d9b"/><path d="M8 14c2-8 14-8 16 0" fill="#e8b4bc"/>'),
+      radio: visSvg('<rect x="4" y="10" width="24" height="16" rx="3" fill="#6a5344"/><circle cx="12" cy="18" r="4" fill="#c9a078"/><rect x="18" y="14" width="7" height="3" fill="#e6be72"/>'),
+      flowers: visSvg('<circle cx="11" cy="12" r="5" fill="#e28a96"/><circle cx="21" cy="14" r="5" fill="#f2c79a"/><rect x="15" y="16" width="2" height="10" fill="#7aa36a"/>'),
+      tea: visSvg('<ellipse cx="16" cy="22" rx="10" ry="5" fill="#f4e3ac"/><path d="M8 20c0-8 16-8 16 0" fill="#fffdf8"/><path d="M24 16c4 0 4 6 0 6" fill="none" stroke="#c9a078" stroke-width="2"/>'),
+      candle: visSvg('<rect x="12" y="12" width="8" height="16" rx="1" fill="#f4e3ac"/><ellipse cx="16" cy="10" rx="2" ry="4" fill="#ee9f84"/>'),
+      vinyl: visSvg('<circle cx="16" cy="16" r="12" fill="#4d4239"/><circle cx="16" cy="16" r="4" fill="#e28a96"/><circle cx="16" cy="16" r="1.5" fill="#f4e3ac"/>'),
+      incense: visSvg('<rect x="8" y="24" width="16" height="4" rx="1" fill="#c9a078"/><rect x="15" y="8" width="2" height="16" fill="#6a5344"/><circle cx="16" cy="7" r="2" fill="#d7ead4"/>'),
+      fish: visSvg('<ellipse cx="16" cy="16" rx="12" ry="10" fill="#8ec4e0"/><path d="M8 16c4 4 8 4 12 0-4-4-8-4-12 0z" fill="#ee9f84"/>'),
+      bunting: visSvg('<path d="M2 8h28" stroke="#c9a078" stroke-width="2"/><polygon points="4,8 10,8 7,18" fill="#e28a96"/><polygon points="12,8 18,8 15,18" fill="#9fb28f"/><polygon points="20,8 26,8 23,18" fill="#f2c79a"/>'),
+      rug: visSvg('<ellipse cx="16" cy="18" rx="13" ry="8" fill="#bd6f7f"/><ellipse cx="16" cy="18" rx="8" ry="4" fill="#d78d9b"/>')
+    };
+    return m[id] || visSvg('<rect x="8" y="8" width="16" height="16" rx="4" fill="#d78d9b"/>');
+  }
+  function upgradeVis(id) {
+    const m = {
+      board: visSvg('<rect x="4" y="6" width="24" height="20" rx="2" fill="#37453d"/><path d="M8 12h16M8 17h12" stroke="#d7ead4" stroke-width="2"/>'),
+      window: visSvg('<rect x="6" y="6" width="20" height="20" rx="1" fill="#8ec4e0" stroke="#c9a078" stroke-width="2"/><path d="M16 6v20M6 16h20" stroke="#c9a078" stroke-width="1.5"/>'),
+      tips: visSvg('<rect x="6" y="10" width="20" height="14" rx="2" fill="#f4e3ac"/><path d="M6 14h20" stroke="#d78d9b" stroke-width="3"/>'),
+      regulars: visSvg('<rect x="6" y="8" width="20" height="16" rx="2" fill="#fffdf8" stroke="#c9a078" stroke-width="1.5"/><circle cx="12" cy="14" r="2" fill="#bd6f7f"/><path d="M10 20c2-3 6-3 8 0" fill="none" stroke="#bd6f7f" stroke-width="1.5"/>'),
+      kettle: visSvg('<ellipse cx="16" cy="22" rx="8" ry="4" fill="#c9a078"/><path d="M10 22c0-10 12-10 12 0" fill="#e8d5b5"/><path d="M22 16c5 0 5 8 0 8" fill="none" stroke="#c9a078" stroke-width="2"/>')
+    };
+    return m[id] || visSvg('<rect x="8" y="8" width="16" height="16" rx="4" fill="#c9a078"/>');
+  }
+  function sealVis(id) {
+    const m = {
+      washi: visSvg('<rect x="4" y="12" width="24" height="8" rx="1" fill="#f0c9d2"/><path d="M4 12l3 8M11 12l3 8M18 12l3 8M25 12l3 8" stroke="#e28a96" stroke-width="1.5"/>'),
+      heart: visSvg('<path d="M16 26C8 19 5 15 5 11a5.5 5.5 0 0 1 11-1 5.5 5.5 0 0 1 11 1c0 4-3 8-11 15z" fill="#e28a96"/>'),
+      star: visSvg('<polygon points="16,3 19,12 29,12 21,18 24,28 16,22 8,28 11,18 3,12 13,12" fill="#e6be72"/>'),
+      dried: visSvg('<circle cx="16" cy="12" r="6" fill="#e28a96"/><rect x="15" y="16" width="2" height="12" fill="#7aa36a"/>'),
+      wax: visSvg('<circle cx="16" cy="16" r="10" fill="#bd6f7f"/><circle cx="16" cy="16" r="5" fill="#d78d9b"/>')
+    };
+    return m[id] || sealVis('washi');
+  }
+
   function goodVis(cat, id) {
     switch (cat) {
       case 'colors': return '<span style="width:34px;height:34px;border-radius:50%;display:block;background:' + hex(id) +
         ';border:2px solid #fff;box-shadow:0 2px 6px rgba(120,96,72,.3)"></span>';
       case 'shapes': return miniBead(id, 'blush', 34);
-      case 'charms': return CHARMS[id].e;
+      case 'charms': return charmVis(id);
       case 'cords': return '<span style="display:block;width:36px;height:8px;border-radius:5px;background:' + CORDS[id].h + '"></span>';
-      case 'hooks': return '<span class="hand" style="font-size:1.05rem">' + HOOKS[id].n + '</span>';
+      case 'hooks': return visSvg('<path d="M10 6c0 0-6 4-6 10a8 8 0 0 0 16 0V8" fill="none" stroke="' + (HOOKS[id].metal || '#c5cdd4') + '" stroke-width="3" stroke-linecap="round"/>');
       case 'rings': return '<span style="display:block;width:28px;height:18px;border:3px solid ' + RINGS[id].h + ';border-radius:50%"></span>';
       case 'clips': return '<span style="display:block;width:36px;height:10px;border-radius:5px;background:' + CLIPS[id].h + '"></span>';
       case 'patterns': return '<span style="display:block;width:38px;height:28px;border-radius:5px;background:#fffdf7;' + patternStyle(id, '#d78d9b') + '"></span>';
       case 'borders': return '<span style="display:block;width:34px;height:26px;border-radius:4px;border:4px double #a8907a"></span>';
-      case 'motifs': return MOTIFS[id].e;
-      case 'wraps': return { kraft: '📦', pouch: '👝', glassine: '🛍️', ribbonbox: '🎁' }[id] || '📦';
-      case 'seals': return SEALS[id].e ||
-        '<span style="display:block;width:36px;height:16px;border-radius:3px;background:repeating-linear-gradient(135deg,#f0c9d2 0 6px,#f8e6ea 6px 12px)"></span>';
-      case 'notes': return '<span class="hand" style="font-size:1.05rem;line-height:1.1">' + NOTES[id].text + '</span>';
-      case 'cosmetics': return COSMETICS[id].e;
+      case 'motifs': return charmVis(id === 'flower' ? 'daisy' : id === 'leaf' ? 'clover' : id === 'berry' ? 'cherry' : id === 'bee' ? 'sparkle' : id);
+      case 'wraps': return wrapVis(id);
+      case 'seals': return sealVis(id);
+      case 'notes': return visSvg('<rect x="6" y="6" width="20" height="20" rx="2" fill="#fffdf8" stroke="#c9a078" stroke-width="1.5"/><path d="M10 12h12M10 16h9M10 20h7" stroke="#bd6f7f" stroke-width="1.5"/>');
+      case 'cosmetics': return cosmeticVis(id);
     }
     return '';
   }
@@ -5825,7 +5895,7 @@
           const afford = S.coins >= cost;
           return '<button class="good' + (maxed ? ' owned' : '') + '" data-act="upgrade" data-id="' + u.id + '"' +
             (maxed || !afford ? ' disabled' : '') + '>' +
-            '<div class="vis">' + u.e + '</div><div class="gname">' + u.n + '</div>' +
+            '<div class="vis">' + upgradeVis(u.id) + '</div><div class="gname">' + u.n + '</div>' +
             '<div class="gdesc">' + u.d + (u.max > 1 ? ' (' + lvl + '/' + u.max + ')' : '') + '</div>' +
             '<div class="price">' + (maxed ? 'fully upgraded ✓' : '🪙 ' + cost) + '</div></button>';
         }).join('') + '</div></div>';
@@ -5840,7 +5910,7 @@
         '<div class="cat-happy' + happyClass(happy) + '" style="width:100%;height:10px;margin:8px 0 14px"><i style="width:' + happy + '%"></i></div>' +
         '<div class="goods">' +
         '<button class="good' + (treatMax ? ' owned' : '') + '" data-act="feedcat"' + ((treatMax || S.coins < 12 || !S.catId) ? ' disabled' : '') + '>' +
-        '<div class="vis">🐟</div><div class="gname">Fish treats</div>' +
+        '<div class="vis"><img class="shop-ico" src="assets/craft-shop/treat-fish.png" alt=""></div><div class="gname">Fish treats</div>' +
         '<div class="gdesc">A snack. +10 happy, sometimes a find. ' + treatN + '/3 today</div>' +
         '<div class="price">' + (treatMax ? 'full today ✓' : '🪙 12') + '</div></button>' +
         CAT_FURN.map(f => {
@@ -5848,7 +5918,7 @@
           const afford = S.coins >= f.cost;
           return '<button class="good' + (owned ? ' owned' : '') + '" data-act="buyfurn" data-id="' + f.id + '"' +
             (owned || !afford ? ' disabled' : '') + '>' +
-            '<div class="vis">' + f.e + '</div><div class="gname">' + f.n + '</div>' +
+            '<div class="vis"><img class="shop-ico" src="' + f.img + '" alt=""></div><div class="gname">' + f.n + '</div>' +
             '<div class="gdesc">' + f.d + ' +' + f.happy + ' happy</div>' +
             '<div class="price">' + (owned ? 'in the shop ✓' : '🪙 ' + f.cost) + '</div></button>';
         }).join('') + '</div></div>';
