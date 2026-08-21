@@ -1182,6 +1182,129 @@
   .chore.done { opacity: 0.55; text-decoration: line-through; }
   .chore .em { font-size: 1.2rem; }
   .chore .hint { margin-left: auto; }
+
+  #questModal {
+    z-index: 92; padding: 0; background: #efe8dc;
+    align-items: stretch; justify-content: center;
+  }
+  .quest-play {
+    width: min(430px, 100%); height: 100%; max-height: 100dvh; margin: 0 auto;
+    display: flex; flex-direction: column; background: #f3eee4;
+  }
+  .quest-stage {
+    position: relative; flex: 1; min-height: 260px; overflow: hidden;
+    touch-action: none; background: #efe8dc; cursor: grab;
+  }
+  .quest-stage:active { cursor: grabbing; }
+  .quest-stage .q-art {
+    position: absolute; left: 0; width: 100%; height: 128%; top: -4%;
+    object-fit: cover; object-position: center 6%;
+    pointer-events: none; user-select: none;
+  }
+  .quest-sheet { flex: 0 0 auto; background: #f4efe6; box-shadow: 0 -10px 28px rgba(80,50,30,0.14); }
+  .quest-head {
+    background: repeating-linear-gradient(-45deg, #2d4a34 0 11px, #355640 11px 22px);
+    color: #fff; text-align: center; padding: 13px 16px;
+    font-weight: 700; letter-spacing: 0.03em; font-size: 1.08rem;
+  }
+  .quest-body { padding: 16px 18px 20px; text-align: center; }
+  .quest-hint { font-size: 0.84rem; color: var(--ink-soft); margin-bottom: 10px; min-height: 1.25em; }
+  .quest-bar {
+    height: 8px; border-radius: 99px; background: rgba(150,124,98,0.18);
+    overflow: hidden; margin: 0 4px 14px;
+  }
+  .quest-bar i { display: block; height: 100%; width: 0%; background: linear-gradient(90deg, #8fbf78, #4f7a4a); transition: width 0.12s linear; }
+  .quest-finish {
+    width: 100%; padding: 15px 18px; border-radius: 16px;
+    background: #b45c48; color: #fff; font-weight: 700; font-size: 1.08rem;
+    box-shadow: 0 4px 0 #8c4034;
+  }
+  .quest-finish.locked { opacity: 0.38; pointer-events: none; box-shadow: none; }
+  .quest-later { margin-top: 10px; font-size: 0.8rem; color: var(--ink-soft); font-weight: 600; }
+  .q-tool {
+    position: absolute; z-index: 6; width: 78px; height: 64px;
+    transform: translate(-50%, -50%); pointer-events: none;
+    filter: drop-shadow(2px 4px 3px rgba(80,50,30,0.28));
+  }
+  .q-tool.pour { transform: translate(-50%, -50%) rotate(-36deg); }
+  .q-can .body {
+    position: absolute; left: 14px; top: 16px; width: 40px; height: 28px;
+    background: linear-gradient(180deg, #dfe6ea, #9aa7b0); border-radius: 8px 10px 12px 12px;
+  }
+  .q-can .spout {
+    position: absolute; left: 2px; top: 10px; width: 22px; height: 8px;
+    background: #b7c2c8; border-radius: 6px 2px 2px 6px; transform: rotate(-28deg);
+  }
+  .q-can .handle {
+    position: absolute; right: 10px; top: 8px; width: 18px; height: 22px;
+    border: 4px solid #c5ced3; border-left: none; border-radius: 0 12px 12px 0;
+  }
+  .q-broom .stick {
+    position: absolute; left: 34px; top: 0; width: 7px; height: 46px;
+    background: linear-gradient(#c08f5f, #8a5a32); border-radius: 4px; transform: rotate(18deg);
+  }
+  .q-broom .bristles {
+    position: absolute; left: 8px; bottom: 4px; width: 44px; height: 22px;
+    background: linear-gradient(#d9c7a2, #b89a6c); border-radius: 4px 4px 10px 10px;
+    transform: rotate(18deg);
+  }
+  .q-cloth {
+    width: 58px; height: 42px; border-radius: 10px 16px 12px 14px;
+    background: linear-gradient(140deg, #e8c4b0, #c56b58);
+  }
+  .q-peg {
+    width: 16px; height: 52px; border-radius: 6px;
+    background: linear-gradient(#d7b07a, #a3744a);
+  }
+  .q-drop {
+    position: absolute; z-index: 5; width: 7px; height: 11px; margin-left: -3px;
+    border-radius: 50% 50% 45% 45%; background: #7ec8e8; pointer-events: none;
+    animation: qdrop 0.65s linear forwards;
+  }
+  @keyframes qdrop { to { transform: translateY(78px); opacity: 0; } }
+  .q-dust, .q-jar, .q-bead, .q-smudge, .q-slot {
+    position: absolute; z-index: 4; transform: translate(-50%, -50%);
+  }
+  .q-dust {
+    width: 30px; height: 22px; border-radius: 50% 45% 50% 40%;
+    background: radial-gradient(circle at 40% 40%, #e4d6c2, #b9a890);
+    box-shadow: 1px 2px 0 rgba(80,50,30,0.15);
+  }
+  .q-dust::before, .q-dust::after {
+    content: ''; position: absolute; background: #5a4a3c; border-radius: 50%;
+    width: 3px; height: 3px; top: 7px;
+  }
+  .q-dust::before { left: 9px; }
+  .q-dust::after { right: 9px; }
+  .q-dust.gone, .q-smudge.gone { opacity: 0; transform: translate(-50%, -50%) scale(0.2); transition: 0.2s; pointer-events: none; }
+  .q-smudge {
+    width: 42px; height: 32px; border-radius: 50%;
+    background: rgba(170,160,145,0.42); filter: blur(1.5px);
+  }
+  .q-slot {
+    width: 46px; height: 46px; border: 2px dashed rgba(80,50,30,0.32);
+    border-radius: 12px; background: rgba(255,255,255,0.22); z-index: 2;
+  }
+  .q-slot.filled { border-style: solid; background: rgba(255,255,255,0.4); }
+  .q-jar {
+    width: 28px; height: 38px; border-radius: 4px 4px 8px 8px;
+    box-shadow: 1px 2px 3px rgba(80,50,30,0.25); z-index: 5;
+  }
+  .q-jar::after {
+    content: ''; position: absolute; left: 6px; top: 10px; width: 4px; height: 4px; border-radius: 50%;
+    background: #4d4239; box-shadow: 8px 0 #4d4239, 4px 7px 0 -1px transparent;
+  }
+  .q-bead {
+    width: 34px; height: 34px; border-radius: 8px; z-index: 5;
+    display: grid; place-items: center; font-weight: 800; color: #fff;
+    box-shadow: 1px 2px 3px rgba(80,50,30,0.25); font-size: 0.95rem;
+  }
+  .q-jar.placed, .q-bead.placed { filter: brightness(1.05); }
+  .q-shine {
+    position: absolute; left: 22%; right: 22%; top: 30%; bottom: 28%; z-index: 3;
+    background: radial-gradient(circle, rgba(255,255,255,0.62), transparent 70%);
+    pointer-events: none; opacity: 0; transition: opacity 0.15s;
+  }
   .journal-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(92px, 1fr)); gap: 8px; }
   .journal-pip {
     text-align: center; padding: 10px 6px; border-radius: 12px; font-size: 0.75rem;
@@ -1362,7 +1485,7 @@
             <li>Share a piece from your <b>shelf</b> — friends can open the link and see it.</li>
             <li>In the <b>town square</b>, visit other shops, send them an order, or ask to be partner stores.</li>
             <li>On day one, pick a <b>shop cat</b>. Pet them, buy furniture, and feed fish treats.</li>
-            <li>Do the day’s <b>shopkeeping</b> jobs, paint the shop in Settings, and fill your collection journal.</li>
+            <li>Each day two little <b>shop jobs</b> pop up — pour water, sweep, tidy jars, and more.</li>
             <li>No timers, ever. Leftover orders wait for tomorrow.</li>
           </ul>
         </div>
@@ -1459,6 +1582,7 @@
 <div class="overlay hidden" id="townModal"></div>
 <div class="overlay hidden" id="catModal"></div>
 <div class="overlay hidden" id="settingsModal"></div>
+<div class="overlay hidden" id="questModal"></div>
 <div class="toast-wrap" id="toastWrap"></div>
 <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js"></script>
@@ -1791,15 +1915,14 @@
   ];
   const AVATARS = ['🧵', '🌸', '🎨', '🌿', '🌙', '🍓', '☕', '📖', '🦋', '🌻'];
   const KIND_E = { bracelet: '🧵', earrings: '💫', keychain: '🔑', clip: '📎', stationery: '✉️' };
-  const CHORES = [
-    { id: 'water', n: 'Water the plants', e: '💧', coins: 6, hearts: 1 },
-    { id: 'sweep', n: 'Sweep the floorboards', e: '🧹', coins: 7, hearts: 1 },
-    { id: 'polish', n: 'Polish the till', e: '✨', coins: 8, hearts: 1 },
-    { id: 'window', n: 'Wipe the shop window', e: '🪟', coins: 7, hearts: 1 },
-    { id: 'yarn', n: 'Wind a yarn ball', e: '🧶', coins: 6, hearts: 1 },
-    { id: 'jars', n: 'Straighten the bead jars', e: '🫙', coins: 8, hearts: 1 },
-    { id: 'letters', n: 'Sort the letter beads', e: '🔤', coins: 7, hearts: 1 },
-    { id: 'cat', n: 'Brush the shop cat', e: '🐾', coins: 6, hearts: 1 }
+  const QUESTS = [
+    { id: 'water', n: 'Water the plants', title: 'Watering!', finish: 'Finish Watering', hint: 'Hold the can over the plant and pour.', e: '💧', coins: 8, hearts: 1, art: 'assets/craft-shop/quest-water.png' },
+    { id: 'sweep', n: 'Sweep the floorboards', title: 'Sweeping!', finish: 'Finish Sweeping', hint: 'Drag the broom over the dust bunnies.', e: '🧹', coins: 8, hearts: 1, art: 'assets/craft-shop/quest-sweep.jpg' },
+    { id: 'organize', n: 'Tidy the bead jars', title: 'Organizing!', finish: 'Finish Organizing', hint: 'Set every jar on a shelf spot.', e: '🫙', coins: 9, hearts: 1, art: 'assets/craft-shop/quest-organize.jpg' },
+    { id: 'window', n: 'Wipe the shop window', title: 'Wiping!', finish: 'Finish Wiping', hint: 'Rub the cloth over the foggy spots.', e: '🪟', coins: 8, hearts: 1, art: 'assets/craft-shop/quest-window.jpg' },
+    { id: 'polish', n: 'Polish the till', title: 'Polishing!', finish: 'Finish Polishing', hint: 'Rub the cloth on the till until it shines.', e: '✨', coins: 9, hearts: 1, art: 'assets/craft-shop/quest-polish.jpg' },
+    { id: 'yarn', n: 'Wind a yarn ball', title: 'Winding!', finish: 'Finish Winding', hint: 'Circle around the yarn to wind it up.', e: '🧶', coins: 8, hearts: 1, art: 'assets/craft-shop/quest-yarn.jpg' },
+    { id: 'letters', n: 'Sort the letter beads', title: 'Sorting!', finish: 'Finish Sorting', hint: 'Drop each bead into a tray slot.', e: '🔤', coins: 9, hearts: 1, art: 'assets/craft-shop/quest-letters.jpg' }
   ];
 
   const GOOD_DESC = {
@@ -4014,7 +4137,7 @@
     const furnHtml = CAT_FURN.filter(f => ownedFurn.indexOf(f.id) >= 0)
       .map(f => '<div class="furn-' + f.id + '" title="' + esc(f.n) + '"></div>').join('');
     const plant = cos.indexOf('plant') >= 0
-      ? '<div class="scene-plant" data-act="waterplant" title="tap to water"><i class="leaf" style="left:2px;bottom:22px;transform:rotate(-18deg)"></i><i class="leaf" style="left:16px;bottom:28px;transform:rotate(22deg) scaleX(-1)"></i><i class="leaf" style="left:8px;bottom:38px;transform:rotate(4deg)"></i><i class="pot"></i></div>'
+      ? '<div class="scene-plant" data-act="waterplant" title="pour water"><i class="leaf" style="left:2px;bottom:22px;transform:rotate(-18deg)"></i><i class="leaf" style="left:16px;bottom:28px;transform:rotate(22deg) scaleX(-1)"></i><i class="leaf" style="left:8px;bottom:38px;transform:rotate(4deg)"></i><i class="pot"></i></div>'
       : '';
     const bunting = cos.indexOf('bunting') >= 0 ? '<div class="scene-bunting"></div>' : '';
     const rug = cos.indexOf('rug') >= 0 ? '<div class="scene-rug"></div>' : '';
@@ -4043,7 +4166,7 @@
       (polaroids || '<div class="wall-art"></div>') +
       '<div class="win"><div class="win-sky"><i class="win-cloud"></i><i class="win-star"></i><i class="win-rain"></i></div>' +
       '<div class="curtain l"></div><div class="curtain r"></div><div class="win-sill"></div>' +
-      '<div class="sill-plant" data-act="waterplant" title="tap to water"></div></div>' +
+      '<div class="sill-plant" data-act="waterplant" title="pour water"></div></div>' +
       '<div class="pegboard"><span class="peg-tool" style="left:8px;top:10px">✂️</span>' +
       '<span class="peg-tool" style="left:34px;top:28px">🎀</span>' +
       '<span class="peg-tool" style="left:58px;top:12px">📏</span></div>' +
@@ -4070,7 +4193,7 @@
     if (el) el.style.color = paint.h;
   }
   function todaysChores() {
-    const list = CHORES.filter(c => c.id !== 'cat' || S.catId);
+    const list = QUESTS;
     const i = ((S.day || 1) * 5) % list.length;
     const a = list[i];
     const b = list[(i + 3) % list.length];
@@ -4084,17 +4207,23 @@
     if (!box || !S) return;
     const jobs = todaysChores();
     const n = jobs.filter(c => choreDone(c.id)).length;
-    box.innerHTML = '<div class="ctrl-title">today\'s shopkeeping · ' + n + '/' + jobs.length + '</div>' +
+    box.innerHTML = '<div class="ctrl-title">today\'s jobs · ' + n + '/' + jobs.length + '</div>' +
+      '<p class="hint" style="margin:4px 0 8px">little minigames — pour, sweep, tidy. two new ones each day.</p>' +
       '<div class="chore-list">' + jobs.map(c =>
         '<button type="button" class="chore' + (choreDone(c.id) ? ' done' : '') + '" data-act="chore" data-id="' + c.id + '"' +
         (choreDone(c.id) ? ' disabled' : '') + '>' +
         '<span class="em">' + c.e + '</span><span>' + c.n + '</span>' +
-        '<span class="hint">' + (choreDone(c.id) ? 'done' : '🪙 ' + c.coins) + '</span></button>'
+        '<span class="hint">' + (choreDone(c.id) ? 'done' : 'play') + '</span></button>'
       ).join('') + '</div>';
   }
   function doChore(id) {
+    if (!S) return;
+    if (choreDone(id)) { toast('already done today'); return; }
+    Quest.open(id);
+  }
+  function completeChore(id) {
     if (!S || choreDone(id)) return;
-    const c = CHORES.find(x => x.id === id);
+    const c = QUESTS.find(x => x.id === id);
     if (!c) return;
     if (!S.today) S.today = { log: [], coins: 0 };
     if (!S.today.chores) S.today.chores = {};
@@ -4102,14 +4231,13 @@
     const g = gainCoins(c.coins);
     S.today.coins = (S.today.coins || 0) + g.got;
     S.hearts += c.hearts;
-    if (id === 'cat' && S.catId) { S.catHappy = Math.min(100, (S.catHappy || 36) + 5); Cat.pet(); }
     if (id === 'water') S.today.watered = true;
     const jobs = todaysChores();
     if (jobs.every(j => choreDone(j.id)) && !S.today.choreBonus) {
       S.today.choreBonus = true;
       const extra = gainCoins(8);
       S.today.coins += extra.got;
-      toast('shopkeeping done · bonus 🪙 ' + extra.got);
+      toast('both jobs done · bonus 🪙 ' + extra.got);
     } else toast(c.n + ' · +' + g.got);
     save();
     Sound.coin();
@@ -4117,18 +4245,270 @@
   }
   function waterPlant() {
     if (!S) return;
-    if (!S.today) S.today = { log: [], coins: 0 };
-    if (S.today.watered) { toast('already watered today'); return; }
-    S.today.watered = true;
-    S.hearts += 1;
-    if (todaysChores().some(c => c.id === 'water') && !choreDone('water')) {
-      doChore('water');
+    if (S.today && S.today.watered && choreDone('water')) { toast('already watered today'); return; }
+    Quest.open('water');
+  }
+  function finishQuest() {
+    if (!Quest.ready) {
+      toast(Quest.meta ? Quest.meta.hint : 'keep going');
       return;
     }
-    toast('the plants perk up');
-    save();
-    renderHome();
+    const id = Quest.id;
+    Quest.close();
+    if (todaysChores().some(c => c.id === id) && !choreDone(id)) {
+      completeChore(id);
+      return;
+    }
+    if (id === 'water') {
+      if (!S.today) S.today = { log: [], coins: 0 };
+      if (!S.today.watered) {
+        S.today.watered = true;
+        S.hearts += 1;
+        save();
+        renderHome();
+      }
+      toast('the plants perk up');
+    }
   }
+
+  const Quest = {
+    id: null,
+    meta: null,
+    ready: false,
+    prog: 0,
+    bits: [],
+    tool: { x: 74, y: 24 },
+    hold: false,
+    dragBit: null,
+    last: 0,
+    lastAng: null,
+    raf: 0,
+
+    open(id) {
+      const meta = QUESTS.find(q => q.id === id);
+      if (!meta || !S) return;
+      this.id = id;
+      this.meta = meta;
+      this.ready = false;
+      this.prog = 0;
+      this.hold = false;
+      this.dragBit = null;
+      this.lastAng = null;
+      this.tool = { x: 76, y: 22 };
+      this.bits = this.spawn(id);
+      const modal = $('#questModal');
+      modal.classList.remove('hidden');
+      const toolClass = id === 'water' ? 'q-can' : id === 'sweep' ? 'q-broom' : id === 'yarn' ? 'q-peg' : (id === 'window' || id === 'polish') ? 'q-cloth' : '';
+      const toolHtml = !toolClass ? ''
+        : id === 'water' ? '<div class="q-tool q-can" id="qTool"><i class="spout"></i><i class="body"></i><i class="handle"></i></div>'
+        : id === 'sweep' ? '<div class="q-tool q-broom" id="qTool"><i class="stick"></i><i class="bristles"></i></div>'
+        : id === 'yarn' ? '<div class="q-tool q-peg" id="qTool"></div>'
+        : '<div class="q-tool q-cloth" id="qTool"></div>';
+      const bitsHtml = this.bits.map(b => {
+        if (b.kind === 'slot') return '<div class="q-slot" id="qbit-' + b.id + '" style="left:' + b.x + '%;top:' + b.y + '%"></div>';
+        if (b.kind === 'dust') return '<div class="q-dust" id="qbit-' + b.id + '" style="left:' + b.x + '%;top:' + b.y + '%"></div>';
+        if (b.kind === 'smudge') return '<div class="q-smudge" id="qbit-' + b.id + '" style="left:' + b.x + '%;top:' + b.y + '%"></div>';
+        if (b.kind === 'jar') return '<div class="q-jar" id="qbit-' + b.id + '" style="left:' + b.x + '%;top:' + b.y + '%;background:' + b.color + '"></div>';
+        if (b.kind === 'bead') return '<div class="q-bead" id="qbit-' + b.id + '" style="left:' + b.x + '%;top:' + b.y + '%;background:' + b.color + '">' + b.ch + '</div>';
+        return '';
+      }).join('');
+      modal.innerHTML = '<div class="quest-play">' +
+        '<div class="quest-stage" id="questStage">' +
+        '<img class="q-art" src="' + meta.art + '" alt="">' +
+        (id === 'polish' ? '<div class="q-shine" id="qShine"></div>' : '') +
+        bitsHtml + toolHtml +
+        '</div>' +
+        '<div class="quest-sheet"><div class="quest-head">' + esc(meta.title) + '</div>' +
+        '<div class="quest-body"><div class="quest-hint" id="questHint">' + esc(meta.hint) + '</div>' +
+        '<div class="quest-bar"><i id="questBarFill"></i></div>' +
+        '<button type="button" class="quest-finish locked" id="questFinish" data-act="questfinish">' + esc(meta.finish) + '</button>' +
+        '<button type="button" class="quest-later" data-act="questclose">later</button></div></div></div>';
+      this.placeTool();
+      this.sync();
+      Sound.tap();
+    },
+    spawn(id) {
+      if (id === 'sweep') return [16, 32, 50, 68, 84].map((x, i) => ({ id: 'd' + i, x: x, y: 58 + (i % 2) * 12, kind: 'dust', gone: false }));
+      if (id === 'window') return [0,1,2,3,4,5,6,7].map(i => ({ id: 's' + i, x: 20 + (i % 4) * 20, y: 26 + Math.floor(i / 4) * 20, kind: 'smudge', gone: false }));
+      if (id === 'organize') {
+        const cols = ['#d78d9b', '#9fb28f', '#e6be72', '#7aa3c4', '#c56b58'];
+        const slots = cols.map((_, i) => ({ id: 'slot' + i, x: 18 + i * 16, y: 30, kind: 'slot', filled: false }));
+        const jars = cols.map((color, i) => ({ id: 'j' + i, x: 18 + i * 16, y: 72, kind: 'jar', color: color, homeX: 18 + i * 16, homeY: 30, placed: false }));
+        return slots.concat(jars);
+      }
+      if (id === 'letters') {
+        const letters = [
+          { ch: 'C', color: '#d78d9b' }, { ch: 'O', color: '#9fb28f' }, { ch: 'Z', color: '#e6be72' },
+          { ch: 'Y', color: '#7aa3c4' }, { ch: 'A', color: '#c56b58' }, { ch: 'E', color: '#b8893a' }
+        ];
+        const slots = letters.map((_, i) => ({ id: 'slot' + i, x: 16 + i * 13.5, y: 32, kind: 'slot', filled: false }));
+        const beads = letters.map((L, i) => ({ id: 'b' + i, x: 16 + ((i * 3) % 6) * 13.5, y: 68 + (i % 2) * 10, kind: 'bead', ch: L.ch, color: L.color, homeX: 16 + i * 13.5, homeY: 32, placed: false }));
+        return slots.concat(beads);
+      }
+      return [];
+    },
+    close() {
+      this.id = null;
+      this.hold = false;
+      this.dragBit = null;
+      this.ready = false;
+      if (this.raf) { cancelAnimationFrame(this.raf); this.raf = 0; }
+      const modal = $('#questModal');
+      if (modal) { modal.classList.add('hidden'); modal.innerHTML = ''; }
+    },
+    pct(e) {
+      const el = $('#questStage');
+      if (!el) return [50, 50];
+      const r = el.getBoundingClientRect();
+      return [
+        Math.max(3, Math.min(97, ((e.clientX - r.left) / r.width) * 100)),
+        Math.max(3, Math.min(97, ((e.clientY - r.top) / r.height) * 100))
+      ];
+    },
+    overPlant() { return Math.hypot(this.tool.x - 48, this.tool.y - 50) < 24; },
+    hitBit(p) {
+      const live = this.bits.filter(b => (b.kind === 'jar' || b.kind === 'bead') && !b.placed);
+      for (let i = live.length - 1; i >= 0; i--) {
+        if (Math.hypot(p[0] - live[i].x, p[1] - live[i].y) < 11) return live[i];
+      }
+      return null;
+    },
+    down(e) {
+      if (e.target.closest('[data-act]')) return false;
+      if (!e.target.closest('#questStage')) return false;
+      e.preventDefault();
+      const p = this.pct(e);
+      this.hold = true;
+      this.last = performance.now();
+      if (this.id === 'organize' || this.id === 'letters') {
+        this.dragBit = this.hitBit(p);
+        if (this.dragBit) { this.dragBit.x = p[0]; this.dragBit.y = p[1]; }
+      } else {
+        this.tool.x = p[0];
+        this.tool.y = p[1];
+        this.applyTool(p, p[0], p[1]);
+      }
+      this.placeTool();
+      this.sync();
+      if (this.id === 'water') {
+        const loop = t => { this.tick(t); if (this.hold && this.id === 'water') this.raf = requestAnimationFrame(loop); };
+        this.raf = requestAnimationFrame(loop);
+      }
+      return true;
+    },
+    move(e) {
+      if (!this.id || !this.hold) return;
+      const p = this.pct(e);
+      if (this.dragBit) {
+        this.dragBit.x = p[0];
+        this.dragBit.y = p[1];
+      } else {
+        const ox = this.tool.x, oy = this.tool.y;
+        this.tool.x = p[0];
+        this.tool.y = p[1];
+        this.applyTool(p, ox, oy);
+      }
+      this.placeTool();
+      this.sync();
+    },
+    up() {
+      if (!this.id) return;
+      this.hold = false;
+      if (this.dragBit) {
+        this.dropBit(this.dragBit);
+        this.dragBit = null;
+      }
+      this.placeTool();
+      this.sync();
+    },
+    applyTool(p, ox, oy) {
+      const id = this.id;
+      if (id === 'sweep' || id === 'window') {
+        const kind = id === 'sweep' ? 'dust' : 'smudge';
+        let hit = false;
+        this.bits.forEach(b => {
+          if (b.kind !== kind || b.gone) return;
+          if (Math.hypot(p[0] - b.x, p[1] - b.y) < 12) { b.gone = true; hit = true; }
+        });
+        if (hit) Sound.tap();
+        const all = this.bits.filter(b => b.kind === kind);
+        this.prog = Math.round(100 * all.filter(b => b.gone).length / all.length);
+      } else if (id === 'polish') {
+        const dist = Math.hypot(p[0] - ox, p[1] - oy);
+        if (Math.hypot(p[0] - 50, p[1] - 48) < 26) this.prog = Math.min(100, this.prog + dist * 1.6);
+      } else if (id === 'yarn') {
+        const ang = Math.atan2(p[1] - 50, p[0] - 50);
+        if (this.lastAng != null) {
+          let d = Math.abs(ang - this.lastAng);
+          if (d > Math.PI) d = Math.abs(d - Math.PI * 2);
+          this.prog = Math.min(100, this.prog + d * 16);
+        }
+        this.lastAng = ang;
+      }
+      this.ready = this.prog >= 99;
+    },
+    tick(now) {
+      if (this.id !== 'water' || !this.hold) return;
+      const dt = Math.min(48, now - (this.last || now));
+      this.last = now;
+      if (this.overPlant()) {
+        this.prog = Math.min(100, this.prog + dt * 0.06);
+        if (Math.random() < 0.45) this.drip();
+        this.ready = this.prog >= 99;
+        this.placeTool();
+        this.sync();
+      } else this.placeTool();
+    },
+    drip() {
+      const stage = $('#questStage');
+      if (!stage) return;
+      const d = document.createElement('i');
+      d.className = 'q-drop';
+      d.style.left = (this.tool.x - 6) + '%';
+      d.style.top = (this.tool.y + 2) + '%';
+      stage.appendChild(d);
+      setTimeout(() => { if (d.parentNode) d.remove(); }, 700);
+    },
+    dropBit(b) {
+      if (Math.hypot(b.x - b.homeX, b.y - b.homeY) < 13) {
+        b.x = b.homeX; b.y = b.homeY; b.placed = true;
+        const slot = this.bits.find(s => s.kind === 'slot' && Math.abs(s.x - b.homeX) < 1);
+        if (slot) slot.filled = true;
+        Sound.tap();
+      }
+      const need = this.bits.filter(x => x.kind === 'jar' || x.kind === 'bead');
+      this.prog = Math.round(100 * need.filter(x => x.placed).length / need.length);
+      this.ready = this.prog >= 99;
+    },
+    placeTool() {
+      const el = $('#qTool');
+      if (!el) return;
+      el.style.left = this.tool.x + '%';
+      el.style.top = this.tool.y + '%';
+      el.classList.toggle('pour', this.id === 'water' && this.hold && this.overPlant());
+    },
+    sync() {
+      this.bits.forEach(b => {
+        const el = $('#qbit-' + b.id);
+        if (!el) return;
+        if (b.kind !== 'slot') {
+          el.style.left = b.x + '%';
+          el.style.top = b.y + '%';
+        }
+        el.classList.toggle('gone', !!b.gone);
+        el.classList.toggle('placed', !!b.placed);
+        el.classList.toggle('filled', !!b.filled);
+      });
+      const bar = $('#questBarFill');
+      if (bar) bar.style.width = Math.min(100, this.prog) + '%';
+      const btn = $('#questFinish');
+      if (btn) btn.classList.toggle('locked', !this.ready);
+      const hint = $('#questHint');
+      if (hint && this.meta) hint.textContent = this.ready ? 'looking lovely — tap finish' : this.meta.hint;
+      const shine = $('#qShine');
+      if (shine) shine.style.opacity = String(this.prog / 100);
+    }
+  };
   function openSettings() {
     const modal = $('#settingsModal');
     if (!modal) return;
@@ -5009,6 +5389,7 @@
 
   function onDown(e) {
     if (e.button != null && e.button !== 0) return;
+    if (Quest.id) { Quest.down(e); return; }
     if (!draft || !$('#screen-bench').classList.contains('active') || benchStep !== 'make') return;
 
     const jar = e.target.closest('[data-jar]');
@@ -5053,6 +5434,7 @@
   }
 
   function onMove(e) {
+    if (Quest.id) { Quest.move(e); return; }
     if (!drag) return;
     const far = Math.hypot(e.clientX - drag.x0, e.clientY - drag.y0) > MOVE_T;
 
@@ -5126,6 +5508,7 @@
   }
 
   function onUp(e) {
+    if (Quest.id) Quest.up();
     if (!drag) return;
     const d = drag;
     drag = null;
@@ -5639,6 +6022,8 @@
       case 'journal': renderJournal(); show('journal'); break;
       case 'chore': doChore(id); break;
       case 'waterplant': waterPlant(); break;
+      case 'questfinish': finishQuest(); break;
+      case 'questclose': Quest.close(); break;
       case 'saveshop': saveShopMeta(); break;
       case 'setlook':
         if (!S) break;
